@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +10,10 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // Service represents a service that interacts with a database.
@@ -25,7 +28,7 @@ type Service interface {
 }
 
 type service struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
 var (
@@ -38,13 +41,69 @@ var (
 	dbInstance *service
 )
 
+func TestDB() *gorm.DB {
+	ctx := context.Background()
+
+	// Set safe defaults for test DB if env vars are empty
+	testDB := database
+	if testDB == "" {
+		testDB = "test_db"
+	}
+	testUser := username
+	if testUser == "" {
+		testUser = "test_user"
+	}
+	testPass := password
+	if testPass == "" {
+		testPass = "test_password"
+	}
+
+	req := testcontainers.ContainerRequest{
+		Image:        "postgres:15.3-alpine",
+		ExposedPorts: []string{"5432/tcp"},
+		Env: map[string]string{
+			"POSTGRES_DB":       testDB,
+			"POSTGRES_USER":     testUser,
+			"POSTGRES_PASSWORD": testPass,
+		},
+		WaitingFor: wait.ForListeningPort("5432/tcp").WithStartupTimeout(30 * time.Second),
+	}
+	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		log.Fatalf("failed to create container: %v", err)
+	}
+	host, err := container.Host(ctx)
+	if err != nil {
+		log.Fatalf("failed to get container host: %v", err)
+	}
+	port, err := container.MappedPort(ctx, "5432")
+	if err != nil {
+		log.Fatalf("failed to get mapped port: %v", err)
+	}
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), testUser, testPass, testDB)
+	var db *gorm.DB
+	for i := 0; i < 5; i++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+		if err == nil {
+			break
+		}
+		time.Sleep(1 * time.Second) // Retry after a short delay
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+}
 func New() Service {
 	// Reuse Connection
 	if dbInstance != nil {
 		return dbInstance
 	}
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable&search_path=%s", username, password, host, port, database, schema)
-	db, err := sql.Open("pgx", connStr)
+	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,7 +122,14 @@ func (s *service) Health() map[string]string {
 	stats := make(map[string]string)
 
 	// Ping the database
-	err := s.db.PingContext(ctx)
+	db, err := s.db.DB()
+	if err != nil {
+		stats["status"] = "down"
+		stats["error"] = fmt.Sprintf("db down: %v", err)
+		log.Fatalf("db down: %v", err) // Log the error and terminate the program
+		return stats
+	}
+	err = db.PingContext(ctx)
 	if err != nil {
 		stats["status"] = "down"
 		stats["error"] = fmt.Sprintf("db down: %v", err)
@@ -76,7 +142,7 @@ func (s *service) Health() map[string]string {
 	stats["message"] = "It's healthy"
 
 	// Get database stats (like open connections, in use, idle, etc.)
-	dbStats := s.db.Stats()
+	dbStats := db.Stats()
 	stats["open_connections"] = strconv.Itoa(dbStats.OpenConnections)
 	stats["in_use"] = strconv.Itoa(dbStats.InUse)
 	stats["idle"] = strconv.Itoa(dbStats.Idle)
@@ -111,5 +177,7 @@ func (s *service) Health() map[string]string {
 // If an error occurs while closing the connection, it returns the error.
 func (s *service) Close() error {
 	log.Printf("Disconnected from database: %s", database)
-	return s.db.Close()
+	return s.db.Connection(func(tx *gorm.DB) error {
+		return tx.Error
+	})
 }
