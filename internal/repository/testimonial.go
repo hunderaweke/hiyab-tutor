@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"fmt"
 	"hiyab-tutor/internal/domain"
 
 	"gorm.io/gorm"
@@ -18,22 +17,87 @@ func (r *testimonialRepository) Create(testimonial *domain.Testimonial) (*domain
 
 	tx := r.db.Model(&domain.Testimonial{}).Create(testimonial)
 	if tx.Error != nil {
-		return nil, fmt.Errorf("failed to create testimonial: %w", tx.Error)
+		return nil, domain.ErrCreateFailed
 	}
 	return testimonial, nil
 }
-func (r *testimonialRepository) GetAll() ([]domain.Testimonial, error) {
-	return nil, nil
+func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain.MultipleTestimonialResponse, error) {
+	var testimonials []domain.Testimonial
+	var total int64
+	query := r.db.Model(&domain.Testimonial{})
+	query.Count(&total)
+
+	query = query.Joins("JOIN testimonial_translations ON testimonial_translations.testimonial_id = testimonials.id")
+	if filter == nil {
+		filter = &domain.TestimonialFilter{
+			Page:   1,
+			Limit:  10,
+			Offset: 0,
+		}
+	} else {
+		if filter.Limit == 0 {
+			filter.Limit = 10
+		}
+		filter.Offset = (filter.Page - 1) * filter.Limit
+		if filter.Query != "" {
+			q := "%" + filter.Query + "%"
+			query = query.Where("testimonials.name LIKE ? OR testimonials.role LIKE ? OR testimonial_translations.text LIKE ?", q, q, q)
+		}
+	}
+
+	if filter.LanguageCodes != nil {
+		query = query.Preload("Translations", "language_code IN ?", filter.LanguageCodes)
+	} else {
+		query = query.Preload("Translations")
+	}
+	query = query.Limit(filter.Limit).Offset(filter.Offset).Order("created_at DESC")
+	if err := query.Group("testimonials.id").Find(&testimonials).Error; err != nil {
+		return domain.MultipleTestimonialResponse{}, domain.ErrSearchFailed
+	}
+
+	return domain.MultipleTestimonialResponse{
+		Testimonials: testimonials,
+		Pagination: domain.Pagination{
+			Page:   filter.Page,
+			Limit:  filter.Limit,
+			Offset: filter.Offset,
+			Total:  int(total),
+		},
+	}, nil
 }
 func (r *testimonialRepository) GetByID(id uint) (*domain.Testimonial, error) {
-	return nil, nil
+	var t domain.Testimonial
+	tx := r.db.Model(&domain.Testimonial{}).Preload("Translations").First(&t, id)
+	if tx.Error != nil {
+		return nil, domain.ErrNotFound
+	}
+	return &t, nil
 }
 func (r *testimonialRepository) Delete(id uint) error {
+	var testimonial domain.Testimonial
+	tx := r.db.Model(&domain.Testimonial{}).First(&testimonial, id)
+	if tx.Error != nil {
+		return domain.ErrNotFound
+	}
+	tx = r.db.Model(&domain.Testimonial{}).Delete(&testimonial)
+	if tx.Error != nil {
+		return domain.ErrDeleteFailed
+	}
+	if tx.RowsAffected == 0 {
+		return domain.ErrNotFound
+	}
 	return nil
 }
 func (r *testimonialRepository) Update(testimonial *domain.Testimonial) (*domain.Testimonial, error) {
+	tx := r.db.Model(&domain.Testimonial{}).Where("id = ?", testimonial.ID).Updates(testimonial)
+	if tx.Error != nil {
+		return nil, domain.ErrUpdateFailed
+	}
+	if tx.RowsAffected == 0 {
+		return nil, domain.ErrNotFound
+	}
+	if tx.RowsAffected != 1 {
+		return nil, domain.ErrUpdateFailed
+	}
 	return testimonial, nil
-}
-func (r *testimonialRepository) Search(query string) ([]domain.Testimonial, error) {
-	return nil, nil
 }

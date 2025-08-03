@@ -4,20 +4,36 @@ import "gorm.io/gorm"
 
 type Testimonial struct {
 	gorm.Model
-	Name      string `json:"name"`
-	Role      string `json:"role"`
-	VideoURL  string `json:"video_url"`
-	Text      string `json:"content"`
-	Thumbnail string `json:"thumbnail"`
+	Name         string                    `json:"name"`
+	Role         string                    `json:"role"`
+	VideoURL     string                    `json:"video_url"`
+	Thumbnail    string                    `json:"thumbnail"`
+	Translations []TestimonialTranslations `json:"languages" gorm:"foreignKey:TestimonialID"`
 }
 
+type TestimonialTranslations struct {
+	gorm.Model
+	LanguageCode  string `json:"language_code"`
+	TestimonialID uint   `json:"testimonial_id"`
+	Text          string `json:"name"`
+}
+type TestimonialFilter struct {
+	LanguageCodes []string `json:"language_codes"`
+	Page          int      `json:"page"`
+	Limit         int      `json:"limit"`
+	Offset        int      `json:"offset"`
+	Query         string   `json:"query"`
+}
+type MultipleTestimonialResponse struct {
+	Testimonials []Testimonial `json:"data"`
+	Pagination   Pagination    `json:"meta"`
+}
 type TestimonialRepository interface {
 	Create(testimonial *Testimonial) (*Testimonial, error)
-	GetAll() ([]Testimonial, error)
+	GetAll(filter *TestimonialFilter) (MultipleTestimonialResponse, error)
 	GetByID(id uint) (*Testimonial, error)
 	Delete(id uint) error
 	Update(testimonial *Testimonial) (*Testimonial, error)
-	Search(query string) ([]Testimonial, error)
 }
 
 type TestimonialService interface {
