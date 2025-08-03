@@ -23,6 +23,8 @@ type TestimonialFilter struct {
 	Limit         int      `json:"limit"`
 	Offset        int      `json:"offset"`
 	Query         string   `json:"query"`
+	SortBy        string   `json:"sort_by"`
+	SortOrder     string   `json:"sort_order"` // "asc" or "desc"
 }
 type MultipleTestimonialResponse struct {
 	Testimonials []Testimonial `json:"data"`

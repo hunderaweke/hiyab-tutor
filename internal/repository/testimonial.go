@@ -25,7 +25,6 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 	var testimonials []domain.Testimonial
 	var total int64
 	query := r.db.Model(&domain.Testimonial{})
-	query.Count(&total)
 
 	query = query.Joins("JOIN testimonial_translations ON testimonial_translations.testimonial_id = testimonials.id")
 	if filter == nil {
@@ -43,14 +42,24 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 			q := "%" + filter.Query + "%"
 			query = query.Where("testimonials.name LIKE ? OR testimonials.role LIKE ? OR testimonial_translations.text LIKE ?", q, q, q)
 		}
+		if filter.SortBy != "" {
+			switch filter.SortOrder {
+			case "desc":
+				query = query.Order(filter.SortBy + " DESC")
+			case "asc":
+				query = query.Order(filter.SortBy + " ASC")
+			}
+		} else {
+			query = query.Order("created_at DESC") // Default sorting by created_at in descending order
+		}
+		if filter.LanguageCodes != nil {
+			query = query.Preload("Translations", "language_code IN ?", filter.LanguageCodes)
+		} else {
+			query = query.Preload("Translations")
+		}
 	}
-
-	if filter.LanguageCodes != nil {
-		query = query.Preload("Translations", "language_code IN ?", filter.LanguageCodes)
-	} else {
-		query = query.Preload("Translations")
-	}
-	query = query.Limit(filter.Limit).Offset(filter.Offset).Order("created_at DESC")
+	query = query.Limit(filter.Limit).Offset(filter.Offset)
+	query.Count(&total)
 	if err := query.Group("testimonials.id").Find(&testimonials).Error; err != nil {
 		return domain.MultipleTestimonialResponse{}, domain.ErrSearchFailed
 	}

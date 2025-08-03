@@ -25,9 +25,8 @@ func (suite *TestimonialTestSuite) SetupTest() {
 		suite.T().Fatal("Failed to initialize database connection")
 	}
 	suite.db = db
-	suite.db.Logger.LogMode(1) // Enable query logging
+	suite.db.Debug()
 	suite.db.AutoMigrate(&domain.Testimonial{}, &domain.TestimonialTranslations{})
-	// Clear database tables
 	suite.db.Exec("DELETE FROM testimonials")
 	suite.db.Exec("DELETE FROM testimonial_translations")
 	suite.testimonialRepo = NewTestimonialRepository(suite.db)
@@ -75,7 +74,7 @@ func (suite *TestimonialTestSuite) TestCreateTestimonial() {
 func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 	testimonials := []*domain.Testimonial{
 		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
-			{LanguageCode: "en", Text: "This is a testimonial."},
+			{LanguageCode: "en", Text: "This is a random."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"}}, Thumbnail: "http://example.com/thumbnail.jpg"},
 		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
 			{LanguageCode: "en", Text: "This is a testimonial."},
@@ -92,7 +91,14 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 		suite.Assert().NoError(err)
 	}
 	suite.Run("Get All without filter", func() {
-		found, err := suite.testimonialRepo.GetAll(nil)
+		filter := &domain.TestimonialFilter{
+			Page:      1,
+			Limit:     10,
+			Offset:    0,
+			SortBy:    "created_at",
+			SortOrder: "asc",
+		}
+		found, err := suite.testimonialRepo.GetAll(filter)
 		if err != nil {
 			suite.T().Fatalf("Failed to get testimonials: %v", err)
 		}
@@ -104,11 +110,17 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 			suite.Assert().Equal(t.VideoURL, testimonials[i].VideoURL, "Expected testimonial video URLs to match")
 			suite.Assert().Equal(t.Thumbnail, testimonials[i].Thumbnail, "Expected testimonial thumbnails to match")
 			suite.Assert().Len(t.Translations, len(testimonials[i].Translations), "Expected number of translations to match")
+			for j, translation := range t.Translations {
+				suite.Assert().Equal(translation.LanguageCode, testimonials[i].Translations[j].LanguageCode, "Expected language codes to match")
+				suite.Assert().Equal(translation.Text, testimonials[i].Translations[j].Text, "Expected translation texts to match")
+			}
 		}
 	})
 	suite.Run("Get All with filter", func() {
 		filter := &domain.TestimonialFilter{
 			LanguageCodes: []string{"en"},
+			SortBy:        "created_at",
+			SortOrder:     "asc",
 		}
 		found, err := suite.testimonialRepo.GetAll(filter)
 		if err != nil {
@@ -128,6 +140,25 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 			suite.Assert().Equal(t.Role, testimonials[i].Role, "Expected testimonial roles to match")
 			suite.Assert().Equal(t.VideoURL, testimonials[i].VideoURL, "Expected testimonial video URLs to match")
 			suite.Assert().Equal(t.Thumbnail, testimonials[i].Thumbnail, "Expected testimonial thumbnails to match")
+		}
+	})
+	suite.Run("Get with query", func() {
+		filter := &domain.TestimonialFilter{
+			Query: "random",
+		}
+		found, err := suite.testimonialRepo.GetAll(filter)
+		if err != nil {
+			suite.T().Fatalf("Failed to get testimonials: %v", err)
+		}
+		suite.Assert().NotNil(found, "Expected found to be non-nil")
+		suite.Assert().NotEmpty(found.Testimonials, "Expected non-empty testimonials list")
+		suite.Assert().Len(found.Testimonials, 1, "Expected one testimonial matching the query")
+		for _, t := range found.Testimonials {
+			suite.Assert().Contains(t.Name, testimonials[0].Name, "Expected testimonial name to contain query")
+			suite.Assert().Contains(t.Role, testimonials[0].Role, "Expected testimonial role to contain query")
+			suite.Assert().Equal(t.VideoURL, testimonials[0].VideoURL, "Expected testimonial video URL to match")
+			suite.Assert().Equal(t.Thumbnail, testimonials[0].Thumbnail, "Expected testimonial thumbnail to match")
+			suite.Assert().Len(t.Translations, len(testimonials[0].Translations), "Expected number of translations to match")
 		}
 	})
 
