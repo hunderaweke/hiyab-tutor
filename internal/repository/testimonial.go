@@ -21,8 +21,8 @@ func (r *testimonialRepository) Create(testimonial *domain.Testimonial) (*domain
 	}
 	return testimonial, nil
 }
-func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain.MultipleTestimonialResponse, error) {
-	var testimonials []domain.Testimonial
+func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (*domain.MultipleTestimonialResponse, error) {
+	var testimonials []*domain.Testimonial
 	var total int64
 	query := r.db.Model(&domain.Testimonial{})
 
@@ -61,10 +61,10 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 	query = query.Group("testimonials.id").Limit(filter.Limit).Offset(filter.Offset)
 	query.Count(&total)
 	if err := query.Find(&testimonials).Error; err != nil {
-		return domain.MultipleTestimonialResponse{}, domain.ErrSearchFailed
+		return nil, domain.ErrSearchFailed
 	}
 
-	return domain.MultipleTestimonialResponse{
+	return &domain.MultipleTestimonialResponse{
 		Testimonials: testimonials,
 		Pagination: domain.Pagination{
 			Page:   filter.Page,

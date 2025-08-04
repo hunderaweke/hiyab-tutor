@@ -27,22 +27,21 @@ type TestimonialFilter struct {
 	SortOrder     string   `json:"sort_order"` // "asc" or "desc"
 }
 type MultipleTestimonialResponse struct {
-	Testimonials []Testimonial `json:"data"`
-	Pagination   Pagination    `json:"meta"`
+	Testimonials []*Testimonial `json:"data"`
+	Pagination   Pagination     `json:"meta"`
 }
 type TestimonialRepository interface {
 	Create(testimonial *Testimonial) (*Testimonial, error)
-	GetAll(filter *TestimonialFilter) (MultipleTestimonialResponse, error)
+	GetAll(filter *TestimonialFilter) (*MultipleTestimonialResponse, error)
 	GetByID(id uint, languageCodes []string) (*Testimonial, error)
 	Delete(id uint) error
 	Update(testimonial *Testimonial) (*Testimonial, error)
 }
 
-type TestimonialService interface {
+type TestimonialUsecase interface {
 	CreateTestimonial(testimonial *Testimonial) (*Testimonial, error)
-	GetAllTestimonials() ([]Testimonial, error)
+	GetAllTestimonials(filter *TestimonialFilter) (*MultipleTestimonialResponse, error)
 	GetTestimonialByID(id uint) (*Testimonial, error)
 	DeleteTestimonial(id uint) error
 	UpdateTestimonial(testimonial *Testimonial) (*Testimonial, error)
-	SearchTestimonials(query string) ([]Testimonial, error)
 }

@@ -30,7 +30,6 @@ func (suite *PartnerTestSuite) SetupSuite() {
 }
 func (suite *PartnerTestSuite) SetupTest() {
 	suite.db.Exec("DELETE FROM partners")
-	suite.db.Exec("DELETE FROM partner_translations")
 	suite.partnerRepo = NewPartnerRepository(suite.db)
 }
 func (suite *PartnerTestSuite) TearDownSuite() {

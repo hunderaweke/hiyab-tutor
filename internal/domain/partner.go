@@ -28,3 +28,10 @@ type PartnerRepository interface {
 	Update(partner *Partner) (*Partner, error)
 	Delete(id uint) error
 }
+type PartnerUsecase interface {
+	CreatePartner(partner *Partner) (*Partner, error)
+	GetAllPartners(filter *PartnerFilter) (*MultiplePartners, error)
+	GetPartnerByID(id uint) (*Partner, error)
+	DeletePartner(id uint) error
+	UpdatePartner(partner *Partner) (*Partner, error)
+}

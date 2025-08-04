@@ -1,0 +1,38 @@
+package usecases
+
+import (
+	"hiyab-tutor/internal/domain"
+	"hiyab-tutor/internal/repository"
+
+	"gorm.io/gorm"
+)
+
+type testimonialService struct {
+	repo domain.TestimonialRepository
+}
+
+func NewTestimonialService(db *gorm.DB) domain.TestimonialUsecase {
+	return &testimonialService{
+		repo: repository.NewTestimonialRepository(db),
+	}
+}
+
+func (s *testimonialService) CreateTestimonial(testimonial *domain.Testimonial) (*domain.Testimonial, error) {
+	return s.repo.Create(testimonial)
+}
+func (s *testimonialService) GetAllTestimonials(filter *domain.TestimonialFilter) (*domain.MultipleTestimonialResponse, error) {
+	response, err := s.repo.GetAll(nil)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+func (s *testimonialService) GetTestimonialByID(id uint) (*domain.Testimonial, error) {
+	return s.repo.GetByID(id, nil)
+}
+func (s *testimonialService) DeleteTestimonial(id uint) error {
+	return s.repo.Delete(id)
+}
+func (s *testimonialService) UpdateTestimonial(testimonial *domain.Testimonial) (*domain.Testimonial, error) {
+	return s.repo.Update(testimonial)
+}

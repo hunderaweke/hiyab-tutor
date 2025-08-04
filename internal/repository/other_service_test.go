@@ -11,7 +11,7 @@ import (
 
 type ServiceRepositoryTestSuite struct {
 	suite.Suite
-	serviceRepo domain.ServiceRepository
+	serviceRepo domain.OtherServiceRepository
 	db          *gorm.DB
 }
 
@@ -26,11 +26,11 @@ func (suite *ServiceRepositoryTestSuite) SetupSuite() {
 	}
 	suite.db = db
 	suite.db.Debug()
-	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Service{}, &domain.ServiceTranslations{}))
+	suite.Assert().NoError(suite.db.AutoMigrate(&domain.OtherService{}, &domain.OtherServiceTranslations{}))
 }
 func (suite *ServiceRepositoryTestSuite) SetupTest() {
-	suite.db.Exec("DELETE FROM service_translations")
-	suite.db.Exec("DELETE FROM services")
+	suite.db.Exec("DELETE FROM other_service_translations")
+	suite.db.Exec("DELETE FROM other_services")
 	suite.serviceRepo = NewServiceRepository(suite.db)
 }
 func (suite *ServiceRepositoryTestSuite) TearDownSuite() {
@@ -42,10 +42,10 @@ func (suite *ServiceRepositoryTestSuite) TearDownSuite() {
 }
 
 func (suite *ServiceRepositoryTestSuite) TestCreateService() {
-	service := &domain.Service{
+	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
 		ImageURL:   "http://example.com/image.jpg",
-		Translations: []domain.ServiceTranslations{
+		Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
 		},
@@ -64,10 +64,10 @@ func (suite *ServiceRepositoryTestSuite) TestCreateService() {
 	}
 }
 func (suite *ServiceRepositoryTestSuite) TestGetByID() {
-	service := &domain.Service{
+	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
 		ImageURL:   "http://example.com/image.jpg",
-		Translations: []domain.ServiceTranslations{
+		Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
 		},
@@ -91,24 +91,24 @@ func (suite *ServiceRepositoryTestSuite) TestGetByID() {
 }
 
 func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
-	services := []*domain.Service{
-		{ImageURL: "http://example.com/image1.jpg", WebsiteURL: "http://example.com/1", Translations: []domain.ServiceTranslations{
+	services := []*domain.OtherService{
+		{ImageURL: "http://example.com/image1.jpg", WebsiteURL: "http://example.com/1", Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Service 1", Description: "Description 1", TagLine: "Tagline 1"},
 			{LanguageCode: "fr", Name: "Service 1 FR", Description: "Description 1 FR", TagLine: "Tagline 1 FR"},
 		}},
-		{ImageURL: "http://example.com/image2.jpg", WebsiteURL: "http://example.com/2", Translations: []domain.ServiceTranslations{
+		{ImageURL: "http://example.com/image2.jpg", WebsiteURL: "http://example.com/2", Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Service 2", Description: "Description 2", TagLine: "Tagline 2"},
 			{LanguageCode: "fr", Name: "Service 2 FR", Description: "Description 2 FR", TagLine: "Tagline 2 FR"},
 		}},
-		{ImageURL: "http://example.com/image3.jpg", WebsiteURL: "http://example.com/3", Translations: []domain.ServiceTranslations{
+		{ImageURL: "http://example.com/image3.jpg", WebsiteURL: "http://example.com/3", Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Service 3", Description: "Description 3", TagLine: "Tagline 3"},
 			{LanguageCode: "fr", Name: "Service 3 FR", Description: "Description 3 FR", TagLine: "Tagline 3 FR"},
 		}},
-		{ImageURL: "http://example.com/image4.jpg", WebsiteURL: "http://example.com/4", Translations: []domain.ServiceTranslations{
+		{ImageURL: "http://example.com/image4.jpg", WebsiteURL: "http://example.com/4", Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Service 4", Description: "Description 4", TagLine: "Tagline 4"},
 			{LanguageCode: "fr", Name: "Service 4 FR", Description: "Description 4 FR", TagLine: "Tagline 4 FR"},
 		}},
-		{ImageURL: "http://example.com/image5.jpg", WebsiteURL: "http://example.com/5", Translations: []domain.ServiceTranslations{
+		{ImageURL: "http://example.com/image5.jpg", WebsiteURL: "http://example.com/5", Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Service 5", Description: "Description 5", TagLine: "Tagline 5"},
 			{LanguageCode: "fr", Name: "Service 5 FR", Description: "Description 5 FR", TagLine: "Tagline 5 FR"},
 		}},
@@ -127,11 +127,11 @@ func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
 	response, err := suite.serviceRepo.GetAll(filter)
 	suite.NoError(err)
 	suite.NotNil(response)
-	suite.Greater(len(response.Services), 0)
+	suite.Greater(len(response.OtherServicesList), 0)
 	suite.Equal(filter.Page, response.Pagination.Page)
 	suite.Equal(filter.Limit, response.Pagination.Limit)
 	suite.Equal(response.Pagination.Total, len(services))
-	for i, svc := range response.Services {
+	for i, svc := range response.OtherServicesList {
 		suite.Equal(services[i].ImageURL, svc.ImageURL)
 		suite.Equal(services[i].WebsiteURL, svc.WebsiteURL)
 		for j, translation := range services[i].Translations {
@@ -144,10 +144,10 @@ func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
 }
 
 func (suite *ServiceRepositoryTestSuite) TestUpdateService() {
-	service := &domain.Service{
+	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
 		ImageURL:   "http://example.com/image.jpg",
-		Translations: []domain.ServiceTranslations{
+		Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
 		},
@@ -165,10 +165,10 @@ func (suite *ServiceRepositoryTestSuite) TestUpdateService() {
 }
 
 func (suite *ServiceRepositoryTestSuite) TestDeleteService() {
-	service := &domain.Service{
+	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
 		ImageURL:   "http://example.com/image.jpg",
-		Translations: []domain.ServiceTranslations{
+		Translations: []domain.OtherServiceTranslations{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
 		},
