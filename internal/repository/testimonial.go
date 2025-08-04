@@ -45,12 +45,12 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 		if filter.SortBy != "" {
 			switch filter.SortOrder {
 			case "desc":
-				query = query.Order(filter.SortBy + " DESC")
+				query = query.Order("testimonials." + filter.SortBy + " DESC")
 			case "asc":
-				query = query.Order(filter.SortBy + " ASC")
+				query = query.Order("testimonials." + filter.SortBy + " ASC")
 			}
 		} else {
-			query = query.Order("created_at DESC") // Default sorting by created_at in descending order
+			query = query.Order("testimonials.created_at DESC") // Default sorting by created_at in descending order
 		}
 		if filter.LanguageCodes != nil {
 			query = query.Preload("Translations", "language_code IN ?", filter.LanguageCodes)
@@ -58,9 +58,9 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 			query = query.Preload("Translations")
 		}
 	}
-	query = query.Limit(filter.Limit).Offset(filter.Offset)
+	query = query.Group("testimonials.id").Limit(filter.Limit).Offset(filter.Offset)
 	query.Count(&total)
-	if err := query.Group("testimonials.id").Find(&testimonials).Error; err != nil {
+	if err := query.Find(&testimonials).Error; err != nil {
 		return domain.MultipleTestimonialResponse{}, domain.ErrSearchFailed
 	}
 
@@ -74,9 +74,14 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (domain
 		},
 	}, nil
 }
-func (r *testimonialRepository) GetByID(id uint) (*domain.Testimonial, error) {
+func (r *testimonialRepository) GetByID(id uint, languageCodes []string) (*domain.Testimonial, error) {
 	var t domain.Testimonial
-	tx := r.db.Model(&domain.Testimonial{}).Preload("Translations").First(&t, id)
+	var tx *gorm.DB
+	if len(languageCodes) > 0 {
+		tx = r.db.Model(&domain.Testimonial{}).Preload("Translations", "language_code IN ?", languageCodes).First(&t, id)
+	} else {
+		tx = r.db.Model(&domain.Testimonial{}).Preload("Translations").First(&t, id)
+	}
 	if tx.Error != nil {
 		return nil, domain.ErrNotFound
 	}

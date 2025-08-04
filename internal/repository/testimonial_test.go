@@ -180,7 +180,7 @@ func (suite *TestimonialTestSuite) TestGetTestimonialByID() {
 		suite.T().Fatalf("Failed to create testimonial: %v", err)
 	}
 
-	foundTestimonial, err := suite.testimonialRepo.GetByID(createdTestimonial.Model.ID)
+	foundTestimonial, err := suite.testimonialRepo.GetByID(createdTestimonial.Model.ID, nil)
 	if err != nil {
 		suite.T().Fatalf("Failed to get testimonial by ID: %v", err)
 	}
@@ -220,7 +220,7 @@ func (suite *TestimonialTestSuite) TestDeleteTestimonial() {
 		suite.T().Fatalf("Failed to delete testimonial: %v", err)
 	}
 
-	foundTestimonial, err := suite.testimonialRepo.GetByID(createdTestimonial.Model.ID)
+	foundTestimonial, err := suite.testimonialRepo.GetByID(createdTestimonial.Model.ID, []string{})
 	suite.Assert().Error(err, "Expected error when getting deleted testimonial")
 	suite.Assert().Nil(foundTestimonial, "Expected testimonial to be nil after deletion")
 }

@@ -14,7 +14,7 @@ type Testimonial struct {
 type TestimonialTranslations struct {
 	gorm.Model
 	LanguageCode  string `json:"language_code"`
-	TestimonialID uint   `json:"testimonial_id"`
+	TestimonialID uint   `json:"testimonial_id" gorm:"onDelete: CASCADE"`
 	Text          string `json:"name"`
 }
 type TestimonialFilter struct {
@@ -33,7 +33,7 @@ type MultipleTestimonialResponse struct {
 type TestimonialRepository interface {
 	Create(testimonial *Testimonial) (*Testimonial, error)
 	GetAll(filter *TestimonialFilter) (MultipleTestimonialResponse, error)
-	GetByID(id uint) (*Testimonial, error)
+	GetByID(id uint, languageCodes []string) (*Testimonial, error)
 	Delete(id uint) error
 	Update(testimonial *Testimonial) (*Testimonial, error)
 }
