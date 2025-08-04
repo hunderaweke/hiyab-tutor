@@ -18,18 +18,22 @@ type ServiceRepositoryTestSuite struct {
 func TestServiceRepository(t *testing.T) {
 	suite.Run(t, new(ServiceRepositoryTestSuite))
 }
-
-func (suite *ServiceRepositoryTestSuite) SetupTest() {
+func (suite *ServiceRepositoryTestSuite) SetupSuite() {
+	// Create DB connection once for the entire suite
 	db := database.TestDB()
 	if db == nil {
 		suite.T().Fatal("Failed to initialize database connection")
 	}
 	suite.db = db
 	suite.db.Debug()
-	suite.db.AutoMigrate(&domain.Service{}, &domain.ServiceTranslations{})
+	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Service{}, &domain.ServiceTranslations{}))
+}
+func (suite *ServiceRepositoryTestSuite) SetupTest() {
+	suite.db.Exec("DELETE FROM service_translations")
+	suite.db.Exec("DELETE FROM services")
 	suite.serviceRepo = NewServiceRepository(suite.db)
 }
-func (suite *ServiceRepositoryTestSuite) TearDownTest() {
+func (suite *ServiceRepositoryTestSuite) TearDownSuite() {
 	db, _ := suite.db.DB()
 
 	if err := db.Close(); err != nil {

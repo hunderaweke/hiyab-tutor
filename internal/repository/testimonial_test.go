@@ -19,19 +19,22 @@ func TestTestimonialsRepository(t *testing.T) {
 	suite.Run(t, new(TestimonialTestSuite))
 }
 
-func (suite *TestimonialTestSuite) SetupTest() {
+func (suite *TestimonialTestSuite) SetupSuite() {
 	db := database.TestDB()
 	if db == nil {
 		suite.T().Fatal("Failed to initialize database connection")
 	}
 	suite.db = db
 	suite.db.Debug()
-	suite.db.AutoMigrate(&domain.Testimonial{}, &domain.TestimonialTranslations{})
+	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Testimonial{}, &domain.TestimonialTranslations{}))
+}
+func (suite *TestimonialTestSuite) SetupTest() {
+
 	suite.db.Exec("DELETE FROM testimonials")
 	suite.db.Exec("DELETE FROM testimonial_translations")
 	suite.testimonialRepo = NewTestimonialRepository(suite.db)
 }
-func (suite *TestimonialTestSuite) TearDownTest() {
+func (suite *TestimonialTestSuite) TearDownSuite() {
 	db, _ := suite.db.DB()
 
 	if err := db.Close(); err != nil {

@@ -18,18 +18,22 @@ type PartnerTestSuite struct {
 func TestPartnersRepository(t *testing.T) {
 	suite.Run(t, new(PartnerTestSuite))
 }
-
-func (suite *PartnerTestSuite) SetupTest() {
+func (suite *PartnerTestSuite) SetupSuite() {
+	// Create DB connection once for the entire suite
 	db := database.TestDB()
 	if db == nil {
 		suite.T().Fatal("Failed to initialize database connection")
 	}
 	suite.db = db
 	suite.db.Debug()
-	suite.db.AutoMigrate(&domain.Partner{})
+	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Partner{}))
+}
+func (suite *PartnerTestSuite) SetupTest() {
+	suite.db.Exec("DELETE FROM partners")
+	suite.db.Exec("DELETE FROM partner_translations")
 	suite.partnerRepo = NewPartnerRepository(suite.db)
 }
-func (suite *PartnerTestSuite) TearDownTest() {
+func (suite *PartnerTestSuite) TearDownSuite() {
 	db, _ := suite.db.DB()
 
 	if err := db.Close(); err != nil {
