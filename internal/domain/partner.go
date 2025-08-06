@@ -1,9 +1,7 @@
 package domain
 
-import "gorm.io/gorm"
-
 type Partner struct {
-	gorm.Model
+	Model
 	Name       string `json:"name"`
 	ImageURL   string `json:"image_url"`
 	WebsiteURL string `json:"website_url"`

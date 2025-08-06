@@ -1,5 +1,6 @@
 package domain
 
+// swagger:model Pagination
 type Pagination struct {
 	Page         int `json:"page"`
 	Limit        int `json:"limit"`

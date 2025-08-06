@@ -88,17 +88,12 @@ func (r *testimonialRepository) GetByID(id uint, languageCodes []string) (*domai
 	return &t, nil
 }
 func (r *testimonialRepository) Delete(id uint) error {
-	var testimonial domain.Testimonial
-	tx := r.db.Model(&domain.Testimonial{}).First(&testimonial, id)
-	if tx.Error != nil {
-		return domain.ErrNotFound
+	// delete associated translations first
+	if err := r.db.Where("testimonial_id = ?", id).Delete(&domain.TestimonialTranslations{}).Error; err != nil {
+		return err
 	}
-	tx = r.db.Model(&domain.Testimonial{}).Delete(&testimonial)
-	if tx.Error != nil {
-		return domain.ErrDeleteFailed
-	}
-	if tx.RowsAffected == 0 {
-		return domain.ErrNotFound
+	if err := r.db.Delete(&domain.Testimonial{}, id).Error; err != nil {
+		return err
 	}
 	return nil
 }

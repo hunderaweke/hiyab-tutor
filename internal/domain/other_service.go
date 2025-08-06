@@ -1,16 +1,14 @@
 package domain
 
-import "gorm.io/gorm"
-
 type OtherService struct {
-	gorm.Model
+	Model
 	WebsiteURL   string                     `json:"website_url"`
 	ImageURL     string                     `json:"image_url"`
-	Translations []OtherServiceTranslations `json:"languages" gorm:"foreignKey:ServiceID"`
+	Translations []OtherServiceTranslations `json:"languages" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
 }
 
 type OtherServiceTranslations struct {
-	gorm.Model
+	Model
 	LanguageCode string `json:"language_code"`
 	ServiceID    uint   `json:"service_id"`
 	Name         string `json:"name"`

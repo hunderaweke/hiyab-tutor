@@ -31,4 +31,5 @@ var (
 	ErrGameNotFound        = errors.New("game not found")
 	ErrInvalidDateRange    = errors.New("invalid date range")
 	ErrInvalidSortOrder    = errors.New("invalid sort order")
+	ErrInvalidID           = errors.New("invalid ID")
 )

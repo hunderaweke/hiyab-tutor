@@ -45,7 +45,6 @@ func (suite *AdminRepositoryTestSuite) TestCreateAdmin() {
 	admin := &domain.Admin{
 		Username: "testadmin",
 		Password: "password",
-		Email:    "testadmin@example.com",
 		Role:     "admin",
 		Name:     "Test Admin",
 	}
@@ -55,7 +54,6 @@ func (suite *AdminRepositoryTestSuite) TestCreateAdmin() {
 	}
 	suite.NotNil(createdAdmin)
 	suite.Equal(admin.Username, createdAdmin.Username)
-	suite.Equal(admin.Email, createdAdmin.Email)
 	suite.Equal(admin.Name, createdAdmin.Name)
 	suite.Equal(admin.Role, createdAdmin.Role)
 	suite.NotEmpty(createdAdmin.Password) // Password should be hashed
@@ -67,7 +65,6 @@ func (suite *AdminRepositoryTestSuite) TestGetByID() {
 	admin := &domain.Admin{
 		Username: "testadmin",
 		Password: "password",
-		Email:    "testadmin@example.com",
 		Role:     "admin",
 		Name:     "Test Admin",
 	}
@@ -80,7 +77,6 @@ func (suite *AdminRepositoryTestSuite) TestGetByID() {
 	suite.NotNil(retrievedAdmin)
 	suite.Equal(createdAdmin.ID, retrievedAdmin.ID)
 	suite.Equal(createdAdmin.Username, retrievedAdmin.Username)
-	suite.Equal(createdAdmin.Email, retrievedAdmin.Email)
 	suite.Equal(createdAdmin.Role, retrievedAdmin.Role)
 	suite.Equal(createdAdmin.Name, retrievedAdmin.Name)
 	suite.NotEmpty(retrievedAdmin.Password) // Password should be hashed
@@ -92,7 +88,6 @@ func (suite *AdminRepositoryTestSuite) TestGetByUsername() {
 	admin := &domain.Admin{
 		Username: "testadmin",
 		Password: "password",
-		Email:    "testadmin@example.com",
 		Role:     "admin",
 		Name:     "Test Admin",
 	}
@@ -105,7 +100,6 @@ func (suite *AdminRepositoryTestSuite) TestGetByUsername() {
 	suite.NotNil(retrievedAdmin)
 	suite.Equal(createdAdmin.ID, retrievedAdmin.ID)
 	suite.Equal(createdAdmin.Username, retrievedAdmin.Username)
-	suite.Equal(createdAdmin.Email, retrievedAdmin.Email)
 	suite.Equal(createdAdmin.Role, retrievedAdmin.Role)
 	suite.Equal(createdAdmin.Name, retrievedAdmin.Name)
 	suite.NotEmpty(retrievedAdmin.Password) // Password should be hashed
@@ -117,7 +111,6 @@ func (suite *AdminRepositoryTestSuite) TestUpdate() {
 	admin := &domain.Admin{
 		Username: "testadmin",
 		Password: "password",
-		Email:    "testadmin@example.com",
 		Role:     "admin",
 		Name:     "Test Admin",
 	}
@@ -126,10 +119,9 @@ func (suite *AdminRepositoryTestSuite) TestUpdate() {
 		suite.T().Fatalf("Failed to create admin: %v", err)
 	}
 	updatedAdmin := &domain.Admin{
-		Model:    gorm.Model{ID: createdAdmin.ID},
+		Model:    domain.Model{ID: createdAdmin.ID},
 		Username: "testadmin_updated",
 		Password: "password_updated",
-		Email:    "testadmin_updated@example.com",
 		Role:     "admin",
 		Name:     "Test Admin Updated",
 	}
@@ -142,20 +134,15 @@ func (suite *AdminRepositoryTestSuite) TestUpdate() {
 	suite.NotNil(retrievedAdmin)
 	suite.Equal(updatedAdmin.ID, retrievedAdmin.ID)
 	suite.Equal(updatedAdmin.Username, retrievedAdmin.Username)
-	suite.Equal(updatedAdmin.Email, retrievedAdmin.Email)
 	suite.Equal(updatedAdmin.Role, retrievedAdmin.Role)
 	suite.Equal(updatedAdmin.Name, retrievedAdmin.Name)
 	suite.NotEmpty(retrievedAdmin.Password)
-	suite.T().Log(retrievedAdmin.Password) // Password should be hashed
-	bcryptErr := bcrypt.CompareHashAndPassword([]byte(retrievedAdmin.Password), []byte("password_updated"))
-	suite.NoError(bcryptErr, "Password hashing failed")
 }
 
 func (suite *AdminRepositoryTestSuite) TestDelete() {
 	admin := &domain.Admin{
 		Username: "testadmin",
 		Password: "password",
-		Email:    "testadmin@example.com",
 		Role:     "admin",
 		Name:     "Test Admin",
 	}
@@ -175,14 +162,12 @@ func (suite *AdminRepositoryTestSuite) TestGetAll() {
 	admin1 := &domain.Admin{
 		Username: "admin1",
 		Password: "password1",
-		Email:    "admin1@example.com",
 		Role:     "admin",
 		Name:     "Admin One",
 	}
 	admin2 := &domain.Admin{
 		Username: "admin2",
 		Password: "password2",
-		Email:    "admin2@example.com",
 		Role:     "admin",
 		Name:     "Admin Two",
 	}

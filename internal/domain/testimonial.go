@@ -1,20 +1,18 @@
 package domain
 
-import "gorm.io/gorm"
-
 type Testimonial struct {
-	gorm.Model
+	Model
 	Name         string                    `json:"name"`
 	Role         string                    `json:"role"`
 	VideoURL     string                    `json:"video_url"`
 	Thumbnail    string                    `json:"thumbnail"`
-	Translations []TestimonialTranslations `json:"languages" gorm:"foreignKey:TestimonialID"`
+	Translations []TestimonialTranslations `json:"languages" gorm:"foreignKey:TestimonialID;constraint:OnDelete:CASCADE"`
 }
 
 type TestimonialTranslations struct {
-	gorm.Model
+	Model
 	LanguageCode  string `json:"language_code"`
-	TestimonialID uint   `json:"testimonial_id" gorm:"onDelete: CASCADE"`
+	TestimonialID uint   `json:"testimonial_id"`
 	Text          string `json:"name"`
 }
 type TestimonialFilter struct {

@@ -1,0 +1,440 @@
+definitions:
+  domain.Admin:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      role:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
+  domain.ChangePasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+  domain.CreateAdminRequest:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+      role:
+        enum:
+        - admin
+        - superadmin
+        type: string
+      username:
+        type: string
+    required:
+    - name
+    - password
+    - role
+    - username
+    type: object
+  domain.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  domain.LoginAndRegisterResponse:
+    properties:
+      access_token:
+        description: |-
+          The access token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      refresh_token:
+        description: |-
+          The refresh token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
+      user:
+        allOf:
+        - $ref: '#/definitions/domain.Admin'
+        description: The user object
+    type: object
+  domain.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.MultipleAdmins:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Admin'
+        type: array
+      meta:
+        $ref: '#/definitions/domain.Pagination'
+    type: object
+  domain.Pagination:
+    properties:
+      limit:
+        type: integer
+      next_page:
+        type: integer
+      offset:
+        type: integer
+      page:
+        type: integer
+      previous_page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  domain.ResetPasswordRequest:
+    properties:
+      new_password:
+        minLength: 8
+        type: string
+    required:
+    - new_password
+    type: object
+  domain.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  domain.UpdateAdminRequest:
+    properties:
+      name:
+        type: string
+      role:
+        enum:
+        - admin
+        - superadmin
+        type: string
+    required:
+    - name
+    - role
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Testing Swagger APIs.
+  termsOfService: http://swagger.io/terms/
+  title: Nigus Bingo Desktop APIs
+  version: "1.0"
+paths:
+  /admin:
+    get:
+      description: Retrieve all admins with optional filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of results per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc/desc)
+        in: query
+        name: sort_order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.MultipleAdmins'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Get All Admins
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin with the provided details
+      parameters:
+      - description: Admin details
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Admin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Create Admin
+      tags:
+      - Admin
+  /admin/{id}:
+    delete:
+      description: Delete an admin by their ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Delete Admin
+      tags:
+      - Admin
+    get:
+      description: Retrieve an admin by their ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Admin'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Get Admin by ID
+      tags:
+      - Admin
+    put:
+      consumes:
+      - application/json
+      description: Update an admin's details
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated admin details
+        in: body
+        name: admin
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdateAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Admin'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Update Admin
+      tags:
+      - Admin
+  /admin/{id}/reset-password:
+    put:
+      consumes:
+      - application/json
+      description: Resets an admin's password
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New password
+        in: body
+        name: new_password
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Reset Admin Password
+      tags:
+      - Admin
+  /admin/change-password:
+    put:
+      consumes:
+      - application/json
+      description: Changes an admin's password
+      parameters:
+      - description: Change password details
+        in: body
+        name: change_password
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ChangePasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Change Admin Password
+      tags:
+      - Admin
+  /admin/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in an admin and returns a token
+      parameters:
+      - description: Admin login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.LoginAndRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Admin Login
+      tags:
+      - Admin
+  /admin/me:
+    get:
+      description: Retrieves the currently logged-in admin's details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Admin'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Get Current Admin
+      tags:
+      - Admin
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -7,11 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
+// swagger:model Admin
 type Admin struct {
-	gorm.Model
+	Model
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Email    string `json:"email"`
 	Role     string `json:"role"`
 	Name     string `json:"name"`
 }
@@ -25,16 +25,6 @@ func (a *Admin) BeforeCreate(tx *gorm.DB) (err error) {
 	log.Println(a)
 	return nil
 }
-func (a *Admin) BeforeUpdate(tx *gorm.DB) (err error) {
-	if a.Password != "" {
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
-		if err != nil {
-			return err
-		}
-		a.Password = string(hashedPassword)
-	}
-	return nil
-}
 
 type AdminFilter struct {
 	Page      int    `json:"page"`
@@ -46,6 +36,7 @@ type AdminFilter struct {
 	Role      string `json:"role"`       // Filter by role if needed
 }
 
+// swagger:model MultipleAdmins
 type MultipleAdmins struct {
 	Admins     []Admin    `json:"data"`
 	Pagination Pagination `json:"meta"`
@@ -57,4 +48,16 @@ type AdminRepository interface {
 	GetAll(f *AdminFilter) (*MultipleAdmins, error)
 	Update(admin *Admin) (*Admin, error)
 	Delete(id uint) error
+}
+
+type AdminUsecase interface {
+	Create(admin *Admin) (*Admin, error)
+	GetByID(id uint) (*Admin, error)
+	GetByUsername(username string) (*Admin, error)
+	GetAll(f *AdminFilter) (*MultipleAdmins, error)
+	Update(admin *Admin) (*Admin, error)
+	Delete(id uint) error
+	ResetPassword(id uint, newPassword string) error
+	ChangePassword(id uint, oldPassword, newPassword string) error
+	Login(username, password string) (*Admin, error)
 }

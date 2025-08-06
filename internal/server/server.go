@@ -3,27 +3,29 @@ package server
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
-
+	"hiyab-tutor/internal/config"
 	"hiyab-tutor/internal/database"
 )
 
 type Server struct {
 	port int
 
-	db database.Service
+	DB database.Service
 }
 
 func NewServer() *http.Server {
-	port, _ := strconv.Atoi(os.Getenv("PORT"))
+	c, err := config.LoadConfig()
+	if err != nil {
+		panic("Failed to load config")
+	}
+	port, _ := strconv.Atoi(c.ServerPort)
 	NewServer := &Server{
 		port: port,
 
-		db: database.New(),
+		DB: database.New(),
 	}
 
 	// Declare Server config

@@ -18,12 +18,16 @@ import (
 
 // Service represents a service that interacts with a database.
 type Service interface {
+	// Gorm returns the gorm.DB instance for database operations.
+	Gorm() *gorm.DB
+
 	// Health returns a map of health status information.
 	// The keys and values in the map are service-specific.
 	Health() map[string]string
 
 	// Close terminates the database connection.
 	// It returns an error if the connection cannot be closed.
+
 	Close() error
 }
 
@@ -45,18 +49,9 @@ func TestDB() *gorm.DB {
 	ctx := context.Background()
 
 	// Set safe defaults for test DB if env vars are empty
-	testDB := database
-	if testDB == "" {
-		testDB = "test_db"
-	}
-	testUser := username
-	if testUser == "" {
-		testUser = "test_user"
-	}
-	testPass := password
-	if testPass == "" {
-		testPass = "test_password"
-	}
+	testDB := "test_db"
+	testUser := "test_user"
+	testPass := "test_password"
 
 	req := testcontainers.ContainerRequest{
 		Image:        "postgres:15.3-alpine",
@@ -75,15 +70,25 @@ func TestDB() *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed to create container: %v", err)
 	}
+
+	// Check container state and print logs if not running
+	state, err := container.State(ctx)
+	if err != nil {
+		log.Fatalf("failed to get container state: %v", err)
+	}
+	if !state.Running {
+		logs, _ := container.Logs(ctx)
+		log.Fatalf("container is not running. Logs:\n%s", logs)
+	}
 	host, err := container.Host(ctx)
 	if err != nil {
 		log.Fatalf("failed to get container host: %v", err)
 	}
-	port, err := container.MappedPort(ctx, "5432")
+	port, err := container.MappedPort(ctx, "5432/tcp")
 	if err != nil {
 		log.Fatalf("failed to get mapped port: %v", err)
 	}
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port.Port(), testUser, testPass, testDB)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=allow", host, port.Port(), testUser, testPass, testDB)
 	var db *gorm.DB
 	for i := 0; i < 5; i++ {
 		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -111,6 +116,9 @@ func New() Service {
 		db: db,
 	}
 	return dbInstance
+}
+func (s *service) Gorm() *gorm.DB {
+	return s.db
 }
 
 // Health checks the health of the database connection by pinging the database.

@@ -26,11 +26,6 @@ const (
 	TokenTypeAccess  = "access"
 )
 
-type TokenResponse struct {
-	RefreshToken string `json:"refresh_token"`
-	AccessToken  string `json:"access_token"`
-}
-
 func GenerateToken(user *domain.Admin, tokenType string) (string, error) {
 	cfg, err := config.LoadConfig()
 	if err != nil {
@@ -54,7 +49,7 @@ func GenerateToken(user *domain.Admin, tokenType string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(cfg.Jwt.Secret))
+	tokenString, err := token.SignedString([]byte(cfg.JwtSecret))
 	if err != nil {
 		return "", err
 	}
@@ -67,7 +62,7 @@ func ValidateToken(tokenString, tokenType string) (*UserClaims, error) {
 		return nil, err
 	}
 	token, err := jwt.ParseWithClaims(tokenString, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(cfg.Jwt.Secret), nil
+		return []byte(cfg.JwtSecret), nil
 	})
 	userClaims, ok := token.Claims.(*UserClaims)
 	if err != nil || !token.Valid || !ok {
