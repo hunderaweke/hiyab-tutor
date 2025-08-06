@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"log"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -10,7 +12,8 @@ type Admin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 	Email    string `json:"email"`
-	Role     string `json:"role"` // e.g., "superadmin", "admin"
+	Role     string `json:"role"`
+	Name     string `json:"name"`
 }
 
 func (a *Admin) BeforeCreate(tx *gorm.DB) (err error) {
@@ -19,6 +22,17 @@ func (a *Admin) BeforeCreate(tx *gorm.DB) (err error) {
 		return err
 	}
 	a.Password = string(hashedPassword)
+	log.Println(a)
+	return nil
+}
+func (a *Admin) BeforeUpdate(tx *gorm.DB) (err error) {
+	if a.Password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(a.Password), bcrypt.DefaultCost)
+		if err != nil {
+			return err
+		}
+		a.Password = string(hashedPassword)
+	}
 	return nil
 }
 
