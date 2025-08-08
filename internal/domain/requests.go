@@ -30,3 +30,47 @@ type LoginRequest struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+
+// swagger:model CreatePartnerRequest
+type CreatePartnerRequest struct {
+	Name       string `json:"name" binding:"required"`
+	ImageURL   string `json:"image_url" binding:"required,url"`
+	WebsiteURL string `json:"website_url" binding:"required,url"`
+}
+
+// swagger:model UpdatePartnerRequest
+type UpdatePartnerRequest struct {
+	Name       string `json:"name" binding:"required"`
+	ImageURL   string `json:"image_url" binding:"required,url"`
+	WebsiteURL string `json:"website_url" binding:"required,url"`
+}
+
+// swagger:model CreateTestimonialRequest
+type CreateTestimonialRequest struct {
+	Name         string                                `json:"name" binding:"required"`
+	Role         string                                `json:"role" binding:"required"`
+	VideoURL     string                                `json:"video_url" binding:"required,url"`
+	Thumbnail    string                                `json:"thumbnail" binding:"required,url"`
+	Translations []CreateTestimonialTranslationRequest `json:"languages" binding:"required,dive"`
+}
+
+// swagger:model UpdateTestimonialRequest
+type UpdateTestimonialRequest struct {
+	Name         string                                `json:"name" binding:"required"`
+	Role         string                                `json:"role" binding:"required"`
+	VideoURL     string                                `json:"video_url" binding:"required,url"`
+	Thumbnail    string                                `json:"thumbnail" binding:"required,url"`
+	Translations []UpdateTestimonialTranslationRequest `json:"languages" binding:"required,dive"`
+}
+
+// swagger:model CreateTestimonialTranslationRequest
+type CreateTestimonialTranslationRequest struct {
+	LanguageCode string `json:"language_code" binding:"required"`
+	Text         string `json:"name" binding:"required"`
+}
+
+// swagger:model UpdateTestimonialTranslationRequest
+type UpdateTestimonialTranslationRequest struct {
+	LanguageCode string `json:"language_code" binding:"required"`
+	Text         string `json:"name" binding:"required"`
+}
