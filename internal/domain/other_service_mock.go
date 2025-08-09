@@ -7,6 +7,304 @@ import (
 	"sync"
 )
 
+// Ensure, that OtherServiceUsecaseMock does implement OtherServiceUsecase.
+// If this is not the case, regenerate this file with moq.
+var _ OtherServiceUsecase = &OtherServiceUsecaseMock{}
+
+// OtherServiceUsecaseMock is a mock implementation of OtherServiceUsecase.
+//
+//	func TestSomethingThatUsesOtherServiceUsecase(t *testing.T) {
+//
+//		// make and configure a mocked OtherServiceUsecase
+//		mockedOtherServiceUsecase := &OtherServiceUsecaseMock{
+//			AddTranslationFunc: func(serviceID uint, translation *OtherServiceTranslation) (*OtherService, error) {
+//				panic("mock out the AddTranslation method")
+//			},
+//			CreateServiceFunc: func(service *OtherService) (*OtherService, error) {
+//				panic("mock out the CreateService method")
+//			},
+//			DeleteServiceFunc: func(id uint) error {
+//				panic("mock out the DeleteService method")
+//			},
+//			GetAllServicesFunc: func(filter *ServiceFilter) (*MultipleOtherServices, error) {
+//				panic("mock out the GetAllServices method")
+//			},
+//			GetServiceByIDFunc: func(id uint, languageCodes []string) (*OtherService, error) {
+//				panic("mock out the GetServiceByID method")
+//			},
+//			UpdateServiceFunc: func(service *OtherService) (*OtherService, error) {
+//				panic("mock out the UpdateService method")
+//			},
+//		}
+//
+//		// use mockedOtherServiceUsecase in code that requires OtherServiceUsecase
+//		// and then make assertions.
+//
+//	}
+type OtherServiceUsecaseMock struct {
+	// AddTranslationFunc mocks the AddTranslation method.
+	AddTranslationFunc func(serviceID uint, translation *OtherServiceTranslation) (*OtherService, error)
+
+	// CreateServiceFunc mocks the CreateService method.
+	CreateServiceFunc func(service *OtherService) (*OtherService, error)
+
+	// DeleteServiceFunc mocks the DeleteService method.
+	DeleteServiceFunc func(id uint) error
+
+	// GetAllServicesFunc mocks the GetAllServices method.
+	GetAllServicesFunc func(filter *ServiceFilter) (*MultipleOtherServices, error)
+
+	// GetServiceByIDFunc mocks the GetServiceByID method.
+	GetServiceByIDFunc func(id uint, languageCodes []string) (*OtherService, error)
+
+	// UpdateServiceFunc mocks the UpdateService method.
+	UpdateServiceFunc func(service *OtherService) (*OtherService, error)
+
+	// calls tracks calls to the methods.
+	calls struct {
+		// AddTranslation holds details about calls to the AddTranslation method.
+		AddTranslation []struct {
+			// ServiceID is the serviceID argument value.
+			ServiceID uint
+			// Translation is the translation argument value.
+			Translation *OtherServiceTranslation
+		}
+		// CreateService holds details about calls to the CreateService method.
+		CreateService []struct {
+			// Service is the service argument value.
+			Service *OtherService
+		}
+		// DeleteService holds details about calls to the DeleteService method.
+		DeleteService []struct {
+			// ID is the id argument value.
+			ID uint
+		}
+		// GetAllServices holds details about calls to the GetAllServices method.
+		GetAllServices []struct {
+			// Filter is the filter argument value.
+			Filter *ServiceFilter
+		}
+		// GetServiceByID holds details about calls to the GetServiceByID method.
+		GetServiceByID []struct {
+			// ID is the id argument value.
+			ID uint
+			// LanguageCodes is the languageCodes argument value.
+			LanguageCodes []string
+		}
+		// UpdateService holds details about calls to the UpdateService method.
+		UpdateService []struct {
+			// Service is the service argument value.
+			Service *OtherService
+		}
+	}
+	lockAddTranslation sync.RWMutex
+	lockCreateService  sync.RWMutex
+	lockDeleteService  sync.RWMutex
+	lockGetAllServices sync.RWMutex
+	lockGetServiceByID sync.RWMutex
+	lockUpdateService  sync.RWMutex
+}
+
+// AddTranslation calls AddTranslationFunc.
+func (mock *OtherServiceUsecaseMock) AddTranslation(serviceID uint, translation *OtherServiceTranslation) (*OtherService, error) {
+	if mock.AddTranslationFunc == nil {
+		panic("OtherServiceUsecaseMock.AddTranslationFunc: method is nil but OtherServiceUsecase.AddTranslation was just called")
+	}
+	callInfo := struct {
+		ServiceID   uint
+		Translation *OtherServiceTranslation
+	}{
+		ServiceID:   serviceID,
+		Translation: translation,
+	}
+	mock.lockAddTranslation.Lock()
+	mock.calls.AddTranslation = append(mock.calls.AddTranslation, callInfo)
+	mock.lockAddTranslation.Unlock()
+	return mock.AddTranslationFunc(serviceID, translation)
+}
+
+// AddTranslationCalls gets all the calls that were made to AddTranslation.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.AddTranslationCalls())
+func (mock *OtherServiceUsecaseMock) AddTranslationCalls() []struct {
+	ServiceID   uint
+	Translation *OtherServiceTranslation
+} {
+	var calls []struct {
+		ServiceID   uint
+		Translation *OtherServiceTranslation
+	}
+	mock.lockAddTranslation.RLock()
+	calls = mock.calls.AddTranslation
+	mock.lockAddTranslation.RUnlock()
+	return calls
+}
+
+// CreateService calls CreateServiceFunc.
+func (mock *OtherServiceUsecaseMock) CreateService(service *OtherService) (*OtherService, error) {
+	if mock.CreateServiceFunc == nil {
+		panic("OtherServiceUsecaseMock.CreateServiceFunc: method is nil but OtherServiceUsecase.CreateService was just called")
+	}
+	callInfo := struct {
+		Service *OtherService
+	}{
+		Service: service,
+	}
+	mock.lockCreateService.Lock()
+	mock.calls.CreateService = append(mock.calls.CreateService, callInfo)
+	mock.lockCreateService.Unlock()
+	return mock.CreateServiceFunc(service)
+}
+
+// CreateServiceCalls gets all the calls that were made to CreateService.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.CreateServiceCalls())
+func (mock *OtherServiceUsecaseMock) CreateServiceCalls() []struct {
+	Service *OtherService
+} {
+	var calls []struct {
+		Service *OtherService
+	}
+	mock.lockCreateService.RLock()
+	calls = mock.calls.CreateService
+	mock.lockCreateService.RUnlock()
+	return calls
+}
+
+// DeleteService calls DeleteServiceFunc.
+func (mock *OtherServiceUsecaseMock) DeleteService(id uint) error {
+	if mock.DeleteServiceFunc == nil {
+		panic("OtherServiceUsecaseMock.DeleteServiceFunc: method is nil but OtherServiceUsecase.DeleteService was just called")
+	}
+	callInfo := struct {
+		ID uint
+	}{
+		ID: id,
+	}
+	mock.lockDeleteService.Lock()
+	mock.calls.DeleteService = append(mock.calls.DeleteService, callInfo)
+	mock.lockDeleteService.Unlock()
+	return mock.DeleteServiceFunc(id)
+}
+
+// DeleteServiceCalls gets all the calls that were made to DeleteService.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.DeleteServiceCalls())
+func (mock *OtherServiceUsecaseMock) DeleteServiceCalls() []struct {
+	ID uint
+} {
+	var calls []struct {
+		ID uint
+	}
+	mock.lockDeleteService.RLock()
+	calls = mock.calls.DeleteService
+	mock.lockDeleteService.RUnlock()
+	return calls
+}
+
+// GetAllServices calls GetAllServicesFunc.
+func (mock *OtherServiceUsecaseMock) GetAllServices(filter *ServiceFilter) (*MultipleOtherServices, error) {
+	if mock.GetAllServicesFunc == nil {
+		panic("OtherServiceUsecaseMock.GetAllServicesFunc: method is nil but OtherServiceUsecase.GetAllServices was just called")
+	}
+	callInfo := struct {
+		Filter *ServiceFilter
+	}{
+		Filter: filter,
+	}
+	mock.lockGetAllServices.Lock()
+	mock.calls.GetAllServices = append(mock.calls.GetAllServices, callInfo)
+	mock.lockGetAllServices.Unlock()
+	return mock.GetAllServicesFunc(filter)
+}
+
+// GetAllServicesCalls gets all the calls that were made to GetAllServices.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.GetAllServicesCalls())
+func (mock *OtherServiceUsecaseMock) GetAllServicesCalls() []struct {
+	Filter *ServiceFilter
+} {
+	var calls []struct {
+		Filter *ServiceFilter
+	}
+	mock.lockGetAllServices.RLock()
+	calls = mock.calls.GetAllServices
+	mock.lockGetAllServices.RUnlock()
+	return calls
+}
+
+// GetServiceByID calls GetServiceByIDFunc.
+func (mock *OtherServiceUsecaseMock) GetServiceByID(id uint, languageCodes []string) (*OtherService, error) {
+	if mock.GetServiceByIDFunc == nil {
+		panic("OtherServiceUsecaseMock.GetServiceByIDFunc: method is nil but OtherServiceUsecase.GetServiceByID was just called")
+	}
+	callInfo := struct {
+		ID            uint
+		LanguageCodes []string
+	}{
+		ID:            id,
+		LanguageCodes: languageCodes,
+	}
+	mock.lockGetServiceByID.Lock()
+	mock.calls.GetServiceByID = append(mock.calls.GetServiceByID, callInfo)
+	mock.lockGetServiceByID.Unlock()
+	return mock.GetServiceByIDFunc(id, languageCodes)
+}
+
+// GetServiceByIDCalls gets all the calls that were made to GetServiceByID.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.GetServiceByIDCalls())
+func (mock *OtherServiceUsecaseMock) GetServiceByIDCalls() []struct {
+	ID            uint
+	LanguageCodes []string
+} {
+	var calls []struct {
+		ID            uint
+		LanguageCodes []string
+	}
+	mock.lockGetServiceByID.RLock()
+	calls = mock.calls.GetServiceByID
+	mock.lockGetServiceByID.RUnlock()
+	return calls
+}
+
+// UpdateService calls UpdateServiceFunc.
+func (mock *OtherServiceUsecaseMock) UpdateService(service *OtherService) (*OtherService, error) {
+	if mock.UpdateServiceFunc == nil {
+		panic("OtherServiceUsecaseMock.UpdateServiceFunc: method is nil but OtherServiceUsecase.UpdateService was just called")
+	}
+	callInfo := struct {
+		Service *OtherService
+	}{
+		Service: service,
+	}
+	mock.lockUpdateService.Lock()
+	mock.calls.UpdateService = append(mock.calls.UpdateService, callInfo)
+	mock.lockUpdateService.Unlock()
+	return mock.UpdateServiceFunc(service)
+}
+
+// UpdateServiceCalls gets all the calls that were made to UpdateService.
+// Check the length with:
+//
+//	len(mockedOtherServiceUsecase.UpdateServiceCalls())
+func (mock *OtherServiceUsecaseMock) UpdateServiceCalls() []struct {
+	Service *OtherService
+} {
+	var calls []struct {
+		Service *OtherService
+	}
+	mock.lockUpdateService.RLock()
+	calls = mock.calls.UpdateService
+	mock.lockUpdateService.RUnlock()
+	return calls
+}
+
 // Ensure, that OtherServiceRepositoryMock does implement OtherServiceRepository.
 // If this is not the case, regenerate this file with moq.
 var _ OtherServiceRepository = &OtherServiceRepositoryMock{}

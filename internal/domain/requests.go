@@ -1,5 +1,7 @@
 package domain
 
+import "mime/multipart"
+
 // swagger:model CreateAdminRequest
 type CreateAdminRequest struct {
 	Username string `json:"username" binding:"required"`
@@ -33,16 +35,14 @@ type LoginRequest struct {
 
 // swagger:model CreatePartnerRequest
 type CreatePartnerRequest struct {
-	Name       string `json:"name" binding:"required"`
-	ImageURL   string `json:"image_url" binding:"required,url"`
-	WebsiteURL string `json:"website_url" binding:"required,url"`
+	Name       string `form:"name" json:"name" binding:"required"`
+	WebsiteURL string `form:"website_url,omitempty" json:"website_url,omitempty"`
 }
 
 // swagger:model UpdatePartnerRequest
 type UpdatePartnerRequest struct {
-	Name       string `json:"name" binding:"required"`
-	ImageURL   string `json:"image_url" binding:"required,url"`
-	WebsiteURL string `json:"website_url" binding:"required,url"`
+	Name       string `form:"name" json:"name"`
+	WebsiteURL string `form:"website_url" json:"website_url"`
 }
 
 // swagger:model CreateTestimonialRequest
@@ -67,4 +67,10 @@ type CreateTestimonialTranslationRequest struct {
 type UpdateTestimonialTranslationRequest struct {
 	LanguageCode string `json:"language_code" binding:"required"`
 	Text         string `json:"name" binding:"required"`
+}
+
+// swagger:model CreateOtherService
+type CreateOtherService struct {
+	WebsiteURL string                `form:"website_url"`
+	Image      *multipart.FileHeader `form:"image"`
 }

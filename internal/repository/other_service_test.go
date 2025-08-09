@@ -44,7 +44,7 @@ func (suite *ServiceRepositoryTestSuite) TearDownSuite() {
 func (suite *ServiceRepositoryTestSuite) TestCreateService() {
 	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
-		ImageURL:   "http://example.com/image.jpg",
+		Image:      "http://example.com/image.jpg",
 		Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
@@ -55,7 +55,7 @@ func (suite *ServiceRepositoryTestSuite) TestCreateService() {
 	suite.NoError(err)
 	suite.NotNil(createdService)
 	suite.Equal(service.WebsiteURL, createdService.WebsiteURL)
-	suite.Equal(service.ImageURL, createdService.ImageURL)
+	suite.Equal(service.Image, createdService.Image)
 	for i, translation := range service.Translations {
 		suite.Equal(translation.LanguageCode, createdService.Translations[i].LanguageCode)
 		suite.Equal(translation.Name, createdService.Translations[i].Name)
@@ -66,7 +66,7 @@ func (suite *ServiceRepositoryTestSuite) TestCreateService() {
 func (suite *ServiceRepositoryTestSuite) TestGetByID() {
 	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
-		ImageURL:   "http://example.com/image.jpg",
+		Image:      "http://example.com/image.jpg",
 		Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
@@ -81,7 +81,7 @@ func (suite *ServiceRepositoryTestSuite) TestGetByID() {
 	suite.NotNil(fetchedService)
 	suite.Equal(createdService.ID, fetchedService.ID)
 	suite.Equal(createdService.WebsiteURL, fetchedService.WebsiteURL)
-	suite.Equal(createdService.ImageURL, fetchedService.ImageURL)
+	suite.Equal(createdService.Image, fetchedService.Image)
 	for i, translation := range createdService.Translations {
 		suite.Equal(translation.LanguageCode, fetchedService.Translations[i].LanguageCode)
 		suite.Equal(translation.Name, fetchedService.Translations[i].Name)
@@ -92,23 +92,23 @@ func (suite *ServiceRepositoryTestSuite) TestGetByID() {
 
 func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
 	services := []*domain.OtherService{
-		{ImageURL: "http://example.com/image1.jpg", WebsiteURL: "http://example.com/1", Translations: []domain.OtherServiceTranslation{
+		{Image: "http://example.com/image1.jpg", WebsiteURL: "http://example.com/1", Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Service 1", Description: "Description 1", TagLine: "Tagline 1"},
 			{LanguageCode: "fr", Name: "Service 1 FR", Description: "Description 1 FR", TagLine: "Tagline 1 FR"},
 		}},
-		{ImageURL: "http://example.com/image2.jpg", WebsiteURL: "http://example.com/2", Translations: []domain.OtherServiceTranslation{
+		{Image: "http://example.com/image2.jpg", WebsiteURL: "http://example.com/2", Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Service 2", Description: "Description 2", TagLine: "Tagline 2"},
 			{LanguageCode: "fr", Name: "Service 2 FR", Description: "Description 2 FR", TagLine: "Tagline 2 FR"},
 		}},
-		{ImageURL: "http://example.com/image3.jpg", WebsiteURL: "http://example.com/3", Translations: []domain.OtherServiceTranslation{
+		{Image: "http://example.com/image3.jpg", WebsiteURL: "http://example.com/3", Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Service 3", Description: "Description 3", TagLine: "Tagline 3"},
 			{LanguageCode: "fr", Name: "Service 3 FR", Description: "Description 3 FR", TagLine: "Tagline 3 FR"},
 		}},
-		{ImageURL: "http://example.com/image4.jpg", WebsiteURL: "http://example.com/4", Translations: []domain.OtherServiceTranslation{
+		{Image: "http://example.com/image4.jpg", WebsiteURL: "http://example.com/4", Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Service 4", Description: "Description 4", TagLine: "Tagline 4"},
 			{LanguageCode: "fr", Name: "Service 4 FR", Description: "Description 4 FR", TagLine: "Tagline 4 FR"},
 		}},
-		{ImageURL: "http://example.com/image5.jpg", WebsiteURL: "http://example.com/5", Translations: []domain.OtherServiceTranslation{
+		{Image: "http://example.com/image5.jpg", WebsiteURL: "http://example.com/5", Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Service 5", Description: "Description 5", TagLine: "Tagline 5"},
 			{LanguageCode: "fr", Name: "Service 5 FR", Description: "Description 5 FR", TagLine: "Tagline 5 FR"},
 		}},
@@ -132,7 +132,7 @@ func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
 	suite.Equal(filter.Limit, response.Pagination.Limit)
 	suite.Equal(response.Pagination.Total, len(services))
 	for i, svc := range response.OtherServicesList {
-		suite.Equal(services[i].ImageURL, svc.ImageURL)
+		suite.Equal(services[i].Image, svc.Image)
 		suite.Equal(services[i].WebsiteURL, svc.WebsiteURL)
 		for j, translation := range services[i].Translations {
 			suite.Equal(translation.LanguageCode, svc.Translations[j].LanguageCode)
@@ -146,7 +146,7 @@ func (suite *ServiceRepositoryTestSuite) TestGetAllServices() {
 func (suite *ServiceRepositoryTestSuite) TestUpdateService() {
 	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
-		ImageURL:   "http://example.com/image.jpg",
+		Image:      "http://example.com/image.jpg",
 		Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},
@@ -167,7 +167,7 @@ func (suite *ServiceRepositoryTestSuite) TestUpdateService() {
 func (suite *ServiceRepositoryTestSuite) TestDeleteService() {
 	service := &domain.OtherService{
 		WebsiteURL: "http://example.com",
-		ImageURL:   "http://example.com/image.jpg",
+		Image:      "http://example.com/image.jpg",
 		Translations: []domain.OtherServiceTranslation{
 			{LanguageCode: "en", Name: "Test Service", Description: "This is a test service", TagLine: "Test Tagline"},
 			{LanguageCode: "fr", Name: "Service Test", Description: "Ceci est un service de test", TagLine: "Slogan de test"},

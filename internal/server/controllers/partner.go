@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"hiyab-tutor/internal/domain"
 	"net/http"
+	"path"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -120,13 +123,24 @@ func (c *PartnerController) GetByID(ctx *gin.Context) {
 // @Router /partners [post]
 func (c *PartnerController) Create(ctx *gin.Context) {
 	var req domain.CreatePartnerRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid input"})
+		return
+	}
+	imageFile, err := ctx.FormFile("image")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "error parsing image"})
+		return
+	}
+	fileName := fmt.Sprintf("partners-%d%s", time.Now().Unix(), path.Ext(imageFile.Filename))
+	imageURL := path.Join("uploads", "images", fileName)
+	if err := ctx.SaveUploadedFile(imageFile, imageURL); err != nil {
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "error uploading the image"})
 		return
 	}
 	createdPartner, err := c.u.CreatePartner(&domain.Partner{
 		Name:       req.Name,
-		ImageURL:   req.ImageURL,
+		ImageURL:   imageURL,
 		WebsiteURL: req.WebsiteURL,
 	})
 	if err != nil {
@@ -155,12 +169,32 @@ func (c *PartnerController) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid partner ID"})
 		return
 	}
+	_, err = c.u.GetPartnerByID(uint(id))
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "partner not found"})
+		return
+	}
 	var req domain.UpdatePartnerRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid input"})
 		return
 	}
-	updatedPartner, err := c.u.UpdatePartner(&domain.Partner{Model: domain.Model{ID: uint(id)}, Name: req.Name, ImageURL: req.ImageURL, WebsiteURL: req.WebsiteURL})
+	partner := &domain.Partner{Model: domain.Model{ID: uint(id)}, Name: req.Name, WebsiteURL: req.WebsiteURL}
+	imageFile, err := ctx.FormFile("image")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "error parsing image"})
+		return
+	}
+	if imageFile != nil {
+		fileName := fmt.Sprintf("partners-%d%s", time.Now().Unix(), path.Ext(imageFile.Filename))
+		imageURL := path.Join("uploads", "images", fileName)
+		if err := ctx.SaveUploadedFile(imageFile, imageURL); err != nil {
+			ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "error uploading the image"})
+			return
+		}
+		partner.ImageURL = imageURL
+	}
+	updatedPartner, err := c.u.UpdatePartner(partner)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to update partner"})
 		return

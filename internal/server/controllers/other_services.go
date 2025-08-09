@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"hiyab-tutor/internal/domain"
 
@@ -31,12 +34,27 @@ func NewOtherServiceController(u domain.OtherServiceUsecase) *OtherServiceContro
 // @Security JWT
 // @Router /other-services [post]
 func (c *OtherServiceController) Create(ctx *gin.Context) {
-	var service domain.OtherService
-	if err := ctx.ShouldBindJSON(&service); err != nil {
+	var req domain.CreateOtherService
+	if err := ctx.ShouldBind(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	created, err := c.usecase.CreateService(&service)
+	imageFile, err := ctx.FormFile("image")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "error parsing the request"})
+		return
+	}
+	fileName := fmt.Sprintf("services-%d%s", time.Now().Unix(), path.Ext(imageFile.Filename))
+	imageURL := path.Join("uploads", "images", fileName)
+	if err := ctx.SaveUploadedFile(imageFile, imageURL); err != nil {
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "error saving the image"})
+		return
+	}
+	service := &domain.OtherService{
+		WebsiteURL: req.WebsiteURL,
+		Image:      imageURL,
+	}
+	created, err := c.usecase.CreateService(service)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create service"})
 		return
@@ -138,13 +156,13 @@ func (c *OtherServiceController) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
-	var service domain.OtherService
-	if err := ctx.ShouldBindJSON(&service); err != nil {
+	var req domain.OtherService
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	service.ID = uint(idUint)
-	updated, err := c.usecase.UpdateService(&service)
+	req.ID = uint(idUint)
+	updated, err := c.usecase.UpdateService(&req)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "Service not found"})
 		return
@@ -174,4 +192,39 @@ func (c *OtherServiceController) Delete(ctx *gin.Context) {
 		return
 	}
 	ctx.Status(http.StatusNoContent)
+}
+
+// AddTranslation add translation to the given service
+// @Summary AddTranslation an other service
+// @Description AddTranslation add a translation for a service
+// @Tags Other Services
+// @Produce json
+// @Param id path int true "Service ID"
+// @Success 204
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Security JWT
+// @Router /other-services/{id}/translations [post]
+func (c *OtherServiceController) AddTranslation(ctx *gin.Context) {
+	idUint, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+	_, err = c.usecase.GetServiceByID(uint(idUint), nil)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, domain.ErrorResponse{Message: "service not found"})
+		return
+	}
+	var t *domain.OtherServiceTranslation
+	if err := ctx.ShouldBind(&t); err != nil {
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "error parsing translation"})
+		return
+	}
+	s, err := c.usecase.AddTranslation(uint(idUint), t)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, s)
 }

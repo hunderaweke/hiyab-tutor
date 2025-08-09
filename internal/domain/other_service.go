@@ -1,10 +1,11 @@
 package domain
 
+//go:generate moq -out other_service_mock.go . OtherServiceUsecase OtherServiceRepository
 type OtherService struct {
 	Model
-	WebsiteURL   string                    `json:"website_url"`
-	ImageURL     string                    `json:"image_url"`
-	Translations []OtherServiceTranslation `json:"languages" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
+	WebsiteURL   string                    `form:"website_url" json:"website_url,omitempty"`
+	Image        string                    `form:"image" json:"image,omitempty"`
+	Translations []OtherServiceTranslation `json:"languages,omitempty" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
 }
 
 type OtherServiceTranslation struct {

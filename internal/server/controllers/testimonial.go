@@ -53,7 +53,7 @@ func (c *TestimonialController) Create(ctx *gin.Context) {
 	}
 	var videoURL string
 	if video, err := ctx.FormFile("video"); err == nil {
-		fileName := fmt.Sprintf("%d%s", time.Now().Unix(), path.Ext(video.Filename))
+		fileName := fmt.Sprintf("testimonials-%d%s", time.Now().Unix(), path.Ext(video.Filename))
 		videoURL = path.Join("uploads", "videos", fileName)
 		if err := ctx.SaveUploadedFile(video, videoURL); err != nil {
 			ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to save video"})
@@ -62,7 +62,7 @@ func (c *TestimonialController) Create(ctx *gin.Context) {
 	}
 	var thumbnailURL string
 	if thumbnail, err := ctx.FormFile("thumbnail"); err == nil {
-		fileName := fmt.Sprintf("%d%s", time.Now().Unix(), path.Ext(thumbnail.Filename))
+		fileName := fmt.Sprintf("testimonials-%d%s", time.Now().Unix(), path.Ext(thumbnail.Filename))
 		thumbnailURL = path.Join("uploads", "thumbnails", fileName)
 		if err := ctx.SaveUploadedFile(thumbnail, thumbnailURL); err != nil {
 			ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to save thumbnail"})
