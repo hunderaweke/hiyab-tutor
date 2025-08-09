@@ -89,7 +89,7 @@ func (r *testimonialRepository) GetByID(id uint, languageCodes []string) (*domai
 }
 func (r *testimonialRepository) Delete(id uint) error {
 	// delete associated translations first
-	if err := r.db.Where("testimonial_id = ?", id).Delete(&domain.TestimonialTranslations{}).Error; err != nil {
+	if err := r.db.Where("testimonial_id = ?", id).Delete(&domain.TestimonialTranslation{}).Error; err != nil {
 		return err
 	}
 	if err := r.db.Delete(&domain.Testimonial{}, id).Error; err != nil {

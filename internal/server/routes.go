@@ -33,6 +33,12 @@ func (s *Server) RegisterRoutes() http.Handler {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(10)))
 	// Admin routes
 	routes.SetupAdminRoutes(r, s.DB.Gorm())
+	// Other services routes
+	routes.SetupOtherServiceRoutes(r, s.DB.Gorm())
+	// Partners routes
+	routes.SetupPartnerRoutes(r, s.DB.Gorm())
+	// Testimonials routes
+	routes.SetupTestimonialRoutes(r, s.DB.Gorm())
 
 	return r
 }

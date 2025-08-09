@@ -7,13 +7,18 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	RoleAdmin      = "admin"
+	RoleSuperAdmin = "superadmin"
+)
+
 // swagger:model Admin
 type Admin struct {
 	Model
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Role     string `json:"role"`
-	Name     string `json:"name"`
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+	Role     string `json:"role" binding:"required" validate:"oneof=admin superadmin"`
+	Name     string `json:"name" binding:"required"`
 }
 
 func (a *Admin) BeforeCreate(tx *gorm.DB) (err error) {

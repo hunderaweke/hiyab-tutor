@@ -47,20 +47,14 @@ type UpdatePartnerRequest struct {
 
 // swagger:model CreateTestimonialRequest
 type CreateTestimonialRequest struct {
-	Name         string                                `json:"name" binding:"required"`
-	Role         string                                `json:"role" binding:"required"`
-	VideoURL     string                                `json:"video_url" binding:"required,url"`
-	Thumbnail    string                                `json:"thumbnail" binding:"required,url"`
-	Translations []CreateTestimonialTranslationRequest `json:"languages" binding:"required,dive"`
+	Name string `form:"name" json:"name" binding:"required"`
+	Role string `form:"role" json:"role" binding:"required"`
 }
 
 // swagger:model UpdateTestimonialRequest
 type UpdateTestimonialRequest struct {
-	Name         string                                `json:"name" binding:"required"`
-	Role         string                                `json:"role" binding:"required"`
-	VideoURL     string                                `json:"video_url" binding:"required,url"`
-	Thumbnail    string                                `json:"thumbnail" binding:"required,url"`
-	Translations []UpdateTestimonialTranslationRequest `json:"languages" binding:"required,dive"`
+	Name string `form:"name" json:"name"`
+	Role string `form:"role" json:"role"`
 }
 
 // swagger:model CreateTestimonialTranslationRequest

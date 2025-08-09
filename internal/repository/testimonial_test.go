@@ -26,7 +26,7 @@ func (suite *TestimonialTestSuite) SetupSuite() {
 	}
 	suite.db = db
 	suite.db.Debug()
-	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Testimonial{}, &domain.TestimonialTranslations{}))
+	suite.Assert().NoError(suite.db.AutoMigrate(&domain.Testimonial{}, &domain.TestimonialTranslation{}))
 }
 func (suite *TestimonialTestSuite) SetupTest() {
 
@@ -45,9 +45,9 @@ func (suite *TestimonialTestSuite) TestCreateTestimonial() {
 	testimonial := &domain.Testimonial{
 		Name:      "John Doe",
 		Role:      "Developer",
-		VideoURL:  "http://example.com/video.mp4",
+		Video:     "http://example.com/video.mp4",
 		Thumbnail: "http://example.com/thumbnail.jpg",
-		Translations: []domain.TestimonialTranslations{
+		Translations: []domain.TestimonialTranslation{
 			{
 				LanguageCode: "en",
 				Text:         "This is a testimonial.",
@@ -76,16 +76,16 @@ func (suite *TestimonialTestSuite) TestCreateTestimonial() {
 
 func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 	testimonials := []*domain.Testimonial{
-		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
+		{Name: "John Doe", Role: "Student", Video: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a random."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"}}, Thumbnail: "http://example.com/thumbnail.jpg"},
-		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
+		{Name: "John Doe", Role: "Student", Video: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"}}, Thumbnail: "http://example.com/thumbnail.jpg"},
-		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
+		{Name: "John Doe", Role: "Student", Video: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"}}, Thumbnail: "http://example.com/thumbnail.jpg"},
-		{Name: "John Doe", Role: "Student", VideoURL: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslations{
+		{Name: "John Doe", Role: "Student", Video: "http://example.com/video.mp4", Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"}}, Thumbnail: "http://example.com/thumbnail.jpg"},
 	}
@@ -110,7 +110,7 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 		for i, t := range found.Testimonials {
 			suite.Assert().Equal(t.Name, testimonials[i].Name, "Expected testimonial names to match")
 			suite.Assert().Equal(t.Role, testimonials[i].Role, "Expected testimonial roles to match")
-			suite.Assert().Equal(t.VideoURL, testimonials[i].VideoURL, "Expected testimonial video URLs to match")
+			suite.Assert().Equal(t.Video, testimonials[i].Video, "Expected testimonial video URLs to match")
 			suite.Assert().Equal(t.Thumbnail, testimonials[i].Thumbnail, "Expected testimonial thumbnails to match")
 			suite.Assert().Len(t.Translations, len(testimonials[i].Translations), "Expected number of translations to match")
 			for j, translation := range t.Translations {
@@ -141,7 +141,7 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 			}
 			suite.Assert().Equal(t.Name, testimonials[i].Name, "Expected testimonial names to match")
 			suite.Assert().Equal(t.Role, testimonials[i].Role, "Expected testimonial roles to match")
-			suite.Assert().Equal(t.VideoURL, testimonials[i].VideoURL, "Expected testimonial video URLs to match")
+			suite.Assert().Equal(t.Video, testimonials[i].Video, "Expected testimonial video URLs to match")
 			suite.Assert().Equal(t.Thumbnail, testimonials[i].Thumbnail, "Expected testimonial thumbnails to match")
 		}
 	})
@@ -159,7 +159,7 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 		for _, t := range found.Testimonials {
 			suite.Assert().Contains(t.Name, testimonials[0].Name, "Expected testimonial name to contain query")
 			suite.Assert().Contains(t.Role, testimonials[0].Role, "Expected testimonial role to contain query")
-			suite.Assert().Equal(t.VideoURL, testimonials[0].VideoURL, "Expected testimonial video URL to match")
+			suite.Assert().Equal(t.Video, testimonials[0].Video, "Expected testimonial video URL to match")
 			suite.Assert().Equal(t.Thumbnail, testimonials[0].Thumbnail, "Expected testimonial thumbnail to match")
 			suite.Assert().Len(t.Translations, len(testimonials[0].Translations), "Expected number of translations to match")
 		}
@@ -168,10 +168,10 @@ func (suite *TestimonialTestSuite) TestGetAllTestimonials() {
 }
 func (suite *TestimonialTestSuite) TestGetTestimonialByID() {
 	testimonial := &domain.Testimonial{
-		Name:     "John Doe",
-		Role:     "Developer",
-		VideoURL: "http://example.com/video.mp4",
-		Translations: []domain.TestimonialTranslations{
+		Name:  "John Doe",
+		Role:  "Developer",
+		Video: "http://example.com/video.mp4",
+		Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"},
 		},
@@ -192,7 +192,7 @@ func (suite *TestimonialTestSuite) TestGetTestimonialByID() {
 	suite.Assert().Equal(createdTestimonial.Model.ID, foundTestimonial.Model.ID, "Expected IDs to match")
 	suite.Assert().Equal(createdTestimonial.Name, foundTestimonial.Name, "Expected names to match")
 	suite.Assert().Equal(createdTestimonial.Role, foundTestimonial.Role, "Expected roles to match")
-	suite.Assert().Equal(createdTestimonial.VideoURL, foundTestimonial.VideoURL, "Expected video URLs to match")
+	suite.Assert().Equal(createdTestimonial.Video, foundTestimonial.Video, "Expected video URLs to match")
 	suite.Assert().Equal(createdTestimonial.Thumbnail, foundTestimonial.Thumbnail, "Expected thumbnails to match")
 	suite.Assert().Len(foundTestimonial.Translations, len(createdTestimonial.Translations), "Expected number of translations to match")
 	for i, translation := range foundTestimonial.Translations {
@@ -203,10 +203,10 @@ func (suite *TestimonialTestSuite) TestGetTestimonialByID() {
 
 func (suite *TestimonialTestSuite) TestDeleteTestimonial() {
 	testimonial := &domain.Testimonial{
-		Name:     "John Doe",
-		Role:     "Developer",
-		VideoURL: "http://example.com/video.mp4",
-		Translations: []domain.TestimonialTranslations{
+		Name:  "John Doe",
+		Role:  "Developer",
+		Video: "http://example.com/video.mp4",
+		Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"},
 		},
@@ -229,10 +229,10 @@ func (suite *TestimonialTestSuite) TestDeleteTestimonial() {
 }
 func (suite *TestimonialTestSuite) TestUpdateTestimonial() {
 	testimonial := &domain.Testimonial{
-		Name:     "John Doe",
-		Role:     "Developer",
-		VideoURL: "http://example.com/video.mp4",
-		Translations: []domain.TestimonialTranslations{
+		Name:  "John Doe",
+		Role:  "Developer",
+		Video: "http://example.com/video.mp4",
+		Translations: []domain.TestimonialTranslation{
 			{LanguageCode: "en", Text: "This is a testimonial."},
 			{LanguageCode: "am", Text: "ይህ አንደኛ መልእክት ነው።"},
 		},

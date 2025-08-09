@@ -36,3 +36,12 @@ func (s *testimonialService) DeleteTestimonial(id uint) error {
 func (s *testimonialService) UpdateTestimonial(testimonial *domain.Testimonial) (*domain.Testimonial, error) {
 	return s.repo.Update(testimonial)
 }
+func (s *testimonialService) AddTranslation(testimonialID uint, translation *domain.TestimonialTranslation) (*domain.Testimonial, error) {
+	testimonial, err := s.repo.GetByID(testimonialID, nil)
+	if err != nil {
+		return nil, err
+	}
+	translation.TestimonialID = testimonial.ID
+	testimonial.Translations = append(testimonial.Translations, *translation)
+	return s.repo.Update(testimonial)
+}

@@ -2,12 +2,12 @@ package domain
 
 type OtherService struct {
 	Model
-	WebsiteURL   string                     `json:"website_url"`
-	ImageURL     string                     `json:"image_url"`
-	Translations []OtherServiceTranslations `json:"languages" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
+	WebsiteURL   string                    `json:"website_url"`
+	ImageURL     string                    `json:"image_url"`
+	Translations []OtherServiceTranslation `json:"languages" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
 }
 
-type OtherServiceTranslations struct {
+type OtherServiceTranslation struct {
 	Model
 	LanguageCode string `json:"language_code"`
 	ServiceID    uint   `json:"service_id"`
@@ -43,4 +43,5 @@ type OtherServiceUsecase interface {
 	GetServiceByID(id uint, languageCodes []string) (*OtherService, error)
 	DeleteService(id uint) error
 	UpdateService(service *OtherService) (*OtherService, error)
+	AddTranslation(serviceID uint, translation *OtherServiceTranslation) (*OtherService, error)
 }

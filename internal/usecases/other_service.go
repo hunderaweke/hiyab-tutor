@@ -32,3 +32,12 @@ func (s *otherServiceService) DeleteService(id uint) error {
 func (s *otherServiceService) UpdateService(service *domain.OtherService) (*domain.OtherService, error) {
 	return s.repo.Update(service)
 }
+func (s *otherServiceService) AddTranslation(serviceID uint, translation *domain.OtherServiceTranslation) (*domain.OtherService, error) {
+	service, err := s.repo.GetByID(serviceID, nil)
+	if err != nil {
+		return nil, err
+	}
+	translation.ServiceID = service.ID
+	service.Translations = append(service.Translations, *translation)
+	return s.repo.Update(service)
+}

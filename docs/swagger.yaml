@@ -3,16 +3,28 @@ definitions:
     properties:
       created_at:
         type: string
+      deleted_at:
+        type: string
       id:
         type: integer
       name:
         type: string
+      password:
+        type: string
       role:
+        enum:
+        - admin
+        - superadmin
         type: string
       updated_at:
         type: string
       username:
         type: string
+    required:
+    - name
+    - password
+    - role
+    - username
     type: object
   domain.ChangePasswordRequest:
     properties:
@@ -43,6 +55,19 @@ definitions:
     - password
     - role
     - username
+    type: object
+  domain.CreatePartnerRequest:
+    properties:
+      image_url:
+        type: string
+      name:
+        type: string
+      website_url:
+        type: string
+    required:
+    - image_url
+    - name
+    - website_url
     type: object
   domain.ErrorResponse:
     properties:
@@ -85,6 +110,73 @@ definitions:
       meta:
         $ref: '#/definitions/domain.Pagination'
     type: object
+  domain.MultipleOtherServices:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.OtherService'
+        type: array
+      meta:
+        $ref: '#/definitions/domain.Pagination'
+    type: object
+  domain.MultiplePartnersResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.PartnerResponse'
+        type: array
+      meta:
+        $ref: '#/definitions/domain.Pagination'
+    type: object
+  domain.MultipleTestimonialsResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.TestimonialResponse'
+        type: array
+      meta:
+        $ref: '#/definitions/domain.Pagination'
+    type: object
+  domain.OtherService:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      image_url:
+        type: string
+      languages:
+        items:
+          $ref: '#/definitions/domain.OtherServiceTranslation'
+        type: array
+      updated_at:
+        type: string
+      website_url:
+        type: string
+    type: object
+  domain.OtherServiceTranslation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      language_code:
+        type: string
+      name:
+        type: string
+      service_id:
+        type: integer
+      tag_line:
+        type: string
+      updated_at:
+        type: string
+    type: object
   domain.Pagination:
     properties:
       limit:
@@ -100,6 +192,17 @@ definitions:
       total:
         type: integer
     type: object
+  domain.PartnerResponse:
+    properties:
+      id:
+        type: integer
+      image_url:
+        type: string
+      name:
+        type: string
+      website_url:
+        type: string
+    type: object
   domain.ResetPasswordRequest:
     properties:
       new_password:
@@ -111,6 +214,47 @@ definitions:
   domain.SuccessResponse:
     properties:
       message:
+        type: string
+    type: object
+  domain.TestimonialResponse:
+    properties:
+      id:
+        type: integer
+      languages:
+        items:
+          $ref: '#/definitions/domain.TestimonialTranslationResponse'
+        type: array
+      name:
+        type: string
+      role:
+        type: string
+      thumbnail:
+        type: string
+      video_url:
+        type: string
+    type: object
+  domain.TestimonialTranslation:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      language_code:
+        type: string
+      name:
+        type: string
+      testimonial_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  domain.TestimonialTranslationResponse:
+    properties:
+      language_code:
+        type: string
+      name:
         type: string
     type: object
   domain.UpdateAdminRequest:
@@ -125,6 +269,19 @@ definitions:
     required:
     - name
     - role
+    type: object
+  domain.UpdatePartnerRequest:
+    properties:
+      image_url:
+        type: string
+      name:
+        type: string
+      website_url:
+        type: string
+    required:
+    - image_url
+    - name
+    - website_url
     type: object
 info:
   contact:
@@ -432,6 +589,579 @@ paths:
       summary: Get Current Admin
       tags:
       - Admin
+  /other-services:
+    get:
+      description: Get all other services with pagination, search, sorting, and language
+        filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of services per page
+        in: query
+        name: limit
+        type: integer
+      - description: Search term
+        in: query
+        name: search
+        type: string
+      - description: Sort by field
+        in: query
+        name: sort_by
+        type: string
+      - description: Sort order (asc/desc)
+        in: query
+        name: sort_order
+        type: string
+      - collectionFormat: csv
+        description: Language codes (comma-separated or repeated)
+        in: query
+        items:
+          type: string
+        name: language_codes
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.MultipleOtherServices'
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get all other services
+      tags:
+      - Other Services
+    post:
+      consumes:
+      - application/json
+      description: Create a new other service with translations
+      parameters:
+      - description: Other service payload
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/domain.OtherService'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.OtherService'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - JWT: []
+      summary: Create a new other service
+      tags:
+      - Other Services
+  /other-services/{id}:
+    delete:
+      description: Delete an other service by ID
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - JWT: []
+      summary: Delete an other service
+      tags:
+      - Other Services
+    get:
+      description: Get a service by ID, optionally filtering translations by language
+        codes
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - collectionFormat: csv
+        description: Language codes (comma-separated or repeated)
+        in: query
+        items:
+          type: string
+        name: language_codes
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.OtherService'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a service by ID
+      tags:
+      - Other Services
+    put:
+      consumes:
+      - application/json
+      description: Update an existing other service
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated service payload
+        in: body
+        name: service
+        required: true
+        schema:
+          $ref: '#/definitions/domain.OtherService'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.OtherService'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - JWT: []
+      summary: Update an other service
+      tags:
+      - Other Services
+  /partners:
+    get:
+      description: Get all partners
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.MultiplePartnersResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get all partners
+      tags:
+      - Partners
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Partner details
+        in: body
+        name: partner
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreatePartnerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.PartnerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Create a partner with Image and description
+      tags:
+      - Partners
+  /partners/{id}:
+    delete:
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Delete a partner by ID
+      tags:
+      - Partners
+    get:
+      description: Get a partner by ID
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PartnerResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get a partner by ID
+      tags:
+      - Partners
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Partner ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Partner details
+        in: body
+        name: partner
+        required: true
+        schema:
+          $ref: '#/definitions/domain.UpdatePartnerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PartnerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Update a partner with Image and description
+      tags:
+      - Partners
+  /testimonials:
+    get:
+      consumes:
+      - application/json
+      description: Get all testimonials with optional filters
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Number of testimonials per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.MultipleTestimonialsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get all testimonials
+      tags:
+      - Testimonials
+    post:
+      consumes:
+      - multipart/form-data
+      description: Create a new testimonial
+      parameters:
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Role
+        in: formData
+        name: role
+        required: true
+        type: string
+      - description: Thumbnail URL
+        in: formData
+        name: thumbnail
+        required: true
+        type: string
+      - description: JSON array of translations
+        in: formData
+        name: languages
+        required: true
+        type: string
+      - description: Video file
+        in: formData
+        name: video
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.TestimonialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Create a new testimonial
+      tags:
+      - Testimonials
+  /testimonials/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a testimonial by ID
+      parameters:
+      - description: Testimonial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Delete a testimonial by ID
+      tags:
+      - Testimonials
+    get:
+      consumes:
+      - application/json
+      description: Get a testimonial by ID
+      parameters:
+      - description: Testimonial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TestimonialResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get a testimonial by ID
+      tags:
+      - Testimonials
+    put:
+      consumes:
+      - multipart/form-data
+      description: Update an existing testimonial
+      parameters:
+      - description: Testimonial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Name
+        in: formData
+        name: name
+        required: true
+        type: string
+      - description: Role
+        in: formData
+        name: role
+        required: true
+        type: string
+      - description: Thumbnail URL
+        in: formData
+        name: thumbnail
+        required: true
+        type: string
+      - description: JSON array of translations
+        in: formData
+        name: languages
+        required: true
+        type: string
+      - description: Video file
+        in: formData
+        name: video
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TestimonialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      - JWT: []
+      summary: Update an existing testimonial
+      tags:
+      - Testimonials
+  /testimonials/{id}/translations:
+    post:
+      description: Add a translation to a testimonial
+      parameters:
+      - description: Testimonial ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Translation
+        in: body
+        name: translation
+        required: true
+        schema:
+          $ref: '#/definitions/domain.TestimonialTranslation'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.TestimonialResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Add a translation to a testimonial
+      tags:
+      - Testimonials
 securityDefinitions:
   JWT:
     in: header

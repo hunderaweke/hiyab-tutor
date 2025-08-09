@@ -2,27 +2,27 @@ package domain
 
 type Testimonial struct {
 	Model
-	Name         string                    `json:"name"`
-	Role         string                    `json:"role"`
-	VideoURL     string                    `json:"video_url"`
-	Thumbnail    string                    `json:"thumbnail"`
-	Translations []TestimonialTranslations `json:"languages" gorm:"foreignKey:TestimonialID;constraint:OnDelete:CASCADE"`
+	Name         string                   `form:"name" json:"name"`
+	Role         string                   `form:"role" json:"role"`
+	Video        string                   `form:"video_url" json:"video_url"`
+	Thumbnail    string                   `form:"thumbnail" json:"thumbnail"`
+	Translations []TestimonialTranslation `form:"translations" json:"translations" gorm:"foreignKey:TestimonialID;constraint:OnDelete:CASCADE"`
 }
 
-type TestimonialTranslations struct {
+type TestimonialTranslation struct {
 	Model
-	LanguageCode  string `json:"language_code"`
-	TestimonialID uint   `json:"testimonial_id"`
-	Text          string `json:"name"`
+	LanguageCode  string `form:"language_code" json:"language_code"`
+	TestimonialID uint   `form:"testimonial_id" json:"testimonial_id"`
+	Text          string `form:"name" json:"name"`
 }
 type TestimonialFilter struct {
-	LanguageCodes []string `json:"language_codes"`
-	Page          int      `json:"page"`
-	Limit         int      `json:"limit"`
-	Offset        int      `json:"offset"`
-	Query         string   `json:"query"`
-	SortBy        string   `json:"sort_by"`
-	SortOrder     string   `json:"sort_order"` // "asc" or "desc"
+	LanguageCodes []string `form:"language_codes" json:"language_codes"`
+	Page          int      `form:"page" json:"page"`
+	Limit         int      `form:"limit" json:"limit"`
+	Offset        int      `form:"offset" json:"offset"`
+	Query         string   `form:"query" json:"query"`
+	SortBy        string   `form:"sort_by" json:"sort_by"`
+	SortOrder     string   `form:"sort_order" json:"sort_order"` // "asc" or "desc"
 }
 type MultipleTestimonialResponse struct {
 	Testimonials []*Testimonial `json:"data"`
@@ -42,4 +42,5 @@ type TestimonialUsecase interface {
 	GetTestimonialByID(id uint) (*Testimonial, error)
 	DeleteTestimonial(id uint) error
 	UpdateTestimonial(testimonial *Testimonial) (*Testimonial, error)
+	AddTranslation(testimonialID uint, translation *TestimonialTranslation) (*Testimonial, error)
 }
