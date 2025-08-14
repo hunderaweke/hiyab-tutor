@@ -36,7 +36,7 @@ const MoreAndContact = () => {
   // Autoplay functionality
   useEffect(() => {
     if (!emblaApi) return;
-    
+
     const autoplayInterval = setInterval(() => {
       if (emblaApi.canScrollNext()) {
         emblaApi.scrollNext();
