@@ -1,0 +1,49 @@
+package domain
+
+//go:generate moq -out other_service_mock.go . OtherServiceUsecase OtherServiceRepository
+type OtherService struct {
+	Model
+	WebsiteURL   string                    `form:"website_url" json:"website_url,omitempty"`
+	Image        string                    `form:"image" json:"image,omitempty"`
+	Translations []OtherServiceTranslation `json:"languages" gorm:"foreignKey:ServiceID;constraint:OnDelete:CASCADE"`
+}
+
+type OtherServiceTranslation struct {
+	Model
+	LanguageCode string `json:"language_code"`
+	ServiceID    uint   `json:"service_id"`
+	Name         string `json:"name"`
+	Description  string `json:"description"`
+	TagLine      string `json:"tag_line"`
+}
+
+type ServiceFilter struct {
+	Page          int      `json:"page"`
+	Limit         int      `json:"limit"`
+	Offset        int      `json:"offset"`
+	Search        string   `json:"search"`
+	SortBy        string   `json:"sort_by"`
+	SortOrder     string   `json:"sort_order"`
+	LanguageCodes []string `json:"language_codes"`
+}
+type MultipleOtherServices struct {
+	OtherServicesList []OtherService `json:"data"`
+	Pagination        Pagination     `json:"meta"`
+}
+
+type OtherServiceRepository interface {
+	Create(service *OtherService) (*OtherService, error)
+	GetByID(id uint, languageCodes []string) (*OtherService, error)
+	GetAll(filter *ServiceFilter) (*MultipleOtherServices, error)
+	Update(service *OtherService) (*OtherService, error)
+	Delete(id uint) error
+	AddTranslation(translation *OtherServiceTranslation) error
+}
+type OtherServiceUsecase interface {
+	CreateService(service *OtherService) (*OtherService, error)
+	GetAllServices(filter *ServiceFilter) (*MultipleOtherServices, error)
+	GetServiceByID(id uint, languageCodes []string) (*OtherService, error)
+	DeleteService(id uint) error
+	UpdateService(service *OtherService) (*OtherService, error)
+	AddTranslation(serviceID uint, translation *OtherServiceTranslation) (*OtherService, error)
+}
