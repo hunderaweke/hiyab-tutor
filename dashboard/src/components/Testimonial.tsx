@@ -120,7 +120,7 @@ const Testimonial = () => {
       <form
         className="space-y-6 text-xl"
         onSubmit={(e) => {
-          e.preventDefault();
+          e.preventDefault(); 
           handleSave();
         }}
       >

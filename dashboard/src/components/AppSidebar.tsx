@@ -1,4 +1,10 @@
-import { Calendar, Home, Settings, MessageCircle } from "lucide-react";
+import {
+  Calendar,
+  Home,
+  Settings,
+  MessageCircle,
+  Handshake,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -10,8 +16,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { NavLink } from "react-router-dom";
-
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
 // Menu items.
 const items = [
   {
@@ -20,16 +26,30 @@ const items = [
     icon: Home,
   },
   {
+    title: "Admins",
+    url: "/admins",
+    icon: Settings,
+  },
+  {
     title: "Testimonials",
     url: "/testimonials",
     icon: MessageCircle,
+  },
+  {
+    title: "Partners",
+    url: "/partners",
+    icon: Handshake,
+  },
+  {
+    title: "Other Services",
+    url: "/other-services",
+    icon: Settings,
   },
   {
     title: "Bookings",
     url: "/bookings",
     icon: Calendar,
   },
-
   {
     title: "Settings",
     url: "#",
@@ -38,6 +58,12 @@ const items = [
 ];
 
 export function AppSidebar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem("auth");
+    navigate("/login");
+  };
   return (
     <Sidebar>
       <SidebarContent>
@@ -49,14 +75,30 @@ export function AppSidebar() {
             <SidebarMenu className="mt-10">
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild className="text-xl">
+                  <SidebarMenuButton
+                    asChild
+                    className={`text-xl py-6 ${
+                      location.pathname === item.url
+                        ? "bg-gray-700 text-white"
+                        : ""
+                    }`}
+                  >
                     <NavLink to={item.url}>
-                      <item.icon />
+                      <item.icon size={"40px"} />
                       <span>{item.title}</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <Button
+                  onClick={handleLogout}
+                  variant="destructive"
+                  className="w-full flex text-xl"
+                >
+                  Logout
+                </Button>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -5,15 +5,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { TestimonialTable, type Testimonial } from "./TestimonialTable";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
+import SharedPagination from "./SharedPagination";
 const Testimonials = () => {
   const navigate = useNavigate();
   const [data, setData] = useState<Testimonial[]>([]);
@@ -34,7 +26,6 @@ const Testimonials = () => {
     const resp = await axios.get(
       `/api/testimonials/?sort_by=${sortBy}&sort_order=${sortOrder}&search=${search}&page=${page}&limit=${meta.limit}`
     );
-    console.log(resp.data.meta);
     setData(resp.data.data || []);
     if (resp.data.meta) setMeta(resp.data.meta);
   };
@@ -98,44 +89,7 @@ const Testimonials = () => {
         onView={handleView}
         onDelete={handleDelete}
       />
-      <Pagination className="mt-6">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={e => {
-                e.preventDefault();
-                if (meta.page > 1) handlePageChange(meta.page - 1);
-              }}
-              aria-disabled={meta.page <= 1}
-            />
-          </PaginationItem>
-          {Array.from({ length: Math.ceil(meta.total / meta.limit) || 1 }, (_, i) => i + 1).map(pageNum => (
-            <PaginationItem key={pageNum}>
-              <PaginationLink
-                href="#"
-                isActive={meta.page === pageNum}
-                onClick={e => {
-                  e.preventDefault();
-                  handlePageChange(pageNum);
-                }}
-              >
-                {pageNum}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={e => {
-                e.preventDefault();
-                if (meta.page < Math.ceil(meta.total / meta.limit)) handlePageChange(meta.page + 1);
-              }}
-              aria-disabled={meta.page >= Math.ceil(meta.total / meta.limit)}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <SharedPagination meta={meta} onPageChange={handlePageChange} />
     </div>
   );
 };
