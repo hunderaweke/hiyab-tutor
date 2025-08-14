@@ -4,7 +4,7 @@ type Testimonial struct {
 	Model
 	Name         string                   `form:"name" json:"name"`
 	Role         string                   `form:"role" json:"role"`
-	Video        string                   `form:"video_url" json:"video_url"`
+	Video        string                   `form:"video" json:"video"`
 	Thumbnail    string                   `form:"thumbnail" json:"thumbnail"`
 	Translations []TestimonialTranslation `form:"translations" json:"translations" gorm:"foreignKey:TestimonialID;constraint:OnDelete:CASCADE"`
 }

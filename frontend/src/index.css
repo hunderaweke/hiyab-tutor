@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --default-font-family:"Space Grotesk", sans-serif;
+  --color-main: #001D0A;
+  --color-white: #FAF9F5;
+  --color-brand-green: #1DB954;
+}
+body{
+  background-color: var(--color-main);
+  color : var(--color-white )
+}
+
+/* Embla carousel - base defaults (overridden by variant classes below) */
+.embla { --slides-per-view: 3; --slide-height: 500px; --fade-width: 180px; }
+.embla__viewport { overflow: hidden; }
+.embla__container { display: flex; align-items: stretch; }
+.embla__slide {
+  flex: 0 0 calc(100% / (var(--slides-per-view) + 1));
+  transition: flex-basis 600ms ease;
+  height: var(--slide-height);
+  display: flex;
+}
+.embla__slide.is-selected {
+  flex-basis: calc((100% / (var(--slides-per-view) + 1)) * 2);
+}
+
+/* Equal width variant for text testimonials (no active doubling) */
+.embla.embla--equal .embla__slide { flex-basis: calc(100% / var(--slides-per-view)); }
+.embla.embla--equal .embla__slide.is-selected { flex-basis: calc(100% / var(--slides-per-view)); box-shadow: 0 0 10px 2px var(--color-brand-green); }
+
+/* Video card overlay only on active slide */
+.embla__slide .video-play { opacity: 0; }
+.embla__slide.is-selected .video-play { opacity: 1; }
+
+/* Ensure video card fills equal slide height */
+.video-card { height: 100%; width: 100%; }
+
+/* Edge fade effect on the right side of the carousel */
+.embla.embla--fade-right { position: relative; }
+.embla.embla--fade-right::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--fade-width, 96px);
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to left, var(--color-main) 0%, rgba(0, 29, 10, 0) 100%);
+}
+
+/* Add matching left fade when needed */
+.embla.embla--fade-left { position: relative; }
+.embla.embla--fade-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--fade-width, 96px);
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to right, var(--color-main) 0%, rgba(0, 29, 10, 0) 100%);
+}
+
+.embla-next-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 90px;
+  width: 90px;
+  background: transparent;
+  color: var(--color-brand-green);
+  display: grid;
+  place-items: center;
+  z-index: 5;
+  border: none;
+  box-shadow: none;
+}
+.embla-next-btn svg {
+  width: 90px;
+  height: 90px;
+}
+
+/* Previous arrow for text carousel */
+.embla-prev-btn {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 90px;
+  width: 90px;
+  background: transparent;
+  color: var(--color-brand-green);
+  display: grid;
+  place-items: center;
+  z-index: 5;
+  border: none;
+}
+.embla-prev-btn svg { width: 90px; height: 90px; }
+
+/* ----- Variant presets for responsiveness ----- */
+/* Video carousel */
+.embla.embla--video { --slides-per-view: 3; --slide-height: 500px; --fade-width: 250px; }
+@media (max-width: 1024px) { /* tablet */
+  .embla.embla--video { --slides-per-view: 2; --slide-height: 420px; --fade-width: 160px; }
+}
+@media (max-width: 640px) { /* mobile */
+  .embla.embla--video { --slides-per-view: 1.2; --slide-height: 360px; --fade-width: 96px; }
+}
+
+/* Text testimonials carousel (equal width) */
+.embla.embla--text { --slides-per-view: 4; --slide-height: 360px; --fade-width: 160px; }
+.embla.embla--text.embla--equal .embla__slide { flex-basis: calc(100% / var(--slides-per-view)); }
+.embla.embla--text.embla--equal .embla__slide.is-selected { flex-basis: calc(100% / var(--slides-per-view)); box-shadow: 0 0 10px 2px var(--color-brand-green); }
+@media (max-width: 1024px) {
+  .embla.embla--text { --slides-per-view: 2; --slide-height: 340px; --fade-width: 120px; }
+}
+@media (max-width: 640px) {
+  .embla.embla--text { --slides-per-view: 1.05; --slide-height: 320px; --fade-width: 80px; }
+}
+
+/* Tutors carousel */
+.embla.embla--tutors { --slides-per-view: 3; --slide-height: 580px; --fade-width: 160px; }
+.embla.embla--tutors.embla--equal .embla__slide { flex-basis: calc(100% / var(--slides-per-view)); }
+.embla.embla--tutors.embla--equal .embla__slide.is-selected { flex-basis: calc(100% / var(--slides-per-view)); }
+@media (max-width: 1024px) {
+  .embla.embla--tutors { --slides-per-view: 2; --slide-height: 560px; --fade-width: 120px; }
+}
+@media (max-width: 640px) {
+  .embla.embla--tutors { --slides-per-view: 1; --slide-height: 540px; --fade-width: 0px; }
+}
+
+/* Arrow sizes responsive */
+@media (max-width: 1024px) {
+  .embla-next-btn, .embla-prev-btn { width: 56px; height: 56px; }
+  .embla-next-btn svg, .embla-prev-btn svg { width: 56px; height: 56px; }
+}
+@media (max-width: 640px) {
+  .embla-next-btn, .embla-prev-btn { width: 40px; height: 40px; }
+  .embla-next-btn svg, .embla-prev-btn svg { width: 40px; height: 40px; }
+}
+
+/* More By Hiyab carousel */
+.embla.embla--more { --slides-per-view: 3; --slide-height: 320px; --fade-width: 120px; }
+@media (max-width: 1024px) {
+  .embla.embla--more { --slides-per-view: 2; --slide-height: 300px; --fade-width: 100px; }
+}
+@media (max-width: 640px) {
+  .embla.embla--more { --slides-per-view: 1; --slide-height: 280px; --fade-width: 0px; }
+}
+
+/* Remove fade effects for smaller screens on text testimonials */
+@media (max-width: 768px) {
+  .embla.embla--text.embla--fade-right::after,
+  .embla.embla--text.embla--fade-left::before {
+    display: none;
+  }
+}

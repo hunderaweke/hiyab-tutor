@@ -242,11 +242,10 @@ func (c *AdminController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to generate token"})
 		return
 	}
-
+	ctx.SetCookie("refresh_token", refreshToken, 60*60*24*7, "/auth", "localhost", true, true)
 	ctx.JSON(http.StatusOK, domain.LoginAndRegisterResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		User:         *admin,
+		AccessToken: accessToken,
+		User:        *admin,
 	})
 }
 
@@ -348,4 +347,52 @@ func (c *AdminController) GetCurrentAdmin(ctx *gin.Context) {
 	}
 
 	ctx.JSON(200, admin)
+}
+
+// @Summary Refresh Access Token
+// @Description Refreshes currenct access token and creates and new one for the user
+// @Tags Admin
+// @Produce json
+// @Success 200 {object} domain.LoginAndRegisterResponse
+// @Failure 401 {object} domain.ErrorResponse
+// @Failure 500 {object} domain.ErrorResponse
+// @Security JWT
+// @Route /admin/refresh [post]
+func (c *AdminController) RefreshToken(ctx *gin.Context) {
+	refreshToken, err := ctx.Cookie("refresh_token")
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusUnauthorized, domain.ErrorResponse{Message: "Unauthorized to make the request"})
+		return
+	}
+	claims, err := auth.ValidateToken(refreshToken, auth.TokenTypeRefresh)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "invalid token"})
+		return
+	}
+	user, err := c.u.GetByID(claims.UserID)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "invalid token"})
+		return
+	}
+	accessToken, err := auth.GenerateToken(user, auth.TokenTypeAccess)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "error generating token"})
+		return
+	}
+	refreshToken, err = auth.GenerateToken(user, auth.TokenTypeRefresh)
+	if err != nil {
+		log.Println(err)
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "error generating token"})
+		return
+	}
+	
+	ctx.SetCookie("refresh_token", refreshToken, 60*60*24*7, "/auth", "localhost", true, true)
+	ctx.JSON(http.StatusOK, domain.LoginAndRegisterResponse{
+		AccessToken: accessToken,
+		User:        *user,
+	})
 }

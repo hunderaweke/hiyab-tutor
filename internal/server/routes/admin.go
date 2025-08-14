@@ -37,6 +37,7 @@ func SetupAdminRoutes(r *gin.Engine, db *gorm.DB) {
 		}
 	}
 	adminGroup := r.Group("/api/v1/admin")
+	adminGroup.POST("/refresh", adminController.RefreshToken)
 	adminGroup.POST("/login", adminController.Login)
 	adminGroup.Use(middlewares.AuthMiddleware(), middlewares.IsAdminMiddleware())
 	{

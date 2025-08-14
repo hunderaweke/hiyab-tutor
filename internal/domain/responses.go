@@ -17,10 +17,6 @@ type SuccessResponse struct {
 
 // swagger:model LoginResponse
 type LoginAndRegisterResponse struct {
-	// The refresh token
-	// example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-	RefreshToken string `json:"refresh_token"`
-	// The access token
 	// example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 	AccessToken string `json:"access_token"`
 	// The user object
@@ -58,7 +54,7 @@ type TestimonialResponse struct {
 	ID           uint                             `json:"id"`
 	Name         string                           `json:"name"`
 	Role         string                           `json:"role"`
-	VideoURL     string                           `json:"video_url"`
+	Video        string                           `json:"video"`
 	Thumbnail    string                           `json:"thumbnail"`
 	Translations []TestimonialTranslationResponse `json:"languages"`
 }

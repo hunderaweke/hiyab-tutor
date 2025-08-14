@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"fmt"
 	"hiyab-tutor/internal/domain"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type testimonialRepository struct {
@@ -11,6 +13,7 @@ type testimonialRepository struct {
 }
 
 func NewTestimonialRepository(db *gorm.DB) domain.TestimonialRepository {
+	db.AutoMigrate(&domain.Testimonial{})
 	return &testimonialRepository{db: db}
 }
 func (r *testimonialRepository) Create(testimonial *domain.Testimonial) (*domain.Testimonial, error) {
@@ -25,8 +28,7 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (*domai
 	var testimonials []*domain.Testimonial
 	var total int64
 	query := r.db.Model(&domain.Testimonial{})
-
-	query = query.Joins("JOIN testimonial_translations ON testimonial_translations.testimonial_id = testimonials.id")
+	query = query.Joins("LEFT JOIN testimonial_translations ON testimonial_translations.testimonial_id = testimonials.id")
 	if filter == nil {
 		filter = &domain.TestimonialFilter{
 			Page:   1,
@@ -43,14 +45,24 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (*domai
 			query = query.Where("testimonials.name LIKE ? OR testimonials.role LIKE ? OR testimonial_translations.text LIKE ?", q, q, q)
 		}
 		if filter.SortBy != "" {
+			allowedSortFields := map[string]bool{
+				"id":         true,
+				"name":       true,
+				"role":       true,
+				"created_at": true,
+			}
+			sortBy := filter.SortBy
+			if !allowedSortFields[sortBy] {
+				sortBy = "created_at"
+			}
 			switch filter.SortOrder {
-			case "desc":
-				query = query.Order("testimonials." + filter.SortBy + " DESC")
 			case "asc":
-				query = query.Order("testimonials." + filter.SortBy + " ASC")
+				query = query.Order(clause.OrderByColumn{Column: clause.Column{Name: fmt.Sprintf("testimonials.%s", filter.SortBy)}, Desc: false})
+			default:
+				query = query.Order(clause.OrderByColumn{Column: clause.Column{Name: fmt.Sprintf("testimonials.%s", filter.SortBy)}, Desc: true})
 			}
 		} else {
-			query = query.Order("testimonials.created_at DESC") // Default sorting by created_at in descending order
+			query = query.Order(clause.OrderByColumn{Column: clause.Column{Name: fmt.Sprintf("testimonials.%s", filter.SortBy)}, Desc: true})
 		}
 		if filter.LanguageCodes != nil {
 			query = query.Preload("Translations", "language_code IN ?", filter.LanguageCodes)
@@ -58,12 +70,11 @@ func (r *testimonialRepository) GetAll(filter *domain.TestimonialFilter) (*domai
 			query = query.Preload("Translations")
 		}
 	}
-	query = query.Group("testimonials.id").Limit(filter.Limit).Offset(filter.Offset)
 	query.Count(&total)
+	query = query.Group("testimonials.id").Limit(filter.Limit).Offset(filter.Offset)
 	if err := query.Find(&testimonials).Error; err != nil {
 		return nil, domain.ErrSearchFailed
 	}
-
 	return &domain.MultipleTestimonialResponse{
 		Testimonials: testimonials,
 		Pagination: domain.Pagination{

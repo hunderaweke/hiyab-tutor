@@ -16,7 +16,7 @@ const (
 type Admin struct {
 	Model
 	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Password string `json:"-" binding:"required"`
 	Role     string `json:"role" binding:"required" validate:"oneof=admin superadmin"`
 	Name     string `json:"name" binding:"required"`
 }

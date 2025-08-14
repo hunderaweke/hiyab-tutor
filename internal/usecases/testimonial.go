@@ -21,11 +21,7 @@ func (s *testimonialService) CreateTestimonial(testimonial *domain.Testimonial) 
 	return s.repo.Create(testimonial)
 }
 func (s *testimonialService) GetAllTestimonials(filter *domain.TestimonialFilter) (*domain.MultipleTestimonialResponse, error) {
-	response, err := s.repo.GetAll(nil)
-	if err != nil {
-		return nil, err
-	}
-	return response, nil
+	return s.repo.GetAll(filter)
 }
 func (s *testimonialService) GetTestimonialByID(id uint) (*domain.Testimonial, error) {
 	return s.repo.GetByID(id, nil)

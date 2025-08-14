@@ -80,7 +80,6 @@ func (c *TestimonialController) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to create testimonial"})
 		return
 	}
-
 	ctx.JSON(http.StatusCreated, createdTestimonial)
 }
 
@@ -144,7 +143,9 @@ func (c *TestimonialController) GetAll(ctx *gin.Context) {
 	if sortOrder != "" {
 		filter.SortOrder = sortOrder
 	}
-	resp, err := c.u.GetAllTestimonials(filter)
+	var err error
+	var resp *domain.MultipleTestimonialResponse
+	resp, err = c.u.GetAllTestimonials(filter)
 	if err != nil {
 		ctx.JSON(500, domain.ErrorResponse{Message: "Failed to fetch testimonials"})
 		return
