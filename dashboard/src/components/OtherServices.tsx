@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SharedPagination from "./SharedPagination";
@@ -84,7 +84,7 @@ const OtherServices: React.FC = () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (resp.status === 200) {
+    if (resp.status === HttpStatusCode.NoContent) {
       fetchServices();
     }
   };

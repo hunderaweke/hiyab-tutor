@@ -40,6 +40,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	routes.SetupPartnerRoutes(r, s.DB.Gorm())
 	// Testimonials routes
 	routes.SetupTestimonialRoutes(r, s.DB.Gorm())
+	// Booking routes
+	routes.SetupBookingRoutes(r, s.DB.Gorm())
 
 	return r
 }

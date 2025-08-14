@@ -32,19 +32,19 @@ const OtherServiceDetail: React.FC = () => {
     tag_line: "",
   });
   const [adding, setAdding] = useState(false);
-
-  useEffect(() => {
+  const fetchService = async () => {
     setLoading(true);
-    axios
-      .get(`/api/other-services/${id}`)
-      .then((res) => {
-        setService(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load service");
-        setLoading(false);
-      });
+    try {
+      const res = await axios.get(`/api/other-services/${id}`);
+      setService(res.data);
+    } catch {
+      setError("Failed to load service");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    fetchService();
   }, [id]);
 
   const handleChange = (
@@ -71,6 +71,7 @@ const OtherServiceDetail: React.FC = () => {
         );
         setForm({ language_code: "", name: "", description: "", tag_line: "" });
         setAdding(false);
+        fetchService();
       })
       .catch(() => {
         setError("Failed to add translation");

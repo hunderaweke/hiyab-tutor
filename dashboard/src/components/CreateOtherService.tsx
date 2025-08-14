@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectLabel,
 } from "@/components/ui/select";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Label } from "@radix-ui/react-label";
 
 interface Translation {
@@ -73,7 +73,7 @@ const CreateOtherService: React.FC = () => {
       setImagePreview("");
       setImageFile(null);
       alert("Other service created successfully!");
-    } catch (err: any) {
+    } catch (err: Error | AxiosError) {
       alert(err.message || "Failed to create other service");
     }
   };
@@ -113,82 +113,6 @@ const CreateOtherService: React.FC = () => {
           className="w-24 h-24 object-cover rounded mb-2"
         />
       )}
-
-      <h3 className="text-lg font-semibold mt-4">Translations</h3>
-      {fields.map((field, idx) => (
-        <div key={field.id} className="border p-2 mb-2 rounded">
-          <label className="block mb-1">Language</label>
-          <Controller
-            name={`languages.${idx}.language_code`}
-            control={control}
-            rules={{ required: "Language is required" }}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Languages</SelectLabel>
-                    {languageOptions.map((lang) => (
-                      <SelectItem key={lang.code} value={lang.code}>
-                        {lang.label}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            )}
-          />
-          <Label htmlFor={`languages.${idx}.name`}>Name</Label>
-          <Input
-            type="text"
-            placeholder="Name"
-            {...register(`languages.${idx}.name`, {
-              required: "Name is required",
-            })}
-          />
-          <Label htmlFor={`languages.${idx}.description`}>Description</Label>
-          <Textarea
-            placeholder="Description"
-            {...register(`languages.${idx}.description`, {
-              required: "Description is required",
-            })}
-          />
-          <Label htmlFor={`languages.${idx}.tag_line`}>Tag Line</Label>
-          <Input
-            type="text"
-            placeholder="Tag Line"
-            {...register(`languages.${idx}.tag_line`, {
-              required: "Tag line is required",
-            })}
-          />
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={() => remove(idx)}
-            className="mt-2"
-          >
-            Remove
-          </Button>
-        </div>
-      ))}
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={() =>
-          append({
-            language_code: "en",
-            name: "",
-            description: "",
-            tag_line: "",
-          })
-        }
-      >
-        Add Translation
-      </Button>
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Submitting..." : "Create"}
       </Button>
