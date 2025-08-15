@@ -74,3 +74,13 @@ type CreateOtherService struct {
 	WebsiteURL string                `form:"website_url"`
 	Image      *multipart.FileHeader `form:"image"`
 }
+
+type UpdateTutorRequest struct {
+	FullName       string `form:"full_name" json:"full_name,omitempty"`
+	PhoneNumber    string `form:"phone_number" json:"phone_number,omitempty"`
+	EducationLevel string `form:"education_level" json:"education_level,omitempty"`
+	DayPerWeek     int    `form:"day_per_week" json:"day_per_week,omitempty"`
+	HrPerDay       int    `form:"hr_per_day" json:"hr_per_day,omitempty"`
+	Verified       bool   `form:"verified" json:"verified,omitempty"`
+	Email          string `form:"email" json:"email,omitempty"`
+}

@@ -30,8 +30,10 @@ func (s *BookingRepoTestSuite) SetupSuite() {
 }
 
 func (s *BookingRepoTestSuite) SetupTest() {
-	s.db.Exec("DELETE FROM bookings")
 	s.bookingRepo = NewBookingRepository(s.db)
+}
+func (s *BookingRepoTestSuite) TearDownTest() {
+	s.db.Exec("DELETE FROM bookings")
 }
 func (s *BookingRepoTestSuite) TearDownSuite() {
 	db, _ := s.db.DB()
