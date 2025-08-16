@@ -30,12 +30,21 @@ func (m *mockBookingUsecase) Create(b *domain.Booking) (*domain.Booking, error) 
 	m.bookings[b.ID] = b
 	return b, nil
 }
-func (m *mockBookingUsecase) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, error) {
-	var result []*domain.Booking
+func (m *mockBookingUsecase) GetAll(filter *domain.BookingFilter) (domain.MultipleBookingResponse, error) {
+	var result []domain.Booking
 	for _, b := range m.bookings {
-		result = append(result, b)
+		result = append(result, *b)
 	}
-	return result, nil
+	resp := domain.MultipleBookingResponse{
+		Data: result,
+		Pagination: domain.Pagination{
+			Page:   1,
+			Limit:  len(result),
+			Offset: 0,
+			Total:  len(result),
+		},
+	}
+	return resp, nil
 }
 func (m *mockBookingUsecase) GetByID(id uint) (*domain.Booking, error) {
 	b, ok := m.bookings[id]
@@ -84,7 +93,7 @@ func (s *BookingControllerTestSuite) SetupTest() {
 }
 
 func (s *BookingControllerTestSuite) TestCreateBooking() {
-	b := &domain.Booking{FullName: "Test User"}
+	b := &domain.Booking{FirstName: "Test User"}
 	body, _ := json.Marshal(b)
 	req := httptest.NewRequest("POST", "/bookings", bytes.NewBuffer(body))
 	req.Header.Set("Content-Type", "application/json")
@@ -93,25 +102,25 @@ func (s *BookingControllerTestSuite) TestCreateBooking() {
 	s.Equal(http.StatusCreated, w.Code)
 	var resp domain.Booking
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Equal("Test User", resp.FullName)
+	s.Equal("Test User", resp.FirstName)
 }
 
 func (s *BookingControllerTestSuite) TestGetAllBookings() {
-	b1 := &domain.Booking{FullName: "A"}
-	b2 := &domain.Booking{FullName: "B"}
+	b1 := &domain.Booking{FirstName: "A"}
+	b2 := &domain.Booking{FirstName: "B"}
 	s.usecase.Create(b1)
 	s.usecase.Create(b2)
 	req := httptest.NewRequest("GET", "/bookings", nil)
 	w := httptest.NewRecorder()
 	s.engine.ServeHTTP(w, req)
 	s.Equal(http.StatusOK, w.Code)
-	var resp []domain.Booking
+	var resp domain.MultipleBookingResponse
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Len(resp, 2)
+	s.Len(resp.Data, 2)
 }
 
 func (s *BookingControllerTestSuite) TestGetBookingByID() {
-	b := &domain.Booking{FullName: "FindMe"}
+	b := &domain.Booking{FirstName: "FindMe"}
 	created, _ := s.usecase.Create(b)
 	req := httptest.NewRequest("GET", "/bookings/1", nil)
 	w := httptest.NewRecorder()
@@ -119,11 +128,11 @@ func (s *BookingControllerTestSuite) TestGetBookingByID() {
 	s.Equal(http.StatusOK, w.Code)
 	var resp domain.Booking
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Equal(created.FullName, resp.FullName)
+	s.Equal(created.FirstName, resp.FirstName)
 }
 
 func (s *BookingControllerTestSuite) TestAssignBooking() {
-	b := &domain.Booking{FullName: "AssignMe", Assigned: false}
+	b := &domain.Booking{FirstName: "AssignMe", Assigned: false}
 	s.usecase.Create(b)
 	req := httptest.NewRequest("PUT", "/bookings/1/assign", nil)
 	w := httptest.NewRecorder()

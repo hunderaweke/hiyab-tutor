@@ -63,15 +63,22 @@ const OtherServices: React.FC = () => {
     order: "asc" | "desc" = "asc"
   ) => {
     try {
-      const resp = await axios.get(
-        `/api/other-services/?search=${encodeURIComponent(
-          searchValue
-        )}&page=${page}&limit=${
-          meta.limit
-        }&language_codes=${lang}&sort_by=${sort}&sort_order=${order}`
-      );
-      setServices(resp.data.data || []);
-      if (resp.data.meta) setMeta(resp.data.meta);
+      const params = new URLSearchParams();
+      if (searchValue) params.append("search", searchValue);
+      params.append("page", String(page));
+      params.append("limit", String(meta.limit));
+      params.append("language_codes", lang);
+      params.append("sort_by", sort);
+      params.append("sort_order", order);
+
+      const resp = await axios.get(`/api/other-services/`, {
+        params: Object.fromEntries(params.entries()),
+      });
+      if (resp.data) {
+        if (Array.isArray(resp.data.data)) setServices(resp.data.data);
+        else if (Array.isArray(resp.data)) setServices(resp.data);
+        if (resp.data.pagination) setMeta(resp.data.pagination);
+      }
       setError(null);
     } catch {
       setError("Failed to fetch services");
@@ -99,131 +106,145 @@ const OtherServices: React.FC = () => {
 
   return (
     <div className="space-y-4 p-10">
-      <div className="flex gap-2 justify-between items-center">
-        <Input
-          type="text"
-          placeholder="Search other services..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        <Select value={language} onValueChange={setLanguage}>
-          <SelectTrigger>
-            <SelectValue placeholder="Language" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Languages</SelectLabel>
-              <SelectItem value="en">English</SelectItem>
-              <SelectItem value="am">Amharic</SelectItem>
-              <SelectItem value="om">Oromo</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <Button onClick={handleCreate}>Create Other Service</Button>
+      <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
+        <div className="flex gap-2 flex-wrap items-center w-full md:w-auto">
+          <Input
+            type="text"
+            placeholder="Search other services..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setMeta((m) => ({ ...m, page: 1 }));
+            }}
+            className="max-w-sm"
+          />
+          <Select
+            value={language}
+            onValueChange={(v) => {
+              setLanguage(v);
+              setMeta((m) => ({ ...m, page: 1 }));
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Language" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Languages</SelectLabel>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="am">Amharic</SelectItem>
+                <SelectItem value="om">Oromo</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button onClick={handleCreate}>Create Other Service</Button>
+        </div>
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <Table className="mb-4">
-        <TableHeader>
-          <TableRow className="bg-gray-100">
-            <TableHead>Image</TableHead>
-            <TableHead>Website</TableHead>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => {
-                setSortBy("name");
-                setSortOrder((prev) =>
-                  sortBy === "name" && prev === "asc" ? "desc" : "asc"
-                );
-              }}
-            >
-              Name ({language.toUpperCase()})
-              {sortBy === "name" && (sortOrder === "asc" ? " ▲" : " ▼")}
-            </TableHead>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => {
-                setSortBy("description");
-                setSortOrder((prev) =>
-                  sortBy === "description" && prev === "asc" ? "desc" : "asc"
-                );
-              }}
-            >
-              Description ({language.toUpperCase()})
-              {sortBy === "description" && (sortOrder === "asc" ? " ▲" : " ▼")}
-            </TableHead>
-            <TableHead
-              className="cursor-pointer select-none"
-              onClick={() => {
-                setSortBy("tag_line");
-                setSortOrder((prev) =>
-                  sortBy === "tag_line" && prev === "asc" ? "desc" : "asc"
-                );
-              }}
-            >
-              Tag Line ({language.toUpperCase()})
-              {sortBy === "tag_line" && (sortOrder === "asc" ? " ▲" : " ▼")}
-            </TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {services.map((service) => {
-            const translation =
-              service.languages?.find((l) => l.language_code === language) ||
-              service.languages?.[0];
-            return (
-              <TableRow key={service.id}>
-                <TableCell>
-                  {service.image ? (
-                    <img
-                      src={`/api/${service.image}`}
-                      alt="Service"
-                      className="w-16 h-16 object-cover rounded"
-                    />
-                  ) : (
-                    <span className="text-gray-400">No Image</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {service.website_url ? (
-                    <a
-                      href={service.website_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
+      <div className="overflow-x-auto">
+        <Table className="mb-4 min-w-[900px]">
+          <TableHeader>
+            <TableRow className="bg-gray-100">
+              <TableHead>Image</TableHead>
+              <TableHead>Website</TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => {
+                  setSortBy("name");
+                  setSortOrder((prev) =>
+                    sortBy === "name" && prev === "asc" ? "desc" : "asc"
+                  );
+                }}
+              >
+                Name ({language.toUpperCase()})
+                {sortBy === "name" && (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => {
+                  setSortBy("description");
+                  setSortOrder((prev) =>
+                    sortBy === "description" && prev === "asc" ? "desc" : "asc"
+                  );
+                }}
+              >
+                Description ({language.toUpperCase()})
+                {sortBy === "description" &&
+                  (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => {
+                  setSortBy("tag_line");
+                  setSortOrder((prev) =>
+                    sortBy === "tag_line" && prev === "asc" ? "desc" : "asc"
+                  );
+                }}
+              >
+                Tag Line ({language.toUpperCase()})
+                {sortBy === "tag_line" && (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {services.map((service) => {
+              const translation =
+                service.languages?.find((l) => l.language_code === language) ||
+                service.languages?.[0];
+              return (
+                <TableRow key={service.id}>
+                  <TableCell>
+                    {service.image ? (
+                      <img
+                        src={`/api/${service.image}`}
+                        alt="Service"
+                        className="w-16 h-16 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No Image</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {service.website_url ? (
+                      <a
+                        href={service.website_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        {service.website_url}
+                      </a>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
+                  </TableCell>
+                  <TableCell>{translation?.name || "-"}</TableCell>
+                  <TableCell>{translation?.description || "-"}</TableCell>
+                  <TableCell>{translation?.tag_line || "-"}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mr-2"
+                      onClick={() => navigate(`/other-services/${service.id}`)}
                     >
-                      {service.website_url}
-                    </a>
-                  ) : (
-                    <span className="text-gray-400">N/A</span>
-                  )}
-                </TableCell>
-                <TableCell>{translation?.name || "-"}</TableCell>
-                <TableCell>{translation?.description || "-"}</TableCell>
-                <TableCell>{translation?.tag_line || "-"}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mr-2"
-                    onClick={() => navigate(`/other-services/${service.id}`)}
-                  >
-                    View
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(service.id)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                      View
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(service.id)}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
       <SharedPagination
         meta={meta}
         onPageChange={(page) => setMeta((m) => ({ ...m, page }))}

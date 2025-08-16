@@ -14,6 +14,7 @@ type bookingRepo struct {
 }
 
 func NewBookingRepository(db *gorm.DB) domain.BookingRepository {
+	db.AutoMigrate(&domain.Booking{})
 	return &bookingRepo{db: db}
 }
 
@@ -23,8 +24,9 @@ func (r *bookingRepo) Create(b *domain.Booking) (*domain.Booking, error) {
 	}
 	return b, nil
 }
-func (r *bookingRepo) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, error) {
+func (r *bookingRepo) GetAll(filter *domain.BookingFilter) (domain.MultipleBookingResponse, error) {
 	var bookings []*domain.Booking
+	var total int64
 	query := r.db.Model(&domain.Booking{})
 	// Filtering
 	if filter != nil {
@@ -42,7 +44,7 @@ func (r *bookingRepo) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, e
 		}
 		if filter.Query != "" {
 			q := "%" + filter.Query + "%"
-			query = query.Where("full_name LIKE ? OR phone_number LIKE ? OR address LIKE ?", q, q, q)
+			query = query.Where("first_name LIKE ? OR last_name LIKE ? OR phone_number LIKE ? OR address LIKE ?", q, q, q, q)
 		}
 		if filter.MinDayPerWeek > 0 {
 			query = query.Where("day_per_week >= ?", filter.MinDayPerWeek)
@@ -61,12 +63,45 @@ func (r *bookingRepo) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, e
 			query = query.Where("assigned = ?", filter.Assigned)
 		}
 	}
-	// Pagination: always limit to 10 per page
-	query = query.Limit(10)
-	if err := query.Find(&bookings).Error; err != nil {
-		return nil, err
+	// Count total matching
+	if err := query.Count(&total).Error; err != nil {
+		return domain.MultipleBookingResponse{}, err
 	}
-	return bookings, nil
+
+	// Pagination defaults
+	limit := 10
+	page := 1
+	if filter != nil {
+		if filter.Limit > 0 {
+			limit = filter.Limit
+		}
+		if filter.Page > 0 {
+			page = filter.Page
+		}
+	}
+	offset := (page - 1) * limit
+
+	query = query.Limit(limit).Offset(offset)
+	if err := query.Find(&bookings).Error; err != nil {
+		return domain.MultipleBookingResponse{}, err
+	}
+
+	// convert []*domain.Booking to []domain.Booking
+	data := make([]domain.Booking, 0, len(bookings))
+	for _, b := range bookings {
+		data = append(data, *b)
+	}
+
+	resp := domain.MultipleBookingResponse{
+		Data: data,
+		Pagination: domain.Pagination{
+			Page:   page,
+			Limit:  limit,
+			Offset: offset,
+			Total:  int(total),
+		},
+	}
+	return resp, nil
 }
 func (r *bookingRepo) GetByID(id uint) (*domain.Booking, error) {
 	var b domain.Booking
@@ -82,7 +117,8 @@ func (r *bookingRepo) Update(id uint, b *domain.Booking) (*domain.Booking, error
 		return nil, err
 	}
 	// Update all fields
-	booking.FullName = b.FullName
+	booking.FirstName = b.FirstName
+	booking.LastName = b.LastName
 	booking.Grade = b.Grade
 	booking.Address = b.Address
 	booking.Gender = b.Gender

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"hiyab-tutor/internal/domain"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -30,6 +31,7 @@ func NewBookingController(u domain.BookingUsecase) *BookingController {
 func (c *BookingController) Create(ctx *gin.Context) {
 	var req domain.Booking
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		log.Println(err)
 		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid request"})
 		return
 	}
@@ -56,18 +58,61 @@ func (c *BookingController) Create(ctx *gin.Context) {
 // @Router /bookings [get]
 func (c *BookingController) GetAll(ctx *gin.Context) {
 	filter := &domain.BookingFilter{}
+	// standard filters
 	if v := ctx.Query("gender"); v != "" {
 		filter.Gender = v
 	}
 	if v := ctx.Query("assigned"); v != "" {
 		filter.Assigned = v == "true"
 	}
-	bookings, err := c.u.GetAll(filter)
+	if v := ctx.Query("query"); v != "" {
+		filter.Query = v
+	}
+	// numeric filters
+	if v := ctx.Query("min_day_per_week"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.MinDayPerWeek = n
+		}
+	}
+	if v := ctx.Query("max_day_per_week"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.MaxDayPerWeek = n
+		}
+	}
+	if v := ctx.Query("min_hr_per_day"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.MinHrPerDay = n
+		}
+	}
+	if v := ctx.Query("max_hr_per_day"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.MaxHrPerDay = n
+		}
+	}
+	// pagination & sorting
+	if v := ctx.Query("page"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.Page = n
+		}
+	}
+	if v := ctx.Query("limit"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			filter.Limit = n
+		}
+	}
+	if v := ctx.Query("sort_by"); v != "" {
+		filter.SortBy = v
+	}
+	if v := ctx.Query("sort_order"); v != "" {
+		filter.SortOrder = v
+	}
+
+	resp, err := c.u.GetAll(filter)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to fetch bookings"})
 		return
 	}
-	ctx.JSON(http.StatusOK, bookings)
+	ctx.JSON(http.StatusOK, resp)
 }
 
 // GetByID handles protected viewing of a single booking

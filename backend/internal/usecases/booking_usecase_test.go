@@ -24,12 +24,21 @@ func (m *mockBookingRepository) Create(b *domain.Booking) (*domain.Booking, erro
 	m.bookings[b.ID] = b
 	return b, nil
 }
-func (m *mockBookingRepository) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, error) {
-	var result []*domain.Booking
+func (m *mockBookingRepository) GetAll(filter *domain.BookingFilter) (domain.MultipleBookingResponse, error) {
+	var result []domain.Booking
 	for _, b := range m.bookings {
-		result = append(result, b)
+		result = append(result, *b)
 	}
-	return result, nil
+	resp := domain.MultipleBookingResponse{
+		Data: result,
+		Pagination: domain.Pagination{
+			Page:   1,
+			Limit:  len(result),
+			Offset: 0,
+			Total:  len(result),
+		},
+	}
+	return resp, nil
 }
 func (m *mockBookingRepository) GetByID(id uint) (*domain.Booking, error) {
 	b, ok := m.bookings[id]
@@ -64,36 +73,36 @@ func (s *BookingUsecaseTestSuite) SetupTest() {
 }
 
 func (s *BookingUsecaseTestSuite) TestCreateAndGetByID() {
-	b := &domain.Booking{FullName: "Test"}
+	b := &domain.Booking{FirstName: "Test"}
 	created, err := s.usecase.Create(b)
 	s.NoError(err)
 	s.NotNil(created)
 	fetched, err := s.usecase.GetByID(created.ID)
 	s.NoError(err)
-	s.Equal(created.FullName, fetched.FullName)
+	s.Equal(created.FirstName, fetched.FirstName)
 }
 
 func (s *BookingUsecaseTestSuite) TestGetAll() {
-	b1 := &domain.Booking{FullName: "A"}
-	b2 := &domain.Booking{FullName: "B"}
+	b1 := &domain.Booking{FirstName: "A"}
+	b2 := &domain.Booking{FirstName: "B"}
 	s.usecase.Create(b1)
 	s.usecase.Create(b2)
-	all, err := s.usecase.GetAll(&domain.BookingFilter{})
+	resp, err := s.usecase.GetAll(&domain.BookingFilter{})
 	s.NoError(err)
-	s.Len(all, 2)
+	s.Len(resp.Data, 2)
 }
 
 func (s *BookingUsecaseTestSuite) TestUpdate() {
-	b := &domain.Booking{FullName: "Old"}
+	b := &domain.Booking{FirstName: "Old"}
 	created, _ := s.usecase.Create(b)
-	updated := &domain.Booking{FullName: "New"}
+	updated := &domain.Booking{FirstName: "New"}
 	result, err := s.usecase.Update(created.ID, updated)
 	s.NoError(err)
-	s.Equal("New", result.FullName)
+	s.Equal("New", result.FirstName)
 }
 
 func (s *BookingUsecaseTestSuite) TestDelete() {
-	b := &domain.Booking{FullName: "ToDelete"}
+	b := &domain.Booking{FirstName: "ToDelete"}
 	created, _ := s.usecase.Create(b)
 	err := s.usecase.Delete(created.ID)
 	s.NoError(err)
@@ -103,7 +112,7 @@ func (s *BookingUsecaseTestSuite) TestDelete() {
 }
 
 func (s *BookingUsecaseTestSuite) TestAssign() {
-	b := &domain.Booking{FullName: "AssignMe", Assigned: false}
+	b := &domain.Booking{FirstName: "AssignMe", Assigned: false}
 	created, _ := s.usecase.Create(b)
 	err := s.usecase.Assign(created.ID)
 	s.NoError(err)

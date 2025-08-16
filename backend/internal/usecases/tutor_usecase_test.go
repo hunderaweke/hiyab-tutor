@@ -37,7 +37,7 @@ func (m *mockTutorRepository) GetAll(filter *domain.TutorFilter) (domain.Multipl
 			if filter.Verified && !t.Verified {
 				continue
 			}
-			if filter.Query != "" && t.FullName != filter.Query {
+			if filter.Query != "" && t.FirstName != filter.Query {
 				continue
 			}
 		}
@@ -89,24 +89,24 @@ func (s *TutorUsecaseTestSuite) SetupTest() {
 }
 
 func (s *TutorUsecaseTestSuite) TestCreate_Valid() {
-	t := &domain.Tutor{FullName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
+	t := &domain.Tutor{FirstName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
 	created, err := s.usecase.Create(t)
 	s.NoError(err)
 	s.NotNil(created)
-	s.Equal("Test Tutor", created.FullName)
+	s.Equal("Test Tutor", created.FirstName)
 }
 
 func (s *TutorUsecaseTestSuite) TestCreate_Invalid() {
 	_, err := s.usecase.Create(nil)
 	s.Error(err)
-	_, err = s.usecase.Create(&domain.Tutor{FullName: "", EducationLevel: "", Email: ""})
+	_, err = s.usecase.Create(&domain.Tutor{FirstName: "", EducationLevel: "", Email: ""})
 	s.Error(err)
 }
 
 func (s *TutorUsecaseTestSuite) TestGetAll_Filtered() {
-	t1 := &domain.Tutor{FullName: "Alice", EducationLevel: "Degree", Verified: true, Email: "alice@example.com"}
-	t2 := &domain.Tutor{FullName: "Bob", EducationLevel: "Diploma", Verified: false, Email: "bob@example.com"}
-	t3 := &domain.Tutor{FullName: "Charlie", EducationLevel: "Degree", Verified: true, Email: "charlie@example.com"}
+	t1 := &domain.Tutor{FirstName: "Alice", EducationLevel: "Degree", Verified: true, Email: "alice@example.com"}
+	t2 := &domain.Tutor{FirstName: "Bob", EducationLevel: "Diploma", Verified: false, Email: "bob@example.com"}
+	t3 := &domain.Tutor{FirstName: "Charlie", EducationLevel: "Degree", Verified: true, Email: "charlie@example.com"}
 	s.usecase.Create(t1)
 	s.usecase.Create(t2)
 	s.usecase.Create(t3)
@@ -117,29 +117,29 @@ func (s *TutorUsecaseTestSuite) TestGetAll_Filtered() {
 }
 
 func (s *TutorUsecaseTestSuite) TestGetByID_ValidAndInvalid() {
-	t := &domain.Tutor{FullName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
+	t := &domain.Tutor{FirstName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
 	created, _ := s.usecase.Create(t)
 	fetched, err := s.usecase.GetByID(created.ID)
 	s.NoError(err)
-	s.Equal(created.FullName, fetched.FullName)
+	s.Equal(created.FirstName, fetched.FirstName)
 	fetched, err = s.usecase.GetByID(999)
 	s.Error(err)
 	s.Nil(fetched)
 }
 
 func (s *TutorUsecaseTestSuite) TestUpdate_ValidAndInvalid() {
-	t := &domain.Tutor{FullName: "Old Name", EducationLevel: "Diploma", Email: "old@example.com"}
+	t := &domain.Tutor{FirstName: "Old Name", EducationLevel: "Diploma", Email: "old@example.com"}
 	created, _ := s.usecase.Create(t)
-	updated := &domain.Tutor{FullName: "New Name", EducationLevel: "Degree", Email: "new@example.com"}
+	updated := &domain.Tutor{FirstName: "New Name", EducationLevel: "Degree", Email: "new@example.com"}
 	result, err := s.usecase.Update(created.ID, updated)
 	s.NoError(err)
-	s.Equal("New Name", result.FullName)
+	s.Equal("New Name", result.FirstName)
 	_, err = s.usecase.Update(999, updated)
 	s.Error(err)
 }
 
 func (s *TutorUsecaseTestSuite) TestDelete_ValidAndInvalid() {
-	t := &domain.Tutor{FullName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
+	t := &domain.Tutor{FirstName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
 	created, _ := s.usecase.Create(t)
 	err := s.usecase.Delete(created.ID)
 	s.NoError(err)
@@ -148,7 +148,7 @@ func (s *TutorUsecaseTestSuite) TestDelete_ValidAndInvalid() {
 }
 
 func (s *TutorUsecaseTestSuite) TestVerify_ValidAndInvalid() {
-	t := &domain.Tutor{FullName: "VerifyMe", EducationLevel: "Degree", Verified: false, Email: "verify@example.com"}
+	t := &domain.Tutor{FirstName: "VerifyMe", EducationLevel: "Degree", Verified: false, Email: "verify@example.com"}
 	created, _ := s.usecase.Create(t)
 	err := s.usecase.Verify(created.ID)
 	s.NoError(err)

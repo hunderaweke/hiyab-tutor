@@ -42,16 +42,18 @@ const Admins: React.FC = () => {
   const fetchAdmins = async (page: number = 1, searchValue: string = "") => {
     const token = localStorage.getItem("auth");
     try {
-      const res = await axios.get(
-        `/api/admin/?search=${encodeURIComponent(
-          searchValue
-        )}&page=${page}&limit=${meta.limit}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setAdmins(res.data.data);
-      setMeta(res.data.meta);
+      const params = new URLSearchParams();
+      if (searchValue) params.append("search", searchValue);
+      params.append("page", String(page));
+      params.append("limit", String(meta.limit));
+      const res = await axios.get(`/api/admin/`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: Object.fromEntries(params.entries()),
+      });
+      if (res.data) {
+        setAdmins(res.data.data || []);
+        if (res.data.pagination) setMeta(res.data.pagination);
+      }
       setError(null);
     } catch (err: unknown) {
       if (typeof err === "object" && err !== null && "message" in err) {
@@ -93,60 +95,70 @@ const Admins: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 p-10">
-      <div className="flex gap-2 justify-between items-center">
-        <Input
-          type="text"
-          placeholder="Search admins..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
-        />
-        <Button onClick={handleCreate}>Create Admin</Button>
+    <div className="space-y-4 p-4 md:p-10">
+      <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
+        <div className="w-full md:w-auto">
+          <Input
+            type="text"
+            placeholder="Search admins..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setMeta((m) => ({ ...m, page: 1 }));
+            }}
+            className="max-w-sm"
+          />
+        </div>
+        <div className="w-full md:w-auto flex justify-end">
+          <Button onClick={handleCreate}>Create Admin</Button>
+        </div>
       </div>
+
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <Table className="mb-4">
-        <TableHeader>
-          <TableRow className="bg-gray-100">
-            <TableHead>Username</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {admins.map((admin) => (
-            <TableRow key={admin.id}>
-              <TableCell>{admin.username}</TableCell>
-              <TableCell>{admin.name}</TableCell>
-              <TableCell>{admin.role}</TableCell>
-              <TableCell>
-                <Button variant="outline" size="sm" className="mr-2">
-                  Edit
-                </Button>
-                <CustomAlertDialog
-                  title="Delete Admin"
-                  description="Are you sure you want to delete this admin?"
-                  trigger={
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => setDeleteId(admin.id)}
-                    >
-                      Delete
-                    </Button>
-                  }
-                  onAction={function (): void {
-                    if (deleteId) {
-                      handleDelete(deleteId);
-                    }
-                  }}
-                />
-              </TableCell>
+
+      <div className="overflow-x-auto">
+        <Table className="mb-4 min-w-[700px]">
+          <TableHeader>
+            <TableRow className="bg-gray-100">
+              <TableHead>Username</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {admins.map((admin) => (
+              <TableRow key={admin.id}>
+                <TableCell>{admin.username}</TableCell>
+                <TableCell>{admin.name}</TableCell>
+                <TableCell>{admin.role}</TableCell>
+                <TableCell>
+                  <Button variant="outline" size="sm" className="mr-2">
+                    Edit
+                  </Button>
+                  <CustomAlertDialog
+                    title="Delete Admin"
+                    description="Are you sure you want to delete this admin?"
+                    trigger={
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleteId(admin.id)}
+                      >
+                        Delete
+                      </Button>
+                    }
+                    onAction={() => {
+                      if (deleteId) handleDelete(deleteId);
+                    }}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
       <SharedPagination
         meta={meta}
         onPageChange={(page) => setMeta((m) => ({ ...m, page }))}

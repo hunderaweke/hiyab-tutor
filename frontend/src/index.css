@@ -160,3 +160,21 @@ body{
     display: none;
   }
 }
+
+/* Make native select dropdowns more readable: dark background and white text */
+select, select option {
+  background-color: rgba(0,29,10,0.95) !important; /* darkish site color */
+  color: var(--color-white) !important;
+}
+
+/* Ensure selected/hovered option remains readable */
+select option:checked, select option:hover {
+  background-color: rgba(0,29,10,0.95) !important;
+  color: var(--color-white) !important;
+}
+
+/* For some browsers ensure the dropdown control itself keeps the intended appearance */
+select {
+  -webkit-appearance: menulist-button;
+  appearance: menulist-button;
+}

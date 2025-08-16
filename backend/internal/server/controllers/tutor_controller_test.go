@@ -29,7 +29,7 @@ type mockTutorUsecase struct {
 }
 
 func (m *mockTutorUsecase) Create(t *domain.Tutor) (*domain.Tutor, error) {
-	if t == nil || t.FullName == "" {
+	if t == nil || t.FirstName == "" {
 		return nil, domain.ErrInvalidInput
 	}
 	m.lastID++
@@ -99,6 +99,8 @@ func (s *TutorControllerTestSuite) TestCreateTutor() {
 	// Create a temp file to simulate document upload
 	tmpFile, err := os.CreateTemp("", "testdoc*.pdf")
 	s.Require().NoError(err)
+	tmpImage, err := os.CreateTemp("", "test*.png")
+	s.Require().NoError(err)
 	defer os.Remove(tmpFile.Name())
 	_, err = tmpFile.Write([]byte("dummy pdf content"))
 	s.Require().NoError(err)
@@ -106,14 +108,19 @@ func (s *TutorControllerTestSuite) TestCreateTutor() {
 
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
-	writer.WriteField("full_name", "Test Tutor")
+	writer.WriteField("first_name", "Test Tutor")
 	writer.WriteField("education_level", "Degree")
 	writer.WriteField("email", "test@example.com")
 	docField, err := writer.CreateFormFile("document", "testdoc.pdf")
 	s.Require().NoError(err)
+	imageField, err := writer.CreateFormFile("image", "image.png")
+	s.Require().NoError(err)
 	docFile, err := os.Open(tmpFile.Name())
 	s.Require().NoError(err)
+	imageFile, err := os.Open(tmpImage.Name())
+	s.Require().NoError(err)
 	io.Copy(docField, docFile)
+	io.Copy(imageField, imageFile)
 	docFile.Close()
 	writer.Close()
 
@@ -125,13 +132,13 @@ func (s *TutorControllerTestSuite) TestCreateTutor() {
 	s.T().Log(w.Body.String())
 	var resp domain.Tutor
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Equal("Test Tutor", resp.FullName)
+	s.Equal("Test Tutor", resp.FirstName)
 	s.Contains(resp.Document, "uploads/documents/")
 }
 
 func (s *TutorControllerTestSuite) TestGetAllTutors() {
-	t1 := &domain.Tutor{FullName: "Alice", EducationLevel: "Degree", Email: "alice@example.com"}
-	t2 := &domain.Tutor{FullName: "Bob", EducationLevel: "Diploma", Email: "bob@example.com"}
+	t1 := &domain.Tutor{FirstName: "Alice", EducationLevel: "Degree", Email: "alice@example.com"}
+	t2 := &domain.Tutor{FirstName: "Bob", EducationLevel: "Diploma", Email: "bob@example.com"}
 	s.usecase.Create(t1)
 	s.usecase.Create(t2)
 	w := httptest.NewRecorder()
@@ -144,7 +151,7 @@ func (s *TutorControllerTestSuite) TestGetAllTutors() {
 }
 
 func (s *TutorControllerTestSuite) TestGetTutorByID() {
-	t := &domain.Tutor{FullName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
+	t := &domain.Tutor{FirstName: "Test Tutor", EducationLevel: "Degree", Email: "test@example.com"}
 	created, _ := s.usecase.Create(t)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/tutors/"+strconv.Itoa(int(created.ID)), nil)
@@ -152,13 +159,14 @@ func (s *TutorControllerTestSuite) TestGetTutorByID() {
 	s.Equal(http.StatusOK, w.Code)
 	var resp domain.Tutor
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Equal(created.FullName, resp.FullName)
+	s.Equal(created.FirstName, resp.FirstName)
 }
 
 func (s *TutorControllerTestSuite) TestUpdateTutor() {
-	t := &domain.Tutor{FullName: "Old Name", EducationLevel: "Diploma", Email: "old@example.com"}
+	t := &domain.Tutor{FirstName: "Old Name", EducationLevel: "Diploma", Email: "old@example.com"}
 	created, _ := s.usecase.Create(t)
-	updated := domain.Tutor{FullName: "New Name", EducationLevel: "Degree", Email: "new@example.com"}
+	// send payload matching UpdateTutorRequest (uses full_name JSON key)
+	updated := map[string]interface{}{"full_name": "New Name", "education_level": "Degree", "email": "new@example.com"}
 	body, _ := json.Marshal(updated)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("PUT", "/tutors/"+strconv.Itoa(int(created.ID)), bytes.NewBuffer(body))
@@ -167,11 +175,11 @@ func (s *TutorControllerTestSuite) TestUpdateTutor() {
 	s.Equal(http.StatusOK, w.Code)
 	var resp domain.Tutor
 	json.Unmarshal(w.Body.Bytes(), &resp)
-	s.Equal("New Name", resp.FullName)
+	s.Equal("New Name", resp.FirstName)
 }
 
 func (s *TutorControllerTestSuite) TestDeleteTutor() {
-	t := &domain.Tutor{FullName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
+	t := &domain.Tutor{FirstName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
 	created, _ := s.usecase.Create(t)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("DELETE", "/tutors/"+strconv.Itoa(int(created.ID)), nil)
@@ -180,7 +188,7 @@ func (s *TutorControllerTestSuite) TestDeleteTutor() {
 }
 
 func (s *TutorControllerTestSuite) TestVerifyTutor() {
-	t := &domain.Tutor{FullName: "VerifyMe", EducationLevel: "Degree", Verified: false, Email: "verify@example.com"}
+	t := &domain.Tutor{FirstName: "VerifyMe", EducationLevel: "Degree", Verified: false, Email: "verify@example.com"}
 	created, _ := s.usecase.Create(t)
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("PUT", "/tutors/"+strconv.Itoa(int(created.ID))+"/verify", nil)

@@ -17,10 +17,10 @@ func SetupTutorRoutes(r *gin.Engine, db *gorm.DB) {
 
 	api := r.Group("/api/v1/tutors")
 	api.POST("/", controller.Create)
+	api.GET("/", controller.GetAll)
+	api.GET("/:id", controller.GetByID)
 	api.Use(middlewares.AuthMiddleware(), middlewares.IsAdminMiddleware())
 	{
-		api.GET("/", controller.GetAll)
-		api.GET("/:id", controller.GetByID)
 		api.PUT("/:id", controller.Update)
 		api.DELETE("/:id", controller.Delete)
 		api.PUT("/:id/verify", controller.Verify)

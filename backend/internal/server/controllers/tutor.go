@@ -47,7 +47,19 @@ func (c *TutorController) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to Upload the document"})
 		return
 	}
+	image, err := ctx.FormFile("image")
+	if err != nil {
+		ctx.JSON(http.StatusNotAcceptable, domain.ErrorResponse{Message: "Image is required"})
+		return
+	}
+	imageName := fmt.Sprintf("tutor-%d%s", time.Now().Unix(), path.Ext(image.Filename))
+	imagePath := path.Join("uploads", "images", imageName)
+	if err := ctx.SaveUploadedFile(image, imagePath); err != nil {
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to Upload the document"})
+		return
+	}
 	req.Document = documentPath
+	req.Image = imagePath
 	created, err := c.u.Create(&req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Failed to create tutor"})
@@ -80,8 +92,30 @@ func (c *TutorController) GetAll(ctx *gin.Context) {
 	if v := ctx.Query("verified"); v != "" {
 		filter.Verified = v == "true"
 	}
+	// support both `query` and `search` from frontend
 	if v := ctx.Query("query"); v != "" {
 		filter.Query = v
+	}
+	if v := ctx.Query("search"); v != "" {
+		filter.Query = v
+	}
+	// pagination
+	if v := ctx.Query("page"); v != "" {
+		if val, err := strconv.Atoi(v); err == nil {
+			filter.Page = val
+		}
+	}
+	if v := ctx.Query("limit"); v != "" {
+		if val, err := strconv.Atoi(v); err == nil {
+			filter.Limit = val
+		}
+	}
+	// sorting
+	if v := ctx.Query("sort_by"); v != "" {
+		filter.SortBy = v
+	}
+	if v := ctx.Query("sort_order"); v != "" {
+		filter.SortOrder = v
 	}
 	if v := ctx.Query("min_day_per_week"); v != "" {
 		if val, err := strconv.Atoi(v); err == nil {
@@ -173,7 +207,7 @@ func (c *TutorController) Update(ctx *gin.Context) {
 		return
 	}
 	updated, err := c.u.Update(uint(id), &domain.Tutor{
-		FullName:       req.FullName,
+		FirstName:      req.FullName,
 		Email:          req.Email,
 		EducationLevel: req.EducationLevel,
 		DayPerWeek:     req.DayPerWeek,

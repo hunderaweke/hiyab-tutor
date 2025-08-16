@@ -51,6 +51,11 @@ const items = [
     icon: Calendar,
   },
   {
+    title: "Tutors",
+    url: "/tutors",
+    icon: Settings,
+  },
+  {
     title: "Settings",
     url: "#",
     icon: Settings,

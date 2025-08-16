@@ -43,7 +43,8 @@ func (s *BookingRepoTestSuite) TearDownSuite() {
 }
 func (s *BookingRepoTestSuite) TestCreate() {
 	b := &domain.Booking{
-		FullName:    "Hundera Awoke",
+		FirstName:   "Hundera",
+		LastName:    "Awoke",
 		Grade:       10,
 		Address:     "Adama,Bole",
 		Gender:      "Male",
@@ -56,7 +57,7 @@ func (s *BookingRepoTestSuite) TestCreate() {
 	s.NoError(err)
 	s.NotNil(createdBooking)
 	s.Equal(createdBooking.ID, uint(1))
-	s.Equal(createdBooking.FullName, b.FullName)
+	s.Equal(createdBooking.FirstName, b.FirstName)
 	s.Equal(createdBooking.Grade, b.Grade)
 	s.Equal(createdBooking.Address, b.Address)
 	s.Equal(createdBooking.Gender, b.Gender)
@@ -67,7 +68,7 @@ func (s *BookingRepoTestSuite) TestCreate() {
 }
 func (s *BookingRepoTestSuite) TestGetByID() {
 	b := &domain.Booking{
-		FullName:    "Hundera Awoke",
+		FirstName:   "Hundera Awoke",
 		Grade:       10,
 		Address:     "Adama,Bole",
 		Gender:      "Male",
@@ -76,12 +77,12 @@ func (s *BookingRepoTestSuite) TestGetByID() {
 		HrPerDay:    2,
 		Assigned:    false,
 	}
-	_, err := s.bookingRepo.Create(b)
+	created, err := s.bookingRepo.Create(b)
 	s.NoError(err)
-	booking, err := s.bookingRepo.GetByID(uint(1))
+	booking, err := s.bookingRepo.GetByID(created.ID)
 	s.NoError(err)
 	s.NotNil(booking)
-	s.Equal(booking.FullName, b.FullName)
+	s.Equal(booking.FirstName, b.FirstName)
 	s.Equal(booking.Grade, b.Grade)
 	s.Equal(booking.Address, b.Address)
 	s.Equal(booking.Gender, b.Gender)
@@ -95,7 +96,7 @@ func (s *BookingRepoTestSuite) TestGetAll_NoFilter() {
 	// Insert 15 bookings
 	for i := 1; i <= 15; i++ {
 		b := &domain.Booking{
-			FullName:    "User" + string(rune(i)),
+			FirstName:   "User" + string(rune(i)),
 			Grade:       i,
 			Address:     "Address" + string(rune(i)),
 			Gender:      "Male",
@@ -108,53 +109,53 @@ func (s *BookingRepoTestSuite) TestGetAll_NoFilter() {
 		s.NoError(err)
 	}
 	// Should return only 10 due to pagination
-	bookings, err := s.bookingRepo.GetAll(&domain.BookingFilter{})
+	resp, err := s.bookingRepo.GetAll(&domain.BookingFilter{})
 	s.NoError(err)
-	s.Len(bookings, 10)
+	s.Len(resp.Data, 10)
 }
 
 func (s *BookingRepoTestSuite) TestGetAll_FilterByGender() {
-	b1 := &domain.Booking{FullName: "A", Gender: "Male"}
-	b2 := &domain.Booking{FullName: "B", Gender: "Female"}
+	b1 := &domain.Booking{FirstName: "A", Gender: "Male"}
+	b2 := &domain.Booking{FirstName: "B", Gender: "Female"}
 	_, err := s.bookingRepo.Create(b1)
 	s.NoError(err)
 	_, err = s.bookingRepo.Create(b2)
 	s.NoError(err)
-	bookings, err := s.bookingRepo.GetAll(&domain.BookingFilter{Gender: "Female"})
+	resp, err := s.bookingRepo.GetAll(&domain.BookingFilter{Gender: "Female"})
 	s.NoError(err)
-	s.Len(bookings, 1)
-	s.Equal("Female", bookings[0].Gender)
+	s.Len(resp.Data, 1)
+	s.Equal("Female", resp.Data[0].Gender)
 }
 
 func (s *BookingRepoTestSuite) TestGetAll_FilterByGradeRange() {
 	for i := 1; i <= 5; i++ {
-		b := &domain.Booking{FullName: "User", Grade: i}
+		b := &domain.Booking{FirstName: "User", Grade: i}
 		_, err := s.bookingRepo.Create(b)
 		s.NoError(err)
 	}
-	bookings, err := s.bookingRepo.GetAll(&domain.BookingFilter{MinGrade: 2, MaxGrade: 4})
+	resp, err := s.bookingRepo.GetAll(&domain.BookingFilter{MinGrade: 2, MaxGrade: 4})
 	s.NoError(err)
-	for _, b := range bookings {
+	for _, b := range resp.Data {
 		s.True(b.Grade >= 2 && b.Grade <= 4)
 	}
 }
 
 func (s *BookingRepoTestSuite) TestGetAll_QuerySearch() {
-	b1 := &domain.Booking{FullName: "Alice", Address: "Wonderland", PhoneNumber: "111"}
-	b2 := &domain.Booking{FullName: "Bob", Address: "Builder", PhoneNumber: "222"}
+	b1 := &domain.Booking{FirstName: "Alice", Address: "Wonderland", PhoneNumber: "111"}
+	b2 := &domain.Booking{FirstName: "Bob", Address: "Builder", PhoneNumber: "222"}
 	_, err := s.bookingRepo.Create(b1)
 	s.NoError(err)
 	_, err = s.bookingRepo.Create(b2)
 	s.NoError(err)
-	bookings, err := s.bookingRepo.GetAll(&domain.BookingFilter{Query: "Alice"})
+	resp, err := s.bookingRepo.GetAll(&domain.BookingFilter{Query: "Alice"})
 	s.NoError(err)
-	s.Len(bookings, 1)
-	s.Equal("Alice", bookings[0].FullName)
+	s.Len(resp.Data, 1)
+	s.Equal("Alice", resp.Data[0].FirstName)
 }
 
 func (s *BookingRepoTestSuite) TestUpdate() {
 	b := &domain.Booking{
-		FullName:    "Hundera Awoke",
+		FirstName:   "Hundera Awoke",
 		Grade:       10,
 		Address:     "Adama,Bole",
 		Gender:      "Male",
@@ -163,10 +164,10 @@ func (s *BookingRepoTestSuite) TestUpdate() {
 		HrPerDay:    2,
 		Assigned:    false,
 	}
-	_, err := s.bookingRepo.Create(b)
+	created, err := s.bookingRepo.Create(b)
 	s.NoError(err)
 	updated := &domain.Booking{
-		FullName:    "Updated Name",
+		FirstName:   "Updated Name",
 		Grade:       12,
 		Address:     "Addis Ababa",
 		Gender:      "Female",
@@ -175,10 +176,10 @@ func (s *BookingRepoTestSuite) TestUpdate() {
 		HrPerDay:    4,
 		Assigned:    true,
 	}
-	result, err := s.bookingRepo.Update(1, updated)
+	result, err := s.bookingRepo.Update(created.ID, updated)
 	s.NoError(err)
 	s.NotNil(result)
-	s.Equal(result.FullName, updated.FullName)
+	s.Equal(result.FirstName, updated.FirstName)
 	s.Equal(result.Grade, updated.Grade)
 	s.Equal(result.Address, updated.Address)
 	s.Equal(result.Gender, updated.Gender)
@@ -190,7 +191,7 @@ func (s *BookingRepoTestSuite) TestUpdate() {
 
 func (s *BookingRepoTestSuite) TestDelete() {
 	b := &domain.Booking{
-		FullName:    "Hundera Awoke",
+		FirstName:   "Hundera Awoke",
 		Grade:       10,
 		Address:     "Adama,Bole",
 		Gender:      "Male",
@@ -209,31 +210,31 @@ func (s *BookingRepoTestSuite) TestDelete() {
 }
 func (s *BookingRepoTestSuite) TestGetAll_EdgeCases() {
 	// No bookings
-	bookings, err := s.bookingRepo.GetAll(&domain.BookingFilter{Gender: "Nonexistent"})
+	resp, err := s.bookingRepo.GetAll(&domain.BookingFilter{Gender: "Nonexistent"})
 	s.NoError(err)
-	s.Len(bookings, 0)
+	s.Len(resp.Data, 0)
 
 	// Large grade range
 	for i := 1; i <= 20; i++ {
-		b := &domain.Booking{FullName: "User", Grade: i}
+		b := &domain.Booking{FirstName: "User", Grade: i}
 		_, err := s.bookingRepo.Create(b)
 		s.NoError(err)
 	}
-	bookings, err = s.bookingRepo.GetAll(&domain.BookingFilter{MinGrade: 100, MaxGrade: 200})
+	resp, err = s.bookingRepo.GetAll(&domain.BookingFilter{MinGrade: 100, MaxGrade: 200})
 	s.NoError(err)
-	s.Len(bookings, 0)
+	s.Len(resp.Data, 0)
 
 	// Assigned true/false
-	b1 := &domain.Booking{FullName: "AssignedTrue", Assigned: true}
-	b2 := &domain.Booking{FullName: "AssignedFalse", Assigned: false}
+	b1 := &domain.Booking{FirstName: "AssignedTrue", Assigned: true}
+	b2 := &domain.Booking{FirstName: "AssignedFalse", Assigned: false}
 	_, err = s.bookingRepo.Create(b1)
 	s.NoError(err)
 	_, err = s.bookingRepo.Create(b2)
 	s.NoError(err)
-	bookings, err = s.bookingRepo.GetAll(&domain.BookingFilter{Assigned: true})
+	resp, err = s.bookingRepo.GetAll(&domain.BookingFilter{Assigned: true})
 	s.NoError(err)
-	s.True(len(bookings) > 0)
-	for _, b := range bookings {
+	s.True(len(resp.Data) > 0)
+	for _, b := range resp.Data {
 		s.True(b.Assigned)
 	}
 }

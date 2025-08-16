@@ -14,7 +14,7 @@ func (u *tutorUsecase) Create(t *domain.Tutor) (*domain.Tutor, error) {
 	if t == nil {
 		return nil, domain.ErrInvalidInput
 	}
-	if t.FullName == "" || t.EducationLevel == "" || t.Email == "" {
+	if t.FirstName == "" || t.EducationLevel == "" || t.Email == "" {
 		return nil, domain.ErrInvalidInput
 	}
 	return u.repo.Create(t)

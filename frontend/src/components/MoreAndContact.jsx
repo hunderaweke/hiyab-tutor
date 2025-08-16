@@ -5,14 +5,26 @@ import { FiPhone } from "react-icons/fi";
 import { HiOutlineMail } from "react-icons/hi";
 import bag from "../assets/download.jpg";
 
-const MoreCard = ({ title = "Zoe Gifts", desc = "The perfect gift for every soul you cherish.", image = bag }) => (
+const MoreCard = ({
+  title = "Zoe Gifts",
+  desc = "The perfect gift for every soul you cherish.",
+  image = bag,
+}) => (
   <div className="relative rounded-xl overflow-hidden bg-white/5 border border-white/10">
-    <img src={image} alt={title} className="h-52 sm:h-60 md:h-64 w-full object-cover opacity-70" />
+    <img
+      loading="lazy"
+      src={image}
+      alt={title}
+      className="h-52 sm:h-60 md:h-64 w-full object-cover opacity-70"
+    />
     <div className="absolute inset-0 p-3 sm:p-4 flex flex-col justify-between">
       <h3 className="text-2xl sm:text-3xl font-bold">
-        {title.split(" ")[0]} <span className="text-brand-green">{title.split(" ")[1]}</span>
+        {title.split(" ")[0]}{" "}
+        <span className="text-brand-green">{title.split(" ")[1]}</span>
       </h3>
-      <p className="max-w-[85%] text-white/85 text-base sm:text-lg leading-snug">{desc}</p>
+      <p className="max-w-[85%] text-white/85 text-base sm:text-lg leading-snug">
+        {desc}
+      </p>
     </div>
   </div>
 );
@@ -36,7 +48,6 @@ const MoreAndContact = () => {
   // Autoplay functionality
   useEffect(() => {
     if (!emblaApi) return;
-
     const autoplayInterval = setInterval(() => {
       if (emblaApi.canScrollNext()) {
         emblaApi.scrollNext();
@@ -44,14 +55,15 @@ const MoreAndContact = () => {
         emblaApi.scrollTo(0);
       }
     }, 4000); // Change slide every 4 seconds
-
     return () => clearInterval(autoplayInterval);
   }, [emblaApi]);
 
   return (
-    <section className="container mx-auto mt-24 px-4">
+    <section id="contact" className="container mx-auto mt-24 px-4">
       {/* More By Hiyab */}
-      <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10">More By <span className="text-brand-green">Hiyab</span></h2>
+      <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10">
+        More By <span className="text-brand-green">Hiyab</span>
+      </h2>
       <div className="relative">
         <div className="embla embla--more embla--fade-right embla--fade-left">
           <div className="embla__viewport" ref={emblaRef}>
@@ -63,13 +75,35 @@ const MoreAndContact = () => {
               ))}
             </div>
           </div>
-          <button onClick={prev} className="embla-prev-btn" aria-label="Previous">
-            <svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+          <button
+            onClick={prev}
+            className="embla-prev-btn"
+            aria-label="Previous"
+          >
+            <svg
+              viewBox="0 0 48 48"
+              width="36"
+              height="36"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M30 10L16 24l14 14" />
             </svg>
           </button>
           <button onClick={next} className="embla-next-btn" aria-label="Next">
-            <svg viewBox="0 0 48 48" width="36" height="36" fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              viewBox="0 0 48 48"
+              width="36"
+              height="36"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M18 10l14 14-14 14" />
             </svg>
           </button>
@@ -77,7 +111,9 @@ const MoreAndContact = () => {
       </div>
 
       {/* Contact Us */}
-      <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10 mt-20">Contact <span className="text-brand-green">Us</span></h2>
+      <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10 mt-20">
+        Contact <span className="text-brand-green">Us</span>
+      </h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 h-[280px] sm:h-[320px] md:h-[360px]">
           {/* Replace with real map embed if needed */}
@@ -90,9 +126,17 @@ const MoreAndContact = () => {
           />
         </div>
         <div className="space-y-6 sm:space-y-8">
-          <ContactItem icon={<FaTelegramPlane />} label="Telegram" value="@telegram" />
+          <ContactItem
+            icon={<FaTelegramPlane />}
+            label="Telegram"
+            value="@telegram"
+          />
           <ContactItem icon={<FiPhone />} label="Phone" value="0912345678" />
-          <ContactItem icon={<HiOutlineMail />} label="Email" value="hiyab@gmail.com" />
+          <ContactItem
+            icon={<HiOutlineMail />}
+            label="Email"
+            value="hiyab@gmail.com"
+          />
         </div>
       </div>
     </section>
@@ -100,5 +144,3 @@ const MoreAndContact = () => {
 };
 
 export default MoreAndContact;
-
-

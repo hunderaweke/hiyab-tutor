@@ -43,7 +43,7 @@ func (s *TutorRepoTestSuite) TearDownSuite() {
 
 func (s *TutorRepoTestSuite) TestCreateAndGetByID() {
 	t := &domain.Tutor{
-		FullName:       "Test Tutor",
+		FirstName:      "Test Tutor",
 		EducationLevel: "Degree",
 		Document:       "doc.pdf",
 		PhoneNumber:    "123456789",
@@ -57,7 +57,7 @@ func (s *TutorRepoTestSuite) TestCreateAndGetByID() {
 	s.NotNil(created)
 	fetched, err := s.tutorRepo.GetByID(created.ID)
 	s.NoError(err)
-	s.Equal(created.FullName, fetched.FullName)
+	s.Equal(created.FirstName, fetched.FirstName)
 	s.Equal(created.EducationLevel, fetched.EducationLevel)
 	s.Equal(created.Document, fetched.Document)
 	s.Equal(created.PhoneNumber, fetched.PhoneNumber)
@@ -68,9 +68,9 @@ func (s *TutorRepoTestSuite) TestCreateAndGetByID() {
 }
 
 func (s *TutorRepoTestSuite) TestGetAllWithFilter() {
-	t1 := &domain.Tutor{FullName: "Alice", EducationLevel: "Degree", DayPerWeek: 5, HrPerDay: 2, Verified: true, Email: "alice@example.com"}
-	t2 := &domain.Tutor{FullName: "Bob", EducationLevel: "Diploma", DayPerWeek: 3, HrPerDay: 1, Verified: false, Email: "bob@example.com"}
-	t3 := &domain.Tutor{FullName: "Charlie", EducationLevel: "Degree", DayPerWeek: 6, HrPerDay: 3, Verified: true, Email: "charlie@example.com"}
+	t1 := &domain.Tutor{FirstName: "Alice", EducationLevel: "Degree", DayPerWeek: 5, HrPerDay: 2, Verified: true, Email: "alice@example.com"}
+	t2 := &domain.Tutor{FirstName: "Bob", EducationLevel: "Diploma", DayPerWeek: 3, HrPerDay: 1, Verified: false, Email: "bob@example.com"}
+	t3 := &domain.Tutor{FirstName: "Charlie", EducationLevel: "Degree", DayPerWeek: 6, HrPerDay: 3, Verified: true, Email: "charlie@example.com"}
 	s.tutorRepo.Create(t1)
 	s.tutorRepo.Create(t2)
 	s.tutorRepo.Create(t3)
@@ -84,7 +84,7 @@ func (s *TutorRepoTestSuite) TestGetAllWithFilter() {
 	resp, err := s.tutorRepo.GetAll(filter)
 	s.NoError(err)
 	s.Len(resp.Data, 1)
-	s.Equal("Charlie", resp.Data[0].FullName)
+	s.Equal("Charlie", resp.Data[0].FirstName)
 	s.Equal("Degree", resp.Data[0].EducationLevel)
 	s.True(resp.Data[0].Verified)
 	s.Equal("charlie@example.com", resp.Data[0].Email)
@@ -92,12 +92,12 @@ func (s *TutorRepoTestSuite) TestGetAllWithFilter() {
 }
 
 func (s *TutorRepoTestSuite) TestUpdate() {
-	t := &domain.Tutor{FullName: "Old Name", EducationLevel: "Diploma", DayPerWeek: 3, HrPerDay: 1, Verified: false, Email: "old@example.com"}
+	t := &domain.Tutor{FirstName: "Old Name", EducationLevel: "Diploma", DayPerWeek: 3, HrPerDay: 1, Verified: false, Email: "old@example.com"}
 	created, _ := s.tutorRepo.Create(t)
-	updated := &domain.Tutor{FullName: "New Name", EducationLevel: "Degree", DayPerWeek: 5, HrPerDay: 2, Verified: true, Email: "new@example.com"}
+	updated := &domain.Tutor{FirstName: "New Name", EducationLevel: "Degree", DayPerWeek: 5, HrPerDay: 2, Verified: true, Email: "new@example.com"}
 	result, err := s.tutorRepo.Update(created.ID, updated)
 	s.NoError(err)
-	s.Equal("New Name", result.FullName)
+	s.Equal("New Name", result.FirstName)
 	s.Equal("Degree", result.EducationLevel)
 	s.Equal(5, result.DayPerWeek)
 	s.Equal(2, result.HrPerDay)
@@ -106,7 +106,7 @@ func (s *TutorRepoTestSuite) TestUpdate() {
 }
 
 func (s *TutorRepoTestSuite) TestDelete() {
-	t := &domain.Tutor{FullName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
+	t := &domain.Tutor{FirstName: "ToDelete", EducationLevel: "Degree", Email: "delete@example.com"}
 	created, _ := s.tutorRepo.Create(t)
 	err := s.tutorRepo.Delete(created.ID)
 	s.NoError(err)

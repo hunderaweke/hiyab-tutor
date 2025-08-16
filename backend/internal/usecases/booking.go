@@ -16,7 +16,7 @@ func (u *bookingUsecase) Create(b *domain.Booking) (*domain.Booking, error) {
 	return u.repo.Create(b)
 }
 
-func (u *bookingUsecase) GetAll(filter *domain.BookingFilter) ([]*domain.Booking, error) {
+func (u *bookingUsecase) GetAll(filter *domain.BookingFilter) (domain.MultipleBookingResponse, error) {
 	return u.repo.GetAll(filter)
 }
 

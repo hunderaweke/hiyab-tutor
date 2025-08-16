@@ -28,12 +28,27 @@ export function Navbar({ children }: NavbarProps) {
           <NavigationMenuList>
             <NavigationMenuItem>
               <NavigationMenuLink href="/" className="px-4 py-2">
-                Home
+                Dashboard
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/about" className="px-4 py-2">
-                About
+              <NavigationMenuLink href="/tutors" className="px-4 py-2">
+                Tutors
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/bookings" className="px-4 py-2">
+                Bookings
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/testimonials" className="px-4 py-2">
+                Testimonials
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/partners" className="px-4 py-2">
+                Partners
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>

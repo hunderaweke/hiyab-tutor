@@ -3,6 +3,7 @@ package routes
 import (
 	"hiyab-tutor/internal/repository"
 	"hiyab-tutor/internal/server/controllers"
+	"hiyab-tutor/internal/server/middlewares"
 	"hiyab-tutor/internal/usecases"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +19,10 @@ func SetupBookingRoutes(r *gin.Engine, db *gorm.DB) {
 	// Public route
 	api.POST("/bookings", controller.Create)
 	// Protected routes (add auth middleware as needed)
-	api.GET("/bookings", controller.GetAll)
-	api.GET("/bookings/:id", controller.GetByID)
-	api.PUT("/bookings/:id/assign", controller.Assign)
+	api.Use(middlewares.AuthMiddleware(), middlewares.IsSuperAdminMiddleware())
+	{
+		api.GET("/bookings", controller.GetAll)
+		api.GET("/bookings/:id", controller.GetByID)
+		api.PUT("/bookings/:id/assign", controller.Assign)
+	}
 }

@@ -11,6 +11,7 @@ type tutorRepo struct {
 }
 
 func NewTutorRepository(db *gorm.DB) domain.TutorRepository {
+	db.AutoMigrate(&domain.Tutor{})
 	return &tutorRepo{db: db}
 }
 
@@ -46,7 +47,7 @@ func (r *tutorRepo) GetAll(filter *domain.TutorFilter) (domain.MultipleTutorResp
 		}
 		if filter.Query != "" {
 			q := "%" + filter.Query + "%"
-			query = query.Where("full_name LIKE ? OR email LIKE ? OR phone_number LIKE ?", q, q, q)
+			query = query.Where("first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone_number LIKE ?", q, q, q, q)
 		}
 	}
 	query.Count(&total)
@@ -54,15 +55,34 @@ func (r *tutorRepo) GetAll(filter *domain.TutorFilter) (domain.MultipleTutorResp
 	limit := 10
 	page := 1
 	if filter != nil {
-		if filter.MinDayPerWeek > 0 {
-			limit = filter.MinDayPerWeek
+		if filter.Limit > 0 {
+			limit = filter.Limit
 		}
-		if filter.MaxDayPerWeek > 0 {
-			page = filter.MaxDayPerWeek
+		if filter.Page > 0 {
+			page = filter.Page
 		}
 	}
 	offset := (page - 1) * limit
 	query = query.Limit(limit).Offset(offset)
+	// Apply safe ordering if provided
+	if filter != nil && filter.SortBy != "" {
+		// whitelist sortable columns to avoid SQL injection
+		allowed := map[string]bool{
+			"first_name":      true,
+			"last_name":       true,
+			"day_per_week":    true,
+			"hr_per_day":      true,
+			"created_at":      true,
+			"education_level": true,
+		}
+		if allowed[filter.SortBy] {
+			order := "asc"
+			if filter.SortOrder == "desc" {
+				order = "desc"
+			}
+			query = query.Order(filter.SortBy + " " + order)
+		}
+	}
 	if err := query.Find(&tutors).Error; err != nil {
 		return domain.MultipleTutorResponse{}, err
 	}
@@ -94,7 +114,7 @@ func (r *tutorRepo) Update(id uint, t *domain.Tutor) (*domain.Tutor, error) {
 		return nil, err
 	}
 	// Update all fields based on domain.Tutor
-	tutor.FullName = t.FullName
+	tutor.FirstName = t.FirstName
 	tutor.EducationLevel = t.EducationLevel
 	tutor.Document = t.Document
 	tutor.PhoneNumber = t.PhoneNumber

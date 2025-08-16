@@ -23,11 +23,19 @@ const Testimonials = () => {
   const [search, setSearch] = useState("");
 
   const fetchTestimonials = async (page = meta.page) => {
-    const resp = await axios.get(
-      `/api/testimonials/?sort_by=${sortBy}&sort_order=${sortOrder}&search=${search}&page=${page}&limit=${meta.limit}`
-    );
-    setData(resp.data.data || []);
-    if (resp.data.meta) setMeta(resp.data.meta);
+    const params = new URLSearchParams();
+    params.append("sort_by", sortBy);
+    params.append("sort_order", sortOrder);
+    if (search) params.append("search", search);
+    params.append("page", String(page));
+    params.append("limit", String(meta.limit));
+    const resp = await axios.get(`/api/testimonials/`, {
+      params: Object.fromEntries(params.entries()),
+    });
+    if (resp.data) {
+      setData(resp.data.data || []);
+      if (resp.data.pagination) setMeta(resp.data.pagination);
+    }
   };
 
   useEffect(() => {
@@ -71,7 +79,10 @@ const Testimonials = () => {
           type="text"
           placeholder="Search testimonials..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setMeta((m) => ({ ...m, page: 1 }));
+          }}
           className="max-w-sm"
         />
         <NavLink to="/create-testimonial">
@@ -81,14 +92,16 @@ const Testimonials = () => {
           </Button>
         </NavLink>
       </div>
-      <TestimonialTable
-        testimonials={data}
-        sortBy={sortBy}
-        sortOrder={sortOrder}
-        onSort={handleSort}
-        onView={handleView}
-        onDelete={handleDelete}
-      />
+      <div className="overflow-x-auto">
+        <TestimonialTable
+          testimonials={data}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSort={handleSort}
+          onView={handleView}
+          onDelete={handleDelete}
+        />
+      </div>
       <SharedPagination meta={meta} onPageChange={handlePageChange} />
     </div>
   );
