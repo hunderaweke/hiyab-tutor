@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer";
 import { FaFilePdf, FaImage } from "react-icons/fa";
 import { FiUpload, FiX } from "react-icons/fi";
+import axios from "axios";
 
 const TutorApplication = () => {
   const [form, setForm] = useState({
@@ -78,13 +79,14 @@ const TutorApplication = () => {
       fd.append("document", documentFile);
       fd.append("image", imageFile);
 
-      const resp = await fetch("/api/v1/tutors", {
-        method: "POST",
-        body: fd,
+      const resp = await axios.post("/api/tutors/", fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (!resp.ok) {
-        const body = await resp.json().catch(() => null);
+      if (resp.status !== 201) {
+        const body = resp.data;
         const msg =
           (body && (body.message || body.Message)) ||
           "Failed to submit application";

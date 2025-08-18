@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useEffect } from "react";
+import { useCallback, useMemo, useEffect, useState } from "react";
+import { t, onLanguageChange } from "../i18n";
 import useEmblaCarousel from "embla-carousel-react";
 import { FaTelegramPlane } from "react-icons/fa";
 import { FiPhone } from "react-icons/fi";
@@ -58,11 +59,14 @@ const MoreAndContact = () => {
     return () => clearInterval(autoplayInterval);
   }, [emblaApi]);
 
+  const [, setLang] = useState(null);
+  useEffect(() => onLanguageChange(() => setLang(Date.now())), []);
+
   return (
     <section id="contact" className="container mx-auto mt-24 px-4">
       {/* More By Hiyab */}
       <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10">
-        More By <span className="text-brand-green">Hiyab</span>
+        {t("more.title")} <span className="text-brand-green">Hiyab</span>
       </h2>
       <div className="relative">
         <div className="embla embla--more embla--fade-right embla--fade-left">
@@ -112,7 +116,7 @@ const MoreAndContact = () => {
 
       {/* Contact Us */}
       <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-8 lg:mb-10 mt-20">
-        Contact <span className="text-brand-green">Us</span>
+        {t("more.contactTitle")} <span className="text-brand-green" />
       </h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
         <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5 h-[280px] sm:h-[320px] md:h-[360px]">

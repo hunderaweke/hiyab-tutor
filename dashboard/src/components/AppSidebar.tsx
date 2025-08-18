@@ -55,11 +55,6 @@ const items = [
     url: "/tutors",
     icon: Settings,
   },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
 ];
 
 export function AppSidebar() {
@@ -70,7 +65,7 @@ export function AppSidebar() {
     navigate("/login");
   };
   return (
-    <Sidebar>
+    <Sidebar className="h-full">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
@@ -95,7 +90,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <SidebarMenuItem>
+              <SidebarMenuItem className="mt-20">
                 <Button
                   onClick={handleLogout}
                   variant="destructive"

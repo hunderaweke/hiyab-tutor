@@ -31,7 +31,7 @@ const Tutor: React.FC = () => {
     if (id) {
       setLoading(true);
       axios
-        .get(`/api/tutors${id}`)
+        .get(`/api/tutors/${id}`)
         .then((res) => {
           setTutor(res.data);
           setError(null);

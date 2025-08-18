@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 interface Translation {
   language_code: string;
@@ -17,16 +17,10 @@ interface FormValues {
   languages: Translation[];
 }
 
-const languageOptions = [
-  { code: "en", label: "English" },
-  { code: "am", label: "Amharic" },
-  { code: "om", label: "Oromo" },
-  // Add more languages as needed
-];
+// language options can be added here if used in the future
 
 const CreateOtherService: React.FC = () => {
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
@@ -37,10 +31,6 @@ const CreateOtherService: React.FC = () => {
         { language_code: "en", name: "", description: "", tag_line: "" },
       ],
     },
-  });
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "languages",
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -62,8 +52,9 @@ const CreateOtherService: React.FC = () => {
       setImagePreview("");
       setImageFile(null);
       alert("Other service created successfully!");
-    } catch (err: Error | AxiosError) {
-      alert(err.message || "Failed to create other service");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      alert(message || "Failed to create other service");
     }
   };
 

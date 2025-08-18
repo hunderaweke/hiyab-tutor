@@ -1,7 +1,6 @@
 import { FaTelegramPlane, FaFacebookF, FaInstagram } from "react-icons/fa";
 import { HiOutlineMail } from "react-icons/hi";
 import { FiPhone } from "react-icons/fi";
-import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -46,16 +45,6 @@ const Footer = () => {
               <a href="#contact" className="hover:text-brand-green">
                 Contact
               </a>
-            </li>
-            <li>
-              <Link to="/book-tutor" className="hover:text-brand-green">
-                Book Tutor
-              </Link>
-            </li>
-            <li>
-              <Link to="/apply-tutor" className="hover:text-brand-green">
-                Apply as Tutor
-              </Link>
             </li>
           </ul>
         </div>

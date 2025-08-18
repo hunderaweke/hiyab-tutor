@@ -5,6 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+interface TestimonialTranslationType {
+  id: number;
+  language_code: string;
+  text: string;
+}
+
 interface TestimonialType {
   id: number;
   name: string;
@@ -12,7 +18,7 @@ interface TestimonialType {
   created_at: string;
   video_url?: string;
   thumbnail?: string;
-  translations: string[];
+  translations: TestimonialTranslationType[];
 }
 
 const Testimonial = () => {
@@ -25,6 +31,10 @@ const Testimonial = () => {
     translations: [""],
     video: null as File | null,
     thumbnail: null as File | null,
+  });
+  const [newTranslation, setNewTranslation] = useState({
+    language_code: "",
+    text: "",
   });
   const [videoPreview, setVideoPreview] = useState<string | undefined>(
     undefined
@@ -79,6 +89,13 @@ const Testimonial = () => {
     }
   };
 
+  const handleNewTranslationChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target as HTMLInputElement;
+    setNewTranslation({ ...newTranslation, [name]: value } as any);
+  };
+
   const handleEditToggle = () => setEditMode((prev) => !prev);
 
   const handleSave = async () => {
@@ -104,6 +121,32 @@ const Testimonial = () => {
     setThumbnailPreview(
       response.data.thumbnail ? `/api/${response.data.thumbnail}` : undefined
     );
+  };
+
+  const handleAddTranslation = async () => {
+    if (!testimonial) return;
+    if (!newTranslation.language_code || !newTranslation.text) {
+      alert("Please provide language code and text for the translation.");
+      return;
+    }
+    try {
+      const token = localStorage.getItem("auth");
+      await axios.post(
+        `/api/testimonials/${testimonial.id}/translations`,
+        {
+          language_code: newTranslation.language_code,
+          text: newTranslation.text,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // refresh testimonial
+      const response = await axios.get(`/api/testimonials/${testimonial.id}`);
+      setTestimonial(response.data);
+      setNewTranslation({ language_code: "", text: "" });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add translation");
+    }
   };
 
   if (loading) return <p>Loading...</p>;
@@ -186,6 +229,45 @@ const Testimonial = () => {
           </Button>
         )}
       </form>
+      {/* Translations section (separate from edit mode) */}
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold mb-2">Translations</h2>
+        <div className="space-y-3">
+          {testimonial && testimonial.translations && testimonial.translations.length ? (
+            testimonial.translations.map((tr) => (
+              <div key={tr.id} className="p-3 border rounded">
+                <div className="text-sm text-white/60">{tr.language_code}</div>
+                <div className="text-base">{tr.text}</div>
+              </div>
+            ))
+          ) : (
+            <div className="text-sm text-white/60">No translations yet.</div>
+          )}
+        </div>
+
+        <div className="mt-4 p-4 border rounded bg-panel">
+          <h3 className="font-medium mb-2">Add Translation</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <Input
+              name="language_code"
+              placeholder="Language code (e.g., en, am)"
+              value={newTranslation.language_code}
+              onChange={handleNewTranslationChange}
+            />
+            <Input
+              name="text"
+              placeholder="Translation text"
+              value={newTranslation.text}
+              onChange={handleNewTranslationChange}
+            />
+            <div className="flex items-center gap-2">
+              <Button onClick={handleAddTranslation} className="w-full">
+                Add Translation
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   );
 };

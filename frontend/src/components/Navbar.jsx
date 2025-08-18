@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { setLanguage } from "../i18n";
 import logo from "../assets/hiyab-logo.svg";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -59,6 +60,7 @@ const Navbar = () => {
           <select
             name="language_code"
             className="bg-transparent border border-white/10 text-white/90 rounded px-2 py-1"
+            onChange={(e) => setLanguage(e.target.value)}
           >
             <option value="en">EN</option>
             <option value="am">AM</option>

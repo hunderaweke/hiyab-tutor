@@ -25,13 +25,22 @@ const Booking: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("auth");
+    if (!token) {
+      setError("Unauthorized");
+      setLoading(false);
+      return;
+    }
     if (id) {
       setLoading(true);
       axios
-        .get(`/api/bookings/${id}`)
+        .get(`/api/bookings/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((res) => {
           setBooking(res.data);
-          setError(null);
         })
         .catch(() => setError("Failed to fetch booking details."))
         .finally(() => setLoading(false));
@@ -42,7 +51,12 @@ const Booking: React.FC = () => {
     if (!id) return;
     setAssigning(true);
     try {
-      await axios.put(`/api/bookings/${id}/assign`);
+      const token = localStorage.getItem("auth");
+      await axios.put(`/api/bookings/${id}/assign`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setBooking((prev) => (prev ? { ...prev, assigned: true } : prev));
       setError(null);
     } catch {

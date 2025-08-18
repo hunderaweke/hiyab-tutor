@@ -74,7 +74,7 @@ const Bookings: React.FC = () => {
     total: 0,
   });
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState("name");
+  const [sortBy, setSortBy] = useState("first_name");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -82,13 +82,13 @@ const Bookings: React.FC = () => {
   const fetchServices = async (
     page = 1,
     searchValue = "",
-    sort = "name",
+    sort = "first_name",
     order: "asc" | "desc" = "asc"
   ) => {
     const token = localStorage.getItem("auth");
     try {
       const params = new URLSearchParams();
-      params.append("search", searchValue);
+      if (searchValue) params.append("search", searchValue);
       params.append("page", String(page));
       params.append("limit", String(meta.limit));
       params.append("sort_by", sort);
@@ -110,6 +110,17 @@ const Bookings: React.FC = () => {
     } catch {
       setError("Failed to fetch services");
     }
+  };
+
+  const toggleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+    // reset to first page
+    setMeta((m) => ({ ...m, page: 1 }));
   };
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem("auth");
@@ -155,44 +166,48 @@ const Bookings: React.FC = () => {
         <Table className="mb-4 min-w-[800px]">
           <TableHeader>
             <TableRow className="bg-gray-100">
-              <TableHead>First Name</TableHead>
-              <TableHead>Last Name</TableHead>
-              <TableHead>Gender</TableHead>
               <TableHead
                 className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("name");
-                  setSortOrder((prev) =>
-                    sortBy === "gender" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
+                onClick={() => toggleSort("first_name")}
               >
-                Grade
+                First Name{" "}
+                {sortBy === "first_name" && (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("last_name")}
+              >
+                Last Name{" "}
+                {sortBy === "last_name" && (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("gender")}
+              >
+                Gender{" "}
                 {sortBy === "gender" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
                 className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("gender");
-                  setSortOrder((prev) =>
-                    sortBy === "gender" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
+                onClick={() => toggleSort("grade")}
               >
-                Address
+                Grade{" "}
                 {sortBy === "grade" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
                 className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("address");
-                  setSortOrder((prev) =>
-                    sortBy === "address" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
+                onClick={() => toggleSort("address")}
               >
-                Phone Number
+                Address{" "}
                 {sortBy === "address" && (sortOrder === "asc" ? " ▲" : " ▼")}
+              </TableHead>
+              <TableHead
+                className="cursor-pointer select-none"
+                onClick={() => toggleSort("phone_number")}
+              >
+                Phone Number{" "}
+                {sortBy === "phone_number" &&
+                  (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
 
               <TableHead>Assigned</TableHead>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { t, onLanguageChange } from "../i18n";
 import useEmblaCarousel from "embla-carousel-react";
 import VideoCard from "./VideoCard";
 import TextCards from "./TextCards";
@@ -77,6 +78,10 @@ const Testimonials = () => {
       role: "Pre-University Student",
     },
   ];
+  const [, setLang] = useState(null);
+
+  useEffect(() => onLanguageChange(() => setLang(Date.now())), []);
+
   return (
     <section
       id="testimonials"
@@ -85,13 +90,16 @@ const Testimonials = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-center">
         <div className="space-y-5 text-center lg:text-left">
           <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-tight">
-            What our <span className="text-brand-green">Clients</span> Say About
-            Us?
+            {t("testimonials.title")
+              .split(" ")
+              .map((word, idx) => (
+                <span key={idx} className={idx === 2 ? "text-brand-green" : ""}>
+                  {word}{" "}
+                </span>
+              ))}
           </h2>
           <p className="text-base sm:text-lg md:text-xl font-light max-w-xl mx-auto lg:mx-0">
-            Hear directly from students and parents who’ve experienced the Hiyab
-            Tutors difference. These real stories show how the right support can
-            change everything.
+            {t("testimonials.subtitle")}
           </p>
         </div>
         <div className="embla embla--video embla--fade-right relative">
