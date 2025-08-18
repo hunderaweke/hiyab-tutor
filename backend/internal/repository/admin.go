@@ -57,6 +57,22 @@ func (r *adminRepository) GetAll(f *domain.AdminFilter) (*domain.MultipleAdmins,
 	if err := query.Count(&total).Error; err != nil {
 		return nil, err
 	}
+	// Apply safe ordering if provided
+	if f.SortBy != "" {
+		allowed := map[string]bool{
+			"username":   true,
+			"email":      true,
+			"name":       true,
+			"created_at": true,
+		}
+		if allowed[f.SortBy] {
+			order := "ASC"
+			if f.SortOrder == "desc" || f.SortOrder == "DESC" {
+				order = "DESC"
+			}
+			query = query.Order(f.SortBy + " " + order)
+		}
+	}
 	if err := query.Offset(f.Offset).Limit(f.Limit).Find(&admins).Error; err != nil {
 		return nil, err
 	}

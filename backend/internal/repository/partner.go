@@ -50,11 +50,19 @@ func (r *partnerRepository) GetAll(filter *domain.PartnerFilter) (*domain.Multip
 		query = query.Where("name LIKE ?", "%"+filter.Search+"%")
 	}
 	if filter.SortBy != "" {
-		switch filter.SortOrder {
-		case "asc":
-			query = query.Order(filter.SortBy + " ASC")
-		case "desc":
-			query = query.Order(filter.SortBy + " DESC")
+		// whitelist allowed sort fields to avoid SQL injection
+		allowed := map[string]bool{
+			"name":        true,
+			"created_at":  true,
+			"website_url": true,
+		}
+		if allowed[filter.SortBy] {
+			switch filter.SortOrder {
+			case "asc":
+				query = query.Order(filter.SortBy + " ASC")
+			case "desc":
+				query = query.Order(filter.SortBy + " DESC")
+			}
 		}
 	}
 	var total int64

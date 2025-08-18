@@ -81,6 +81,25 @@ func (r *bookingRepo) GetAll(filter *domain.BookingFilter) (domain.MultipleBooki
 	}
 	offset := (page - 1) * limit
 
+	// Apply safe ordering if provided
+	if filter != nil && filter.SortBy != "" {
+		allowed := map[string]bool{
+			"first_name":   true,
+			"last_name":    true,
+			"grade":        true,
+			"address":      true,
+			"phone_number": true,
+			"created_at":   true,
+		}
+		if allowed[filter.SortBy] {
+			order := "asc"
+			if filter.SortOrder == "desc" {
+				order = "desc"
+			}
+			query = query.Order(filter.SortBy + " " + order)
+		}
+	}
+
 	query = query.Limit(limit).Offset(offset)
 	if err := query.Find(&bookings).Error; err != nil {
 		return domain.MultipleBookingResponse{}, err

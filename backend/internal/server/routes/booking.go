@@ -15,14 +15,14 @@ func SetupBookingRoutes(r *gin.Engine, db *gorm.DB) {
 	bookingUsecase := usecases.NewBookingUsecase(bookingRepo)
 	controller := controllers.NewBookingController(bookingUsecase)
 
-	api := r.Group("/api/v1")
+	api := r.Group("/api/v1/bookings")
 	// Public route
-	api.POST("/bookings", controller.Create)
+	api.POST("/", controller.Create)
 	// Protected routes (add auth middleware as needed)
 	api.Use(middlewares.AuthMiddleware(), middlewares.IsSuperAdminMiddleware())
 	{
-		api.GET("/bookings", controller.GetAll)
-		api.GET("/bookings/:id", controller.GetByID)
-		api.PUT("/bookings/:id/assign", controller.Assign)
+		api.GET("/", controller.GetAll)
+		api.GET("/:id", controller.GetByID)
+		api.PUT("/:id/assign", controller.Assign)
 	}
 }

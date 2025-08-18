@@ -51,6 +51,7 @@ func (r *serviceRepository) GetAll(filter *domain.ServiceFilter) (*domain.Multip
 		}
 		filter.Offset = (filter.Page - 1) * filter.Limit
 		if filter.SortBy != "" {
+			// If sorting by translation field, use translations join (already whitelisted)
 			if translationFields[filter.SortBy] {
 				query = query.Joins("LEFT JOIN other_service_translations ON other_service_translations.service_id = other_services.id")
 				switch filter.SortOrder {
@@ -60,11 +61,19 @@ func (r *serviceRepository) GetAll(filter *domain.ServiceFilter) (*domain.Multip
 					query = query.Order("other_service_translations." + filter.SortBy + " ASC")
 				}
 			} else {
-				switch filter.SortOrder {
-				case "desc":
-					query = query.Order("other_services." + filter.SortBy + " DESC")
-				case "asc":
-					query = query.Order("other_services." + filter.SortBy + " ASC")
+				// whitelist other_services columns
+				allowed := map[string]bool{
+					"created_at":  true,
+					"id":          true,
+					"website_url": true,
+				}
+				if allowed[filter.SortBy] {
+					switch filter.SortOrder {
+					case "desc":
+						query = query.Order("other_services." + filter.SortBy + " DESC")
+					case "asc":
+						query = query.Order("other_services." + filter.SortBy + " ASC")
+					}
 				}
 			}
 		} else {
