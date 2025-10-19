@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NavLink, useNavigate } from "react-router-dom";
 import { TestimonialTable, type Testimonial } from "./TestimonialTable";
@@ -73,36 +72,47 @@ const Testimonials = () => {
   };
 
   return (
-    <div className="space-y-4 p-10">
-      <div className="flex gap-2 justify-between items-center">
-        <Input
-          type="text"
-          placeholder="Search testimonials..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setMeta((m) => ({ ...m, page: 1 }));
-          }}
-          className="max-w-sm"
-        />
-        <NavLink to="/create-testimonial">
-          <Button className="cursor-pointer">
-            Create <span className="hidden md:block">Testimonial</span>
-            <Plus className="h-4 w-4" />
-          </Button>
-        </NavLink>
+    <div className="space-y-6 p-8">
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+        <div className="flex gap-3 justify-between items-center flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Input
+              type="text"
+              placeholder="Search testimonials..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setMeta((m) => ({ ...m, page: 1 }));
+              }}
+              className="max-w-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <NavLink to="/create-testimonial">
+              <Button className="bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold px-6 py-2 rounded-lg transition-colors">
+                Create Testimonial
+              </Button>
+            </NavLink>
+          </div>
+        </div>
       </div>
-      <div className="overflow-x-auto">
-        <TestimonialTable
-          testimonials={data}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          onSort={handleSort}
-          onView={handleView}
-          onDelete={handleDelete}
-        />
+
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <TestimonialTable
+            testimonials={data}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+            onView={handleView}
+            onDelete={handleDelete}
+          />
+        </div>
       </div>
-      <SharedPagination meta={meta} onPageChange={handlePageChange} />
+
+      <div className="mt-6">
+        <SharedPagination meta={meta} onPageChange={handlePageChange} />
+      </div>
     </div>
   );
 };

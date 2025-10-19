@@ -163,7 +163,7 @@ const Testimonial = () => {
       <form
         className="space-y-6 text-xl"
         onSubmit={(e) => {
-          e.preventDefault(); 
+          e.preventDefault();
           handleSave();
         }}
       >
@@ -233,7 +233,9 @@ const Testimonial = () => {
       <div className="mt-8">
         <h2 className="text-xl font-semibold mb-2">Translations</h2>
         <div className="space-y-3">
-          {testimonial && testimonial.translations && testimonial.translations.length ? (
+          {testimonial &&
+          testimonial.translations &&
+          testimonial.translations.length ? (
             testimonial.translations.map((tr) => (
               <div key={tr.id} className="p-3 border rounded">
                 <div className="text-sm text-white/60">{tr.language_code}</div>

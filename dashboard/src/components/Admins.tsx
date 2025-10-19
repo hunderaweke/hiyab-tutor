@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+/* axios removed (unused) */
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import SharedPagination from "./SharedPagination";
@@ -13,6 +13,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
+import api from "@/lib/api";
 
 interface Admin {
   id: number;
@@ -40,14 +41,12 @@ const Admins: React.FC = () => {
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const fetchAdmins = async (page: number = 1, searchValue: string = "") => {
-    const token = localStorage.getItem("auth");
     try {
       const params = new URLSearchParams();
       if (searchValue) params.append("search", searchValue);
       params.append("page", String(page));
       params.append("limit", String(meta.limit));
-      const res = await axios.get(`/api/admin/`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await api.get(`/admin/`, {
         params: Object.fromEntries(params.entries()),
       });
       if (res.data) {
@@ -76,11 +75,8 @@ const Admins: React.FC = () => {
   }, [meta.page, search]);
 
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("auth");
     try {
-      await axios.delete(`/api/admin/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/admin/${id}`);
       fetchAdmins(meta.page);
     } catch (err: unknown) {
       if (typeof err === "object" && err !== null && "message" in err) {
@@ -95,74 +91,103 @@ const Admins: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 p-4 md:p-10">
-      <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
-        <div className="w-full md:w-auto">
-          <Input
-            type="text"
-            placeholder="Search admins..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setMeta((m) => ({ ...m, page: 1 }));
-            }}
-            className="max-w-sm"
-          />
-        </div>
-        <div className="w-full md:w-auto flex justify-end">
-          <Button onClick={handleCreate}>Create Admin</Button>
+    <div className="space-y-6 p-8">
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+        <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+          <div className="w-full md:w-auto">
+            <Input
+              type="text"
+              placeholder="Search admins..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setMeta((m) => ({ ...m, page: 1 }));
+              }}
+              className="max-w-sm bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-[var(--color-brand-green)]"
+            />
+          </div>
+          <div className="w-full md:w-auto flex justify-end">
+            <Button
+              onClick={handleCreate}
+              className="bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold px-6 py-2 rounded-lg transition-colors"
+            >
+              Create Admin
+            </Button>
+          </div>
         </div>
       </div>
 
-      {error && <div className="text-red-500 mb-2">{error}</div>}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg px-4 py-3">
+          {error}
+        </div>
+      )}
 
-      <div className="overflow-x-auto">
-        <Table className="mb-4 min-w-[700px]">
-          <TableHeader>
-            <TableRow className="bg-gray-100">
-              <TableHead>Username</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {admins.map((admin) => (
-              <TableRow key={admin.id}>
-                <TableCell>{admin.username}</TableCell>
-                <TableCell>{admin.name}</TableCell>
-                <TableCell>{admin.role}</TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm" className="mr-2">
-                    Edit
-                  </Button>
-                  <CustomAlertDialog
-                    title="Delete Admin"
-                    description="Are you sure you want to delete this admin?"
-                    trigger={
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => setDeleteId(admin.id)}
-                      >
-                        Delete
-                      </Button>
-                    }
-                    onAction={() => {
-                      if (deleteId) handleDelete(deleteId);
-                    }}
-                  />
-                </TableCell>
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="mb-0 min-w-[700px]">
+            <TableHeader>
+              <TableRow className="bg-white/10 hover:bg-white/15 border-b border-white/10">
+                <TableHead className="text-white font-semibold">
+                  Username
+                </TableHead>
+                <TableHead className="text-white font-semibold">Name</TableHead>
+                <TableHead className="text-white font-semibold">Role</TableHead>
+                <TableHead className="text-white font-semibold">
+                  Actions
+                </TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {admins.map((admin) => (
+                <TableRow
+                  key={admin.id}
+                  className="hover:bg-white/5 border-b border-white/5"
+                >
+                  <TableCell className="text-white">{admin.username}</TableCell>
+                  <TableCell className="text-white">{admin.name}</TableCell>
+                  <TableCell className="text-white">{admin.role}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                      >
+                        Edit
+                      </Button>
+                      <CustomAlertDialog
+                        title="Delete Admin"
+                        description="Are you sure you want to delete this admin?"
+                        trigger={
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteId(admin.id)}
+                            className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                          >
+                            Delete
+                          </Button>
+                        }
+                        onAction={() => {
+                          if (deleteId) handleDelete(deleteId);
+                        }}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
 
-      <SharedPagination
-        meta={meta}
-        onPageChange={(page) => setMeta((m) => ({ ...m, page }))}
-      />
+      <div className="mt-6">
+        <SharedPagination
+          meta={meta}
+          onPageChange={(page) => setMeta((m) => ({ ...m, page }))}
+        />
+      </div>
     </div>
   );
 };

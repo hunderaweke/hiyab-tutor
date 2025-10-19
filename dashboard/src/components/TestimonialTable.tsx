@@ -40,59 +40,69 @@ export const TestimonialTable: React.FC<TestimonialTableProps> = ({
   <Table>
     <TableCaption>Testimonials List</TableCaption>
     <TableHeader>
-      <TableRow className="md:text-lg">
+      <TableRow className="bg-white/10 hover:bg-white/15 border-b border-white/10 md:text-lg">
         <TableHead
-          className="cursor-pointer select-none"
+          className="cursor-pointer select-none text-white font-semibold"
           onClick={() => onSort("name")}
         >
           Name {sortBy === "name" ? (sortOrder === "asc" ? "▲" : "▼") : null}
         </TableHead>
         <TableHead
-          className="cursor-pointer select-none"
+          className="cursor-pointer select-none text-white font-semibold"
           onClick={() => onSort("role")}
         >
           Role {sortBy === "role" ? (sortOrder === "asc" ? "▲" : "▼") : null}
         </TableHead>
         <TableHead
-          className="cursor-pointer select-none"
+          className="cursor-pointer select-none text-white font-semibold"
           onClick={() => onSort("created_at")}
         >
           Created{" "}
           {sortBy === "created_at" ? (sortOrder === "asc" ? "▲" : "▼") : null}
         </TableHead>
-        <TableHead>Thumbnail</TableHead>
-        <TableHead>Actions</TableHead>
+        <TableHead className="text-white font-semibold">Thumbnail</TableHead>
+        <TableHead className="text-white font-semibold">Actions</TableHead>
       </TableRow>
     </TableHeader>
     <TableBody>
       {testimonials.length ? (
         testimonials.map((t) => (
           <TableRow
-            className="h-16 hover:bg-muted/30 cursor-pointer"
+            className="hover:bg-white/5 border-b border-white/5"
             key={t.id}
           >
-            <TableCell>{t.name}</TableCell>
-            <TableCell>{t.role}</TableCell>
-            <TableCell>{new Date(t.created_at).toLocaleString()}</TableCell>
+            <TableCell className="text-white">{t.name}</TableCell>
+            <TableCell className="text-white">{t.role}</TableCell>
+            <TableCell className="text-white text-sm">
+              {new Date(t.created_at).toLocaleString()}
+            </TableCell>
             <TableCell>
               {t.thumbnail ? (
                 <img
                   src={`/api/${t.thumbnail}`}
                   alt="thumbnail"
-                  className="h-16 object-cover"
+                  className="h-12 w-24 object-cover rounded-md border border-white/20"
                 />
               ) : (
-                "-"
+                <div className="h-12 w-24 bg-white/10 text-white/60 flex items-center justify-center rounded-md">
+                  -
+                </div>
               )}
             </TableCell>
-            <TableCell className="flex gap-3">
-              <Button onClick={() => onView(t.id)}>
-                <Eye className="h-4 w-4" /> View
+            <TableCell className="flex gap-2">
+              <Button
+                onClick={() => onView(t.id)}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                <Eye className="h-4 w-4 mr-1" /> View
               </Button>
               <CustomAlertDialog
                 trigger={
-                  <Button variant="destructive">
-                    <Trash className="h-4 w-4" /> Delete
+                  <Button
+                    variant="destructive"
+                    className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                  >
+                    <Trash className="h-4 w-4 mr-1" /> Delete
                   </Button>
                 }
                 title="Are you absolutely sure?"
@@ -106,7 +116,7 @@ export const TestimonialTable: React.FC<TestimonialTableProps> = ({
         ))
       ) : (
         <TableRow>
-          <TableCell colSpan={6} className="text-center">
+          <TableCell colSpan={6} className="text-center text-white/70">
             No testimonials found.
           </TableCell>
         </TableRow>

@@ -5,6 +5,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
+import { Card } from "./ui/card";
 
 const initialState = {
   first_name: "",
@@ -100,8 +101,10 @@ const CreateTutor: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-8 space-y-6 border rounded-lg bg-white shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Create Tutor</h2>
+    <Card className="max-w-xl mx-auto space-y-6">
+      <h2 className="text-3xl font-bold mb-6 text-center text-white">
+        Create Tutor
+      </h2>
       {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertTitle>Error</AlertTitle>
@@ -136,7 +139,7 @@ const CreateTutor: React.FC = () => {
             value={form.education_level}
             onChange={handleChange}
             required
-            className="w-full border rounded px-2 py-1"
+            className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/60 rounded px-2 py-1"
           >
             <option value="">Select education level</option>
             {educationLevels.map((lvl) => (
@@ -197,7 +200,7 @@ const CreateTutor: React.FC = () => {
               name="city"
               value={form.city}
               onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
+              className="w-full bg-white/10 border border-white/20 text-white placeholder:text-white/60 rounded px-2 py-1"
             >
               <option value="">Select city</option>
               {cities.map((c) => (
@@ -219,12 +222,17 @@ const CreateTutor: React.FC = () => {
         </div>
         <div>
           <Label>Image</Label>
-          <Input type="file" accept="image/*" onChange={handleImageChange} />
+          <Input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="bg-white/10 text-white"
+          />
           {imagePreview && (
             <img
               src={imagePreview}
               alt="Preview"
-              className="mt-2 w-32 h-32 object-cover rounded shadow"
+              className="mt-2 w-32 h-32 object-cover rounded border border-white/10"
             />
           )}
         </div>
@@ -234,9 +242,10 @@ const CreateTutor: React.FC = () => {
             type="file"
             accept="application/pdf,.doc,.docx"
             onChange={handleDocumentChange}
+            className="bg-white/10 text-white"
           />
           {documentPreview && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm text-white/70">
               Selected: {documentPreview}
             </div>
           )}
@@ -245,7 +254,7 @@ const CreateTutor: React.FC = () => {
           {loading ? "Creating..." : "Create Tutor"}
         </Button>
       </form>
-    </div>
+    </Card>
   );
 };
 

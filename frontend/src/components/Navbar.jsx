@@ -61,6 +61,7 @@ const Navbar = () => {
             name="language_code"
             className="bg-transparent border border-white/10 text-white/90 rounded px-2 py-1"
             onChange={(e) => setLanguage(e.target.value)}
+            value={undefined}
           >
             <option value="en">EN</option>
             <option value="am">AM</option>
@@ -113,6 +114,7 @@ const Navbar = () => {
             <select
               name="language_code"
               className="bg-transparent border border-white/10 text-white/90 rounded px-2 py-1"
+              onChange={(e) => setLanguage(e.target.value)}
             >
               <option value="en">EN</option>
               <option value="am">AM</option>

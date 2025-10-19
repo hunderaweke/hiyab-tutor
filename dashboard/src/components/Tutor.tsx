@@ -4,6 +4,7 @@ import axios from "axios";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Alert, AlertTitle, AlertDescription } from "./ui/alert";
+import { Card } from "./ui/card";
 
 interface TutorData {
   id: number;
@@ -42,20 +43,22 @@ const Tutor: React.FC = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading tutor details...</div>;
+    return <div className="text-white">Loading tutor details...</div>;
   }
   if (error) {
     return (
-      <div className="max-w-xl mx-auto p-8">
+      <Card className="max-w-xl mx-auto">
         <Alert variant="destructive">
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
         </Alert>
-      </div>
+      </Card>
     );
   }
   if (!tutor) {
-    return <div>No tutor found.</div>;
+    return (
+      <Card className="max-w-xl mx-auto p-4 text-white">No tutor found.</Card>
+    );
   }
 
   const handleVerify = async () => {
@@ -78,18 +81,20 @@ const Tutor: React.FC = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-8 space-y-6 border rounded-lg bg-white shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Tutor Details</h2>
+    <Card className="max-w-xl mx-auto space-y-6">
+      <h2 className="text-3xl font-bold mb-6 text-center text-white">
+        Tutor Details
+      </h2>
 
       <div className="flex justify-center">
         {tutor.image ? (
           <img
             src={`/api/${tutor.image}`}
             alt="Tutor"
-            className="w-32 h-32 object-cover rounded-full border shadow"
+            className="w-32 h-32 object-cover rounded-full border border-white/10"
           />
         ) : (
-          <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+          <div className="w-32 h-32 rounded-full bg-white/5 flex items-center justify-center text-white/60 border border-white/10">
             No image
           </div>
         )}
@@ -116,12 +121,12 @@ const Tutor: React.FC = () => {
                 href={`/api/${tutor.document}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 underline"
+                className="text-[var(--color-brand-green)] underline"
               >
                 View Document
               </a>
             ) : (
-              <span className="text-gray-400">No document</span>
+              <span className="text-white/70">No document</span>
             )}
           </div>
         </div>
@@ -140,7 +145,7 @@ const Tutor: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -149,14 +154,14 @@ const Detail: React.FC<{ label: string; value: React.ReactNode }> = ({
   value,
 }) => (
   <div>
-    <Label className="font-semibold">{label}</Label>
-    <div className="text-lg text-gray-700">{value}</div>
+    <Label className="font-semibold text-white">{label}</Label>
+    <div className="text-lg text-white/90">{value}</div>
   </div>
 );
 
 const StatusBadge: React.FC<{ verified?: boolean }> = ({ verified }) =>
   verified ? (
-    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-base shadow">
+    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-brand-green)] text-[var(--color-main)] font-semibold text-base shadow">
       <svg
         className="w-5 h-5 text-green-500"
         fill="none"
@@ -169,7 +174,7 @@ const StatusBadge: React.FC<{ verified?: boolean }> = ({ verified }) =>
       Verified
     </span>
   ) : (
-    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-100 text-red-700 font-semibold text-base shadow">
+    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-white/80 font-semibold text-base shadow">
       <svg
         className="w-5 h-5 text-red-500"
         fill="none"

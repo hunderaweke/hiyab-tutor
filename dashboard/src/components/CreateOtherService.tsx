@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+/* axios removed (unused) */
+import api from "@/lib/api";
 
 interface Translation {
   language_code: string;
@@ -25,6 +26,7 @@ const CreateOtherService: React.FC = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm<FormValues>({
     defaultValues: {
       languages: [
@@ -34,19 +36,19 @@ const CreateOtherService: React.FC = () => {
   });
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "languages",
+  });
 
   const onSubmit = async (data: FormValues) => {
-    const token = localStorage.getItem("auth");
     try {
       const formData = new FormData();
       formData.append("website_url", data.website_url);
       if (imageFile) formData.append("image", imageFile);
       formData.append("languages", JSON.stringify(data.languages));
-      await axios.post("/api/other-services/", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
+      await api.post("/other-services/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       reset();
       setImagePreview("");
@@ -61,39 +63,134 @@ const CreateOtherService: React.FC = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-full mx-auto p-6 space-y-4 border rounded-md bg-white"
+      className="max-w-3xl mx-auto p-6 space-y-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl"
     >
-      <h2 className="text-2xl font-bold mb-2">Create Other Service</h2>
-      <label htmlFor="website_url">Website URL</label>
-      <Input
-        type="text"
-        placeholder="Website URL"
-        {...register("website_url", { required: "Website URL is required" })}
-      />
-      {errors.website_url && (
-        <span className="text-red-500 text-xs">
-          {errors.website_url.message}
-        </span>
-      )}
+      <h2 className="text-2xl font-bold mb-2 text-white">
+        Create Other Service
+      </h2>
 
-      <label htmlFor="image">Image</label>
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          const file = e.target.files?.[0] || null;
-          setImageFile(file);
-          setImagePreview(file ? URL.createObjectURL(file) : "");
-        }}
-      />
-      {imagePreview && (
-        <img
-          src={imagePreview}
-          alt="Preview"
-          className="w-24 h-24 object-cover rounded mb-2"
+      <div className="space-y-2">
+        <label htmlFor="website_url" className="text-white/80 text-sm">
+          Website URL
+        </label>
+        <Input
+          type="text"
+          placeholder="https://example.com"
+          {...register("website_url", { required: "Website URL is required" })}
+          className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
         />
-      )}
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
+        {errors.website_url && (
+          <span className="text-red-400 text-xs">
+            {errors.website_url.message}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="image" className="text-white/80 text-sm">
+          Image
+        </label>
+        <Input
+          type="file"
+          accept="image/*"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            setImageFile(file);
+            setImagePreview(file ? URL.createObjectURL(file) : "");
+          }}
+          className="bg-white/10 border-white/20 text-white"
+        />
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Preview"
+            className="w-24 h-24 object-cover rounded-lg border border-white/20"
+          />
+        )}
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-white font-semibold">Translations</h3>
+          <Button
+            type="button"
+            onClick={() =>
+              append({
+                language_code: "en",
+                name: "",
+                description: "",
+                tag_line: "",
+              })
+            }
+            className="bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)]"
+          >
+            Add Translation
+          </Button>
+        </div>
+        <div className="space-y-4">
+          {fields.map((field, index) => (
+            <div
+              key={field.id}
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/5 p-4 rounded-xl border border-white/10"
+            >
+              <div className="space-y-2">
+                <label className="text-white/80 text-sm">Language code</label>
+                <Input
+                  placeholder="e.g., en, am, om"
+                  {...register(`languages.${index}.language_code` as const, {
+                    required: "Language code is required",
+                  })}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-white/80 text-sm">Name</label>
+                <Input
+                  placeholder="Service name"
+                  {...register(`languages.${index}.name` as const, {
+                    required: "Name is required",
+                  })}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-white/80 text-sm">Tag line</label>
+                <Input
+                  placeholder="Short tag line"
+                  {...register(`languages.${index}.tag_line` as const)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-white/80 text-sm">Description</label>
+                <textarea
+                  placeholder="Description"
+                  {...register(`languages.${index}.description` as const)}
+                  className="min-h-24 bg-white/10 border-white/20 text-white placeholder:text-white/60 rounded-md p-2"
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end">
+                {fields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => remove(index)}
+                    className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        className="w-full bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? "Submitting..." : "Create"}
       </Button>
     </form>

@@ -6,19 +6,21 @@ import { Outlet } from "react-router-dom";
 const DashboardLayout = () => {
   return (
     <SidebarProvider defaultOpen={true}>
-      <main className="flex h-screen w-screen">
+      <main className="flex h-screen w-screen bg-gradient-to-br from-[var(--color-main)] to-[#002A0F]">
         {/* Sidebar */}
         <AppSidebar />
 
         {/* Main section */}
-        <div className="flex flex-1 flex-col">
+        <div className="flex flex-1 flex-col backdrop-blur-sm">
           {/* Navbar with Sidebar Trigger inside */}
           <Navbar>
             <SidebarTrigger />
           </Navbar>
 
           {/* Content area */}
-          <Outlet />
+          <div className="flex-1 overflow-auto">
+            <Outlet />
+          </div>
         </div>
       </main>
     </SidebarProvider>

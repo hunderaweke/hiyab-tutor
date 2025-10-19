@@ -69,7 +69,9 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>
-            <h1 className="text-2xl font-bold text-black">Hiyab Tutor</h1>
+            <h1 className="text-2xl font-bold text-white">
+              Hiyab <span className="text-green-500">Tutor</span>
+            </h1>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="mt-10">

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import api from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
@@ -36,8 +37,7 @@ const LoginPage = () => {
   const onSubmit = async (data: LoginFormInputs) => {
     setError("");
     try {
-      // Change the URL to your backend login endpoint
-      const response = await axios.post("/api/admin/login", data);
+      const response = await api.post("/admin/login", data);
       const resp = response.data as LoginResponse;
       localStorage.setItem("auth", resp.access_token);
       navigate("/");
@@ -51,21 +51,22 @@ const LoginPage = () => {
   };
 
   return (
-    <section className="container mx-auto w-screen h-screen flex flex-col justify-center items-center">
+    <section className="container mx-auto w-screen h-screen flex flex-col justify-center items-center bg-gradient-to-br from-[var(--color-main)] to-[#002A0F]">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="border-1 p-10 w-fit flex flex-col gap-5 min-w-80"
+        className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-10 w-fit flex flex-col gap-6 min-w-80 shadow-2xl"
       >
-        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance">
-          Welcome to Hiyab Tutor
+        <h1 className="scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance text-white">
+          Welcome to Hyab Tutor
         </h1>
         <Input
           type="text"
           placeholder="Username"
           {...register("username", { required: "Username is required" })}
+          className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-[var(--color-brand-green)]"
         />
         {errors.username && (
-          <span className="text-red-500 text-xs">
+          <span className="text-red-400 text-xs">
             {errors.username.message}
           </span>
         )}
@@ -74,11 +75,12 @@ const LoginPage = () => {
             type={showPassword ? "text" : "password"}
             placeholder="Password"
             {...register("password", { required: "Password is required" })}
+            className="bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:border-[var(--color-brand-green)] pr-10"
           />
           <button
             type="button"
             tabIndex={-1}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/60 hover:text-white transition-colors"
             onClick={() => setShowPassword((v) => !v)}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
@@ -86,14 +88,20 @@ const LoginPage = () => {
           </button>
         </div>
         {errors.password && (
-          <span className="text-red-500 text-xs">
+          <span className="text-red-400 text-xs">
             {errors.password.message}
           </span>
         )}
         {error && (
-          <span className="text-red-500 text-xs text-center">{error}</span>
+          <span className="text-red-400 text-xs text-center bg-red-500/10 border border-red-500/20 rounded px-3 py-2">
+            {error}
+          </span>
         )}
-        <Button className="w-full" type="submit" disabled={isSubmitting}>
+        <Button
+          className="w-full bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold py-3 rounded-lg transition-colors"
+          type="submit"
+          disabled={isSubmitting}
+        >
           {isSubmitting ? "Logging in..." : "Login"}
         </Button>
       </form>

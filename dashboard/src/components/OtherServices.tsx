@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios, { HttpStatusCode } from "axios";
+import { HttpStatusCode } from "axios";
+import api from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SharedPagination from "./SharedPagination";
@@ -71,7 +72,7 @@ const OtherServices: React.FC = () => {
       params.append("sort_by", sort);
       params.append("sort_order", order);
 
-      const resp = await axios.get(`/api/other-services/`, {
+      const resp = await api.get(`/other-services/`, {
         params: Object.fromEntries(params.entries()),
       });
       if (resp.data) {
@@ -85,12 +86,7 @@ const OtherServices: React.FC = () => {
     }
   };
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("auth");
-    const resp = await axios.delete(`/api/other-services/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const resp = await api.delete(`/other-services/${id}`);
     if (resp.status === HttpStatusCode.NoContent) {
       fetchServices();
     }
@@ -141,109 +137,134 @@ const OtherServices: React.FC = () => {
         </div>
       </div>
       {error && <div className="text-red-500 mb-2">{error}</div>}
-      <div className="overflow-x-auto">
-        <Table className="mb-4 min-w-[900px]">
-          <TableHeader>
-            <TableRow className="bg-gray-100">
-              <TableHead>Image</TableHead>
-              <TableHead>Website</TableHead>
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("name");
-                  setSortOrder((prev) =>
-                    sortBy === "name" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
-              >
-                Name ({language.toUpperCase()})
-                {sortBy === "name" && (sortOrder === "asc" ? " ▲" : " ▼")}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("description");
-                  setSortOrder((prev) =>
-                    sortBy === "description" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
-              >
-                Description ({language.toUpperCase()})
-                {sortBy === "description" &&
-                  (sortOrder === "asc" ? " ▲" : " ▼")}
-              </TableHead>
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => {
-                  setSortBy("tag_line");
-                  setSortOrder((prev) =>
-                    sortBy === "tag_line" && prev === "asc" ? "desc" : "asc"
-                  );
-                }}
-              >
-                Tag Line ({language.toUpperCase()})
-                {sortBy === "tag_line" && (sortOrder === "asc" ? " ▲" : " ▼")}
-              </TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {services.map((service) => {
-              const translation =
-                service.languages?.find((l) => l.language_code === language) ||
-                service.languages?.[0];
-              return (
-                <TableRow key={service.id}>
-                  <TableCell>
-                    {service.image ? (
-                      <img
-                        src={`/api/${service.image}`}
-                        alt="Service"
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                    ) : (
-                      <span className="text-gray-400">No Image</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {service.website_url ? (
-                      <a
-                        href={service.website_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table className="mb-4 min-w-[900px]">
+            <TableHeader>
+              <TableRow className="bg-white/10 hover:bg-white/15 border-b border-white/10 md:text-lg">
+                <TableHead className="text-white font-semibold">
+                  Image
+                </TableHead>
+                <TableHead className="text-white font-semibold">
+                  Website
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none text-white font-semibold"
+                  onClick={() => {
+                    setSortBy("name");
+                    setSortOrder((prev) =>
+                      sortBy === "name" && prev === "asc" ? "desc" : "asc"
+                    );
+                  }}
+                >
+                  Name ({language.toUpperCase()}){" "}
+                  {sortBy === "name" && (sortOrder === "asc" ? " ▲" : " ▼")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none text-white font-semibold"
+                  onClick={() => {
+                    setSortBy("description");
+                    setSortOrder((prev) =>
+                      sortBy === "description" && prev === "asc"
+                        ? "desc"
+                        : "asc"
+                    );
+                  }}
+                >
+                  Description ({language.toUpperCase()}){" "}
+                  {sortBy === "description" &&
+                    (sortOrder === "asc" ? " ▲" : " ▼")}
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer select-none text-white font-semibold"
+                  onClick={() => {
+                    setSortBy("tag_line");
+                    setSortOrder((prev) =>
+                      sortBy === "tag_line" && prev === "asc" ? "desc" : "asc"
+                    );
+                  }}
+                >
+                  Tag Line ({language.toUpperCase()}){" "}
+                  {sortBy === "tag_line" && (sortOrder === "asc" ? " ▲" : " ▼")}
+                </TableHead>
+                <TableHead className="text-white font-semibold">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {services.map((service) => {
+                const translation =
+                  service.languages?.find(
+                    (l) => l.language_code === language
+                  ) || service.languages?.[0];
+                return (
+                  <TableRow
+                    key={service.id}
+                    className="hover:bg-white/5 border-b border-white/5"
+                  >
+                    <TableCell>
+                      {service.image ? (
+                        <img
+                          src={`/api/${service.image}`}
+                          alt="Service"
+                          className="w-16 h-16 object-cover rounded-md border border-white/20"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 bg-white/10 text-white/60 flex items-center justify-center rounded-md">
+                          No Image
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {service.website_url ? (
+                        <a
+                          href={service.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-brand-green)] underline"
+                        >
+                          {service.website_url}
+                        </a>
+                      ) : (
+                        <span className="text-white/60">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white">
+                      {translation?.name || "-"}
+                    </TableCell>
+                    <TableCell className="text-white">
+                      {translation?.description || "-"}
+                    </TableCell>
+                    <TableCell className="text-white">
+                      {translation?.tag_line || "-"}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mr-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        onClick={() =>
+                          navigate(`/other-services/${service.id}`)
+                        }
                       >
-                        {service.website_url}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">N/A</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{translation?.name || "-"}</TableCell>
-                  <TableCell>{translation?.description || "-"}</TableCell>
-                  <TableCell>{translation?.tag_line || "-"}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mr-2"
-                      onClick={() => navigate(`/other-services/${service.id}`)}
-                    >
-                      View
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(service.id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+                        View
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(service.id)}
+                        className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       <SharedPagination
         meta={meta}

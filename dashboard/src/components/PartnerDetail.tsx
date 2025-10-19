@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Card } from "./ui/card";
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
@@ -77,12 +78,12 @@ const PartnerDetail = () => {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <p className="text-white">Loading...</p>;
 
   return (
-    <main className="max-w-full mx-auto p-auto md:p-6 mt-5 bg-background rounded-lg shadow">
+    <Card className="max-w-full mx-auto p-6 mt-5">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Partner Detail</h1>
+        <h1 className="text-2xl font-bold text-white">Partner Detail</h1>
         <Button variant="outline" onClick={handleEditToggle}>
           {editMode ? "Cancel" : "Edit"}
         </Button>
@@ -121,7 +122,7 @@ const PartnerDetail = () => {
                 <img
                   src={logoPreview}
                   alt="Thumbnail"
-                  className="max-w-lg max-h-[32rem] border rounded"
+                  className="max-w-lg max-h-[32rem] border border-white/10 rounded"
                 />
               )}
               {editMode && (
@@ -140,7 +141,7 @@ const PartnerDetail = () => {
           </Button>
         )}
       </form>
-    </main>
+    </Card>
   );
 };
 

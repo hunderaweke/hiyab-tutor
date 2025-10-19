@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios, { HttpStatusCode } from "axios";
+import { HttpStatusCode } from "axios";
+import api from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SharedPagination from "./SharedPagination";
@@ -12,13 +13,14 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useNavigate } from "react-router-dom";
+import { Card } from "./ui/card";
 
 // Assignment status badge for table
 const StatusBadge: React.FC<{ assigned?: boolean }> = ({ assigned }) =>
   assigned ? (
-    <span className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold text-sm shadow">
+    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--color-brand-green)] text-[var(--color-main)] font-semibold text-sm shadow">
       <svg
-        className="w-4 h-4 text-green-500"
+        className="w-4 h-4 text-[var(--color-main)]"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -29,9 +31,9 @@ const StatusBadge: React.FC<{ assigned?: boolean }> = ({ assigned }) =>
       Assigned
     </span>
   ) : (
-    <span className="inline-flex items-center gap-2 px-2 py-0.5 rounded-full bg-red-100 text-red-700 font-semibold text-sm shadow">
+    <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 text-white/80 font-semibold text-sm shadow">
       <svg
-        className="w-4 h-4 text-red-500"
+        className="w-4 h-4 text-white/80"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -85,7 +87,6 @@ const Bookings: React.FC = () => {
     sort = "first_name",
     order: "asc" | "desc" = "asc"
   ) => {
-    const token = localStorage.getItem("auth");
     try {
       const params = new URLSearchParams();
       if (searchValue) params.append("search", searchValue);
@@ -94,8 +95,7 @@ const Bookings: React.FC = () => {
       params.append("sort_by", sort);
       params.append("sort_order", order);
 
-      const resp = await axios.get(`/api/bookings`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const resp = await api.get(`/bookings/`, {
         params: Object.fromEntries(params.entries()),
       });
       // API may return { data: [...], meta: { ... } } or an array directly
@@ -123,12 +123,7 @@ const Bookings: React.FC = () => {
     setMeta((m) => ({ ...m, page: 1 }));
   };
   const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("auth");
-    const resp = await axios.delete(`/api/bookings/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const resp = await api.delete(`/bookings/${id}`);
     if (resp.status === HttpStatusCode.NoContent) {
       fetchServices();
     }
@@ -143,66 +138,77 @@ const Bookings: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 p-4 md:p-10">
-      <div className="flex flex-col md:flex-row gap-2 justify-between items-center">
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <Input
-            type="text"
-            placeholder="Search bookings..."
-            value={search}
-            onChange={(e) => {
-              setSearch(e.target.value);
-              setMeta((m) => ({ ...m, page: 1 }));
-            }}
-            className="max-w-sm"
-          />
+    <div className="space-y-6 p-8">
+      <Card className="p-6">
+        <div className="flex flex-col md:flex-row gap-3 justify-between items-center">
+          <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <Input
+              type="text"
+              placeholder="Search bookings..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setMeta((m) => ({ ...m, page: 1 }));
+              }}
+              className="max-w-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+            />
+          </div>
+          <div className="w-full md:w-auto flex justify-end">
+            <Button
+              onClick={handleCreate}
+              className="bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold px-6 py-2 rounded-lg transition-colors"
+            >
+              Create Booking
+            </Button>
+          </div>
         </div>
-        <div className="w-full md:w-auto flex justify-end">
-          <Button onClick={handleCreate}>Create Booking</Button>
+      </Card>
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 text-red-400 rounded px-3 py-2">
+          {error}
         </div>
-      </div>
-      {error && <div className="text-red-500 mb-2">{error}</div>}
-      <div className="overflow-x-auto">
-        <Table className="mb-4 min-w-[800px]">
+      )}
+      <Card className="overflow-hidden">
+        <Table className="mb-0 min-w-[800px]">
           <TableHeader>
-            <TableRow className="bg-gray-100">
+            <TableRow className="bg-white/10 hover:bg-white/15 border-b border-white/10">
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("first_name")}
               >
                 First Name{" "}
                 {sortBy === "first_name" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("last_name")}
               >
                 Last Name{" "}
                 {sortBy === "last_name" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("gender")}
               >
                 Gender{" "}
                 {sortBy === "gender" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("grade")}
               >
                 Grade{" "}
                 {sortBy === "grade" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("address")}
               >
                 Address{" "}
                 {sortBy === "address" && (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
               <TableHead
-                className="cursor-pointer select-none"
+                className="cursor-pointer select-none text-white font-semibold hover:text-[var(--color-brand-green)]"
                 onClick={() => toggleSort("phone_number")}
               >
                 Phone Number{" "}
@@ -210,50 +216,72 @@ const Bookings: React.FC = () => {
                   (sortOrder === "asc" ? " ▲" : " ▼")}
               </TableHead>
 
-              <TableHead>Assigned</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white font-semibold">
+                Assigned
+              </TableHead>
+              <TableHead className="text-white font-semibold">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {bookings.map((booking) => {
               return (
-                <TableRow key={booking.id}>
-                  <TableCell>{booking.first_name}</TableCell>
-                  <TableCell>{booking.last_name}</TableCell>
-                  <TableCell>{booking.gender.toUpperCase()}</TableCell>
-                  <TableCell>{booking.grade}</TableCell>
-                  <TableCell>{booking.address}</TableCell>
-                  <TableCell>{booking.phone_number}</TableCell>
+                <TableRow
+                  key={booking.id}
+                  className="hover:bg-white/5 border-b border-white/5"
+                >
+                  <TableCell className="text-white">
+                    {booking.first_name}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {booking.last_name}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {booking.gender.toUpperCase()}
+                  </TableCell>
+                  <TableCell className="text-white">{booking.grade}</TableCell>
+                  <TableCell className="text-white">
+                    {booking.address}
+                  </TableCell>
+                  <TableCell className="text-white">
+                    {booking.phone_number}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge assigned={booking.assigned} />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="mr-2"
-                      onClick={() => navigate(`/bookings/${booking.id}`)}
-                    >
-                      View
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(booking.id)}
-                    >
-                      Delete
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        onClick={() => navigate(`/bookings/${booking.id}`)}
+                      >
+                        View
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDelete(booking.id)}
+                        className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                      >
+                        Delete
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
+      </Card>
+      <div className="mt-6">
+        <SharedPagination
+          meta={meta}
+          onPageChange={(page) => setMeta((m) => ({ ...m, page }))}
+        />
       </div>
-      <SharedPagination
-        meta={meta}
-        onPageChange={(page) => setMeta((m) => ({ ...m, page }))}
-      />
     </div>
   );
 };

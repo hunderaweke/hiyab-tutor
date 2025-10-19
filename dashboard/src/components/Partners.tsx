@@ -1,6 +1,6 @@
 import axios from "axios";
-import { Eye, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Eye, Trash } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomAlertDialog from "./CustomAlertDialog";
 import { Button } from "./ui/button";
@@ -13,18 +13,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "./ui/table";
+} from "@/components/ui/table";
 import SharedPagination from "./SharedPagination";
-interface Partners {
+
+interface Partner {
   id: number;
   website_url: string;
   image_url: string;
   name: string;
 }
-const Partners = () => {
+
+const Partners: React.FC = () => {
   const [sortBy, setSortBy] = useState("name");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [partners, setPartners] = useState<Partners[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [search, setSearch] = useState("");
   const [meta, setMeta] = useState({ page: 1, limit: 10, total: 0 });
 
@@ -47,148 +49,155 @@ const Partners = () => {
   };
 
   const navigate = useNavigate();
-  const onClick = () => {
-    navigate("/create-partner");
-  };
+  const onClick = () => navigate("/create-partner");
   useEffect(() => {
     fetchPartners(meta.page);
     // eslint-disable-next-line
   }, [sortBy, sortOrder, meta.page, search]);
-  const onSort = (field: "name" | "role" | "created_at") => {
+  const onSort = (field: string) => {
     if (sortBy === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
       setSortBy(field);
       setSortOrder("asc");
     }
   };
-  const onView = (id: number) => {
-    navigate(`/partners/${id}`);
-  };
+  const onView = (id: number) => navigate(`/partners/${id}`);
   const onDelete = async (id: number) => {
     const token = localStorage.getItem("auth");
-    await axios
-      .delete(`/api/partners/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        fetchPartners();
-      });
+    await axios.delete(`/api/partners/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    fetchPartners(meta.page);
   };
+
   return (
-    <main className=" px-2 py-10">
-      <div className="w-full flex flex-col md:flex-row justify-between gap-5">
-        <Input
-          placeholder="Search Partners..."
-          className="w-full md:w-2/5"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setMeta((m) => ({ ...m, page: 1 }));
-          }}
-        />
-        <div className="flex justify-end mt-2 md:mt-0">
-          <Button onClick={onClick}>
-            <Plus />
-            Add Partner
-          </Button>
+    <div className="space-y-6 p-8">
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+        <div className="flex gap-3 justify-between items-center flex-wrap">
+          <div className="flex items-center gap-3 flex-wrap">
+            <Input
+              placeholder="Search Partners..."
+              className="max-w-sm bg-white/10 border-white/20 text-white placeholder:text-white/60"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setMeta((m) => ({ ...m, page: 1 }));
+              }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={onClick}
+              className="bg-[var(--color-brand-green)] hover:bg-[#1ed760] text-[var(--color-main)] font-semibold px-6 py-2 rounded-lg transition-colors"
+            >
+              Add Partner
+            </Button>
+          </div>
         </div>
       </div>
-      <div className="overflow-x-auto mt-4">
-        <Table>
-          <TableCaption>Testimonials List</TableCaption>
-          <TableHeader>
-            <TableRow className="md:text-lg">
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => onSort("name")}
-              >
-                Name{" "}
-                {sortBy === "name" ? (sortOrder === "asc" ? "▲" : "▼") : null}
-              </TableHead>
-              <TableHead>Website URL</TableHead>
-              <TableHead
-                className="cursor-pointer select-none"
-                onClick={() => onSort("created_at")}
-              >
-                Image (Logo)
-                {sortBy === "created_at"
-                  ? sortOrder === "asc"
-                    ? "▲"
-                    : "▼"
-                  : null}
-              </TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {partners.length ? (
-              partners.map((t) => (
-                <TableRow
-                  className="h-16 hover:bg-muted/30 cursor-pointer"
-                  key={t.id}
+
+      <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableCaption>Partners List</TableCaption>
+            <TableHeader>
+              <TableRow className="bg-white/10 hover:bg-white/15 border-b border-white/10 md:text-lg">
+                <TableHead
+                  className="cursor-pointer select-none text-white font-semibold"
+                  onClick={() => onSort("name")}
                 >
-                  <TableCell>{t.name}</TableCell>
-                  <TableCell>
-                    {" "}
-                    {t.website_url ? (
-                      <a
-                        href={`https://${t.website_url}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
+                  Name{" "}
+                  {sortBy === "name" ? (sortOrder === "asc" ? "▲" : "▼") : null}
+                </TableHead>
+                <TableHead className="text-white font-semibold">
+                  Website URL
+                </TableHead>
+                <TableHead className="text-white font-semibold">
+                  Image (Logo)
+                </TableHead>
+                <TableHead className="text-white font-semibold">
+                  Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {partners.length ? (
+                partners.map((t) => (
+                  <TableRow
+                    className="hover:bg-white/5 border-b border-white/5"
+                    key={t.id}
+                  >
+                    <TableCell className="text-white">{t.name}</TableCell>
+                    <TableCell>
+                      {t.website_url ? (
+                        <a
+                          href={`https://${t.website_url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[var(--color-brand-green)] underline"
+                        >
+                          {t.website_url}
+                        </a>
+                      ) : (
+                        <span className="text-white/60">N/A</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {t.image_url ? (
+                        <img
+                          src={`/api/${t.image_url}`}
+                          alt="thumbnail"
+                          className="h-12 w-28 object-cover rounded-md border border-white/20"
+                        />
+                      ) : (
+                        <div className="h-12 w-28 bg-white/10 text-white/60 flex items-center justify-center rounded-md">
+                          -
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="flex gap-2">
+                      <Button
+                        onClick={() => onView(t.id)}
+                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                       >
-                        {t.website_url}
-                      </a>
-                    ) : (
-                      <span className="text-gray-400">N/A</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {t.image_url ? (
-                      <img
-                        src={`/api/${t.image_url}`}
-                        alt="thumbnail"
-                        className="h-16 object-cover"
+                        <Eye className="h-4 w-4 mr-1" /> View
+                      </Button>
+                      <CustomAlertDialog
+                        trigger={
+                          <Button
+                            variant="destructive"
+                            className="bg-red-500/20 border-red-500/30 text-red-300 hover:bg-red-500/30"
+                          >
+                            <Trash className="h-4 w-4 mr-1" /> Delete
+                          </Button>
+                        }
+                        title="Are you absolutely sure?"
+                        description="This action cannot be undone. This will permanently delete the testimonial and remove the data from our servers."
+                        cancelText="Cancel"
+                        actionText="Continue"
+                        onAction={() => onDelete(t.id)}
                       />
-                    ) : (
-                      "-"
-                    )}
-                  </TableCell>
-                  <TableCell className="flex gap-3">
-                    <Button onClick={() => onView(t.id)}>
-                      <Eye className="h-4 w-4" /> View
-                    </Button>
-                    <CustomAlertDialog
-                      trigger={
-                        <Button variant="destructive">
-                          <Trash className="h-4 w-4" /> Delete
-                        </Button>
-                      }
-                      title="Are you absolutely sure?"
-                      description="This action cannot be undone. This will permanently delete the testimonial and remove the data from our servers."
-                      cancelText="Cancel"
-                      actionText="Continue"
-                      onAction={() => onDelete(t.id)}
-                    />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-white/70">
+                    No partners found.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  No partners found.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
+
       <SharedPagination
         meta={meta}
         onPageChange={(page) => setMeta((m) => ({ ...m, page }))}
       />
-    </main>
+    </div>
   );
 };
 

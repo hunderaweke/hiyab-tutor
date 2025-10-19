@@ -11,6 +11,7 @@ type PartnerFormInputs = {
 };
 
 import { useState } from "react";
+import { Card } from "./ui/card";
 
 const CreatePartner = () => {
   const navigate = useNavigate();
@@ -53,50 +54,49 @@ const CreatePartner = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-full mx-auto p-6 space-y-4 border rounded-md bg-white"
-    >
-      <h2 className="text-2xl font-bold mb-2">Add Partner</h2>
-      <Label htmlFor="name">Name</Label>
-      <Input
-        type="text"
-        placeholder="Name"
-        {...register("name", { required: "Name is required" })}
-        aria-invalid={!!errors.name}
-      />
-      {errors.name && (
-        <span className="text-red-500 text-xs">{errors.name.message}</span>
-      )}
-      <Label htmlFor="website_url">Website URL</Label>
-      <Input
-        type="text"
-        placeholder="Website URL"
-        {...register("website_url")}
-        aria-invalid={!!errors.website_url}
-      />
-      {errors.website_url && (
-        <span className="text-red-500 text-xs">
-          {errors.website_url.message}
-        </span>
-      )}
-      <Label htmlFor="thumbnail">Logo (Image)</Label>
-      <Input
-        type="file"
-        placeholder="Logo (Image)"
-        {...register("image")}
-        onChange={handleImageChange}
-      />
-      {imagePreview && (
-        <img
-          src={imagePreview}
-          alt="Image preview"
-          className="max-w-lg max-h-96 border rounded mb-2"
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Card className="max-w-full mx-auto p-6 space-y-4">
+        <h2 className="text-2xl font-bold mb-2 text-white">Add Partner</h2>
+        <Label htmlFor="name">Name</Label>
+        <Input
+          type="text"
+          placeholder="Name"
+          {...register("name", { required: "Name is required" })}
+          aria-invalid={!!errors.name}
         />
-      )}
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Create"}
-      </Button>
+        {errors.name && (
+          <span className="text-red-500 text-xs">{errors.name.message}</span>
+        )}
+        <Label htmlFor="website_url">Website URL</Label>
+        <Input
+          type="text"
+          placeholder="Website URL"
+          {...register("website_url")}
+          aria-invalid={!!errors.website_url}
+        />
+        {errors.website_url && (
+          <span className="text-red-500 text-xs">
+            {errors.website_url.message}
+          </span>
+        )}
+        <Label htmlFor="thumbnail">Logo (Image)</Label>
+        <Input
+          type="file"
+          placeholder="Logo (Image)"
+          {...register("image")}
+          onChange={handleImageChange}
+        />
+        {imagePreview && (
+          <img
+            src={imagePreview}
+            alt="Image preview"
+            className="max-w-lg max-h-96 border rounded mb-2"
+          />
+        )}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Create"}
+        </Button>
+      </Card>
     </form>
   );
 };

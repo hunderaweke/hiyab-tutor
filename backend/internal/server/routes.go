@@ -44,6 +44,8 @@ func (s *Server) RegisterRoutes() http.Handler {
 	routes.SetupBookingRoutes(r, s.DB.Gorm())
 	// Tutor routes
 	routes.SetupTutorRoutes(r, s.DB.Gorm())
+	// Analytics routes
+	routes.SetupAnalyticsRoutes(r, s.DB.Gorm())
 
 	return r
 }

@@ -11,6 +11,7 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 import axios from "axios";
+import { Card } from "./ui/card";
 import { SelectItem } from "@radix-ui/react-select";
 import { Label } from "./ui/label";
 
@@ -77,154 +78,160 @@ const CreateBooking: React.FC = () => {
       });
       reset();
       alert("Booking created successfully!");
-    } catch (err: any) {
-      alert(err.message || "Failed to create booking");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      alert(message || "Failed to create booking");
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="max-w-full mx-auto p-6 space-y-4 border rounded-md bg-white"
-    >
-      <h2 className="text-2xl font-bold mb-2">Create Booking</h2>
-      <div className="flex w-full">
-        <div className="pr-20">
-          <Label htmlFor="first_name">First Name</Label>
-          <Input
-            type="text"
-            placeholder="First Name"
-            {...register("first_name", { required: "First Name is required" })}
-          />
-          {errors.first_name && (
-            <span className="text-red-500 text-xs">
-              {errors.first_name.message}
-            </span>
-          )}
+    <Card className="max-w-full mx-auto p-6 space-y-4">
+      <h2 className="text-2xl font-bold mb-2 text-white">Create Booking</h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex w-full">
+          <div className="pr-20">
+            <Label htmlFor="first_name">First Name</Label>
+            <Input
+              type="text"
+              placeholder="First Name"
+              {...register("first_name", {
+                required: "First Name is required",
+              })}
+            />
+            {errors.first_name && (
+              <span className="text-red-500 text-xs">
+                {errors.first_name.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="last_name">Last Name</Label>
+            <Input
+              type="text"
+              placeholder="Last Name"
+              {...register("last_name", { required: "Last Name is required" })}
+            />
+            {errors.last_name && (
+              <span className="text-red-500 text-xs">
+                {errors.last_name.message}
+              </span>
+            )}
+          </div>
         </div>
-        <div>
-          <Label htmlFor="last_name">Last Name</Label>
-          <Input
-            type="text"
-            placeholder="Last Name"
-            {...register("last_name", { required: "Last Name is required" })}
-          />
-          {errors.last_name && (
-            <span className="text-red-500 text-xs">
-              {errors.last_name.message}
-            </span>
-          )}
+        <Label htmlFor="phone_number">Phone Number</Label>
+        <Input
+          type="text"
+          placeholder="Phone Number"
+          {...register("phone_number", {
+            required: "Phone Number is required",
+          })}
+        />
+        {errors.phone_number && (
+          <span className="text-red-500 text-xs">
+            {errors.phone_number.message}
+          </span>
+        )}
+        <div className="flex justify-between">
+          <div>
+            <Label htmlFor="address">Address</Label>
+            <Input
+              type="text"
+              placeholder="Address"
+              {...register("address", { required: "Address is required" })}
+            />
+            {errors.address && (
+              <span className="text-red-500 text-xs">
+                {errors.address.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="gender">Gender</Label>
+            <Select {...register("gender", { required: "Gender is required" })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Gender" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Gender</SelectLabel>
+                  {genderOptions.map((option) => (
+                    <SelectItem key={option.code} value={option.code}>
+                      {option.Label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {errors.gender && (
+              <span className="text-red-500 text-xs">
+                {errors.gender.message}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      <Label htmlFor="phone_number">Phone Number</Label>
-      <Input
-        type="text"
-        placeholder="Phone Number"
-        {...register("phone_number", { required: "Phone Number is required" })}
-      />
-      {errors.phone_number && (
-        <span className="text-red-500 text-xs">
-          {errors.phone_number.message}
-        </span>
-      )}
-      <div className="flex justify-between">
-        <div>
-          <Label htmlFor="address">Address</Label>
-          <Input
-            type="text"
-            placeholder="Address"
-            {...register("address", { required: "Address is required" })}
-          />
-          {errors.address && (
-            <span className="text-red-500 text-xs">
-              {errors.address.message}
-            </span>
-          )}
+        <div className="flex justify-between">
+          <div>
+            <Label htmlFor="age">Age</Label>
+            <Input
+              type="number"
+              placeholder="Age"
+              {...register("age", { required: "Age is required" })}
+            />
+            {errors.age && (
+              <span className="text-red-500 text-xs">{errors.age.message}</span>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="grade">Grade</Label>
+            <Input
+              type="number"
+              placeholder="Grade"
+              {...register("grade", { required: "Grade is required" })}
+            />
+            {errors.grade && (
+              <span className="text-red-500 text-xs">
+                {errors.grade.message}
+              </span>
+            )}
+          </div>
         </div>
-        <div>
-          <Label htmlFor="gender">Gender</Label>
-          <Select {...register("gender", { required: "Gender is required" })}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Gender</SelectLabel>
-                {genderOptions.map((option) => (
-                  <SelectItem key={option.code} value={option.code}>
-                    {option.Label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {errors.gender && (
-            <span className="text-red-500 text-xs">
-              {errors.gender.message}
-            </span>
-          )}
+        <div className="flex justify-between">
+          <div>
+            <Label htmlFor="day_per_week">Days per Week</Label>
+            <Input
+              type="number"
+              placeholder="Days per Week"
+              {...register("day_per_week", {
+                required: "Days per Week is required",
+              })}
+            />
+            {errors.day_per_week && (
+              <span className="text-red-500 text-xs">
+                {errors.day_per_week.message}
+              </span>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="hr_per_day">Hours per Day</Label>
+            <Input
+              type="number"
+              placeholder="Hours per Day"
+              {...register("hr_per_day", {
+                required: "Hours per Day is required",
+              })}
+            />
+            {errors.hr_per_day && (
+              <span className="text-red-500 text-xs">
+                {errors.hr_per_day.message}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      <div className="flex justify-between">
-        <div>
-          <Label htmlFor="age">Age</Label>
-          <Input
-            type="number"
-            placeholder="Age"
-            {...register("age", { required: "Age is required" })}
-          />
-          {errors.age && (
-            <span className="text-red-500 text-xs">{errors.age.message}</span>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="grade">Grade</Label>
-          <Input
-            type="number"
-            placeholder="Grade"
-            {...register("grade", { required: "Grade is required" })}
-          />
-          {errors.grade && (
-            <span className="text-red-500 text-xs">{errors.grade.message}</span>
-          )}
-        </div>
-      </div>
-      <div className="flex justify-between">
-        <div>
-          <Label htmlFor="day_per_week">Days per Week</Label>
-          <Input
-            type="number"
-            placeholder="Days per Week"
-            {...register("day_per_week", {
-              required: "Days per Week is required",
-            })}
-          />
-          {errors.day_per_week && (
-            <span className="text-red-500 text-xs">
-              {errors.day_per_week.message}
-            </span>
-          )}
-        </div>
-        <div>
-          <Label htmlFor="hr_per_day">Hours per Day</Label>
-          <Input
-            type="number"
-            placeholder="Hours per Day"
-            {...register("hr_per_day", {
-              required: "Hours per Day is required",
-            })}
-          />
-          {errors.hr_per_day && (
-            <span className="text-red-500 text-xs">
-              {errors.hr_per_day.message}
-            </span>
-          )}
-        </div>
-      </div>
-      <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Create"}
-      </Button>
-    </form>
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Create"}
+        </Button>
+      </form>
+    </Card>
   );
 };
 
