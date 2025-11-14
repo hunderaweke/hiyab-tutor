@@ -102,17 +102,13 @@ build_backend() {
     
     cd "$SCRIPT_DIR/backend"
     
-    # Run tests inside Docker if Go is not available on host
+    # Run tests
     if [ "$SKIP_TESTS" != "true" ]; then
-        if command -v go &> /dev/null; then
-            log_info "Running backend tests..."
-            go test ./... -v || {
-                log_error "Backend tests failed!"
-                exit 1
-            }
-        else
-            log_info "Go not installed on host, skipping tests (tests will run during Docker build)"
-        fi
+        log_info "Running backend tests..."
+        go test ./... -v || {
+            log_error "Backend tests failed!"
+            exit 1
+        }
     fi
     
     # Build Docker image

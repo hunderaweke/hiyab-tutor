@@ -72,7 +72,27 @@ apt-get install -y \
     wget \
     vim \
     htop \
-    ufw
+    ufw \
+    build-essential
+
+# Install Go (for running tests if needed)
+log_info "Installing Go..."
+GO_VERSION="1.24.2"
+if ! command -v go &> /dev/null; then
+    wget -q https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+    rm go${GO_VERSION}.linux-amd64.tar.gz
+    
+    # Add Go to PATH for all users
+    echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile.d/go.sh
+    chmod +x /etc/profile.d/go.sh
+    export PATH=$PATH:/usr/local/go/bin
+    
+    log_success "Go ${GO_VERSION} installed"
+else
+    log_info "Go already installed: $(go version)"
+fi
 
 # Install Docker
 log_info "Installing Docker..."
