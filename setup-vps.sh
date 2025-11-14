@@ -188,7 +188,10 @@ fi
 # Setup automatic security updates
 log_info "Configuring automatic security updates..."
 apt-get install -y unattended-upgrades
-dpkg-reconfigure -plow unattended-upgrades
+# Enable automatic updates non-interactively
+echo 'APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";' > /etc/apt/apt.conf.d/20auto-upgrades
 
 # Display summary
 echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
