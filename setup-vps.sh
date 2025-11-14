@@ -185,14 +185,6 @@ if [ "$INSTALL_FAIL2BAN" = "yes" ]; then
     log_success "fail2ban installed and enabled"
 fi
 
-# Setup automatic security updates
-log_info "Configuring automatic security updates..."
-apt-get install -y unattended-upgrades
-# Enable automatic updates non-interactively
-echo 'APT::Periodic::Update-Package-Lists "1";
-APT::Periodic::Unattended-Upgrade "1";
-APT::Periodic::AutocleanInterval "7";' > /etc/apt/apt.conf.d/20auto-upgrades
-
 # Display summary
 echo -e "\n${GREEN}╔══════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║            VPS Setup Completed Successfully!                 ║${NC}"
