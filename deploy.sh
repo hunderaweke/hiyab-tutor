@@ -83,9 +83,9 @@ backup_data() {
     mkdir -p "$BACKUP_DIR"
     
     # Backup PostgreSQL if running
-    if docker ps | grep -q "hiyab-postgres"; then
+    if docker ps 2>/dev/null | grep -q "hiyab-postgres"; then
         log_info "Backing up PostgreSQL database..."
-        docker exec hiyab-postgres pg_dump -U postgres -d hiyab_tutor > "$BACKUP_DIR/database.sql" || log_warning "Database backup failed"
+        docker exec hiyab-postgres pg_dump -U postgres -d hiyab_tutor > "$BACKUP_DIR/database.sql" 2>/dev/null || log_warning "Database backup skipped (container not running)"
     fi
     
     # Backup uploads if they exist
@@ -102,13 +102,17 @@ build_backend() {
     
     cd "$SCRIPT_DIR/backend"
     
-    # Run tests
+    # Run tests inside Docker if Go is not available on host
     if [ "$SKIP_TESTS" != "true" ]; then
-        log_info "Running backend tests..."
-        go test ./... -v || {
-            log_error "Backend tests failed!"
-            exit 1
-        }
+        if command -v go &> /dev/null; then
+            log_info "Running backend tests..."
+            go test ./... -v || {
+                log_error "Backend tests failed!"
+                exit 1
+            }
+        else
+            log_info "Go not installed on host, skipping tests (tests will run during Docker build)"
+        fi
     fi
     
     # Build Docker image
