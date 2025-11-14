@@ -1,0 +1,52 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Backups
+backups/
+*.sql
+*.tar.gz
+*.backup
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Docker volumes
+postgres_data/
+
+# Node modules (already in subdirectories but just in case)
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.exe
+
+# Uploads (actual uploaded files)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Keep backup directory structure
+!backups/.gitkeep

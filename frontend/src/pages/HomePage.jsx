@@ -4,7 +4,6 @@ import Testimonials from "../components/Testimonials";
 import Tutors from "../components/Tutors";
 import MoreAndContact from "../components/MoreAndContact";
 import Footer from "../components/Footer";
-import Analytics from "../components/Analytics";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 const HomePage = () => {
@@ -30,7 +29,6 @@ const HomePage = () => {
     <>
       <Hero />
       <About />
-      <Analytics />
       <Testimonials />
       <Tutors />
       <MoreAndContact />

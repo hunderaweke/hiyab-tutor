@@ -31,17 +31,18 @@ export const setLanguage = (lang) => {
     listeners.forEach((cb) => cb(current));
   }
 };
-export const t = (path) => {
+export const getCurrentLanguage = () => current;
+export const t = (path, fallback) => {
   const parts = path.split(".");
   let node = translations[current];
   for (const p of parts) {
-    if (!node) return path;
+    if (!node) return fallback || path;
     node = node[p];
   }
-  return node || path;
+  return node || fallback || path;
 };
 export const onLanguageChange = (cb) => {
   listeners.add(cb);
   return () => listeners.delete(cb);
 };
-export default { t, setLanguage, onLanguageChange };
+export default { t, setLanguage, getCurrentLanguage, onLanguageChange };
