@@ -102,6 +102,10 @@ build_backend() {
     
     cd "$SCRIPT_DIR/backend"
     
+    # Create .env file from root .env for Docker build
+    log_info "Copying .env file for backend container..."
+    cp "$SCRIPT_DIR/.env" "$SCRIPT_DIR/backend/.env"
+    
     # Run tests (skip integration tests that require Docker)
     if [ "$SKIP_TESTS" != "true" ]; then
         log_info "Running backend tests (skipping integration tests)..."
@@ -113,6 +117,9 @@ build_backend() {
     
     # Build Docker image
     docker build -t hiyab-backend:latest -f Dockerfile .
+    
+    # Clean up .env file after build (for security)
+    rm -f "$SCRIPT_DIR/backend/.env"
     
     log_success "Backend built successfully"
     cd "$SCRIPT_DIR"

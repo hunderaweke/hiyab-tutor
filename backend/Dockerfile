@@ -41,6 +41,9 @@ WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/docs ./docs
 
+# Copy .env file if it exists (for production deployment)
+COPY --chown=appuser:appuser .env* ./ 
+
 # Create directories for uploads with proper permissions
 RUN mkdir -p uploads/images uploads/videos uploads/documents uploads/thumbnails && \
     chown -R appuser:appuser /app

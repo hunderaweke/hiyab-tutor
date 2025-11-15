@@ -1,5 +1,5 @@
 # Ignore development files
-.env
+# .env file will be copied for production - see Dockerfile
 .env.local
 .env.*.local
 
