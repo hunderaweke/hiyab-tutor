@@ -38,7 +38,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	// Swagger documentation
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, ginSwagger.DefaultModelsExpandDepth(10)))
-	
+
 	// Admin routes
 	routes.SetupAdminRoutes(r, s.DB.Gorm())
 	// Other services routes
