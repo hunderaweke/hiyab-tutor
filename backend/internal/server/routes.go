@@ -2,7 +2,6 @@ package server
 
 import (
 	"hiyab-tutor/docs"
-	"hiyab-tutor/internal/config"
 	"hiyab-tutor/internal/server/routes"
 	"net/http"
 
@@ -13,14 +12,10 @@ import (
 )
 
 func (s *Server) RegisterRoutes() http.Handler {
-	c, err := config.LoadConfig()
-	if err != nil {
-		panic("Failed to load config")
-	}
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{c.WebAppUrl, "http://localhost:4000"}, // Add your frontend URL
+		AllowOrigins:     []string{"*"}, // Add your frontend URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true, // Enable cookies/auth
