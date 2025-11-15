@@ -24,14 +24,19 @@ func LoadConfig() (*Config, error) {
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 	viper.AutomaticEnv() // Allow environment variables to override
+	
+	// Try to read .env file, but don't fail if it doesn't exist
+	// Environment variables will be used instead (for Docker)
 	err := viper.ReadInConfig()
 	if err != nil {
+		// If .env doesn't exist, try config.yaml
 		viper.SetConfigName("config")
 		viper.SetConfigType("yaml")
-		viper.AddConfigPath(".") // Look in the current directory for config.yaml
+		viper.AddConfigPath(".")
 		err = viper.ReadInConfig()
 		if err != nil {
-			return nil, err
+			// If no config file exists, that's OK - we'll use environment variables
+			// Just make sure AutomaticEnv is set (already done above)
 		}
 	}
 
