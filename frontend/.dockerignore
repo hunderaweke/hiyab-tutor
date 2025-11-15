@@ -30,7 +30,6 @@ Thumbs.db
 
 # Documentation
 README.md
-*.md
 
 # Docker files
 Dockerfile
@@ -41,7 +40,3 @@ Dockerfile
 **/*.test.jsx
 **/*.spec.js
 **/*.spec.jsx
-
-# Config files not needed in production
-vite.config.js
-eslint.config.js

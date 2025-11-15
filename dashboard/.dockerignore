@@ -30,7 +30,6 @@ Thumbs.db
 
 # Documentation
 README.md
-*.md
 
 # Docker files
 Dockerfile
@@ -41,11 +40,3 @@ Dockerfile
 **/*.test.tsx
 **/*.spec.ts
 **/*.spec.tsx
-
-# Config files not needed in production
-tsconfig.json
-tsconfig.app.json
-tsconfig.node.json
-vite.config.ts
-eslint.config.js
-components.json
