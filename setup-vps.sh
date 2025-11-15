@@ -159,6 +159,13 @@ if [ "$CREATE_USER" = "yes" ]; then
         log_info "Set password for $USERNAME:"
         passwd "$USERNAME"
     fi
+else
+    # Add current sudo user to docker group
+    if [ -n "$SUDO_USER" ]; then
+        USERNAME="$SUDO_USER"
+        usermod -aG docker "$USERNAME"
+        log_success "Added $USERNAME to docker group"
+    fi
 fi
 
 # Create application directory
@@ -234,14 +241,15 @@ echo -e "  2. Create and configure .env file"
 echo -e "     ${BLUE}cp .env.example .env${NC}"
 echo -e "     ${BLUE}nano .env${NC}"
 echo -e ""
+if [ -n "$USERNAME" ] && [ "$USERNAME" != "root" ]; then
+    echo -e "  ${YELLOW}IMPORTANT: Log out and back in for docker group to take effect${NC}"
+    echo -e "  ${BLUE}exit${NC}"
+    echo -e "  ${BLUE}ssh $USERNAME@your-server${NC}"
+    echo -e ""
+fi
 echo -e "  3. Run the deployment script"
 echo -e "     ${BLUE}chmod +x deploy.sh${NC}"
 echo -e "     ${BLUE}./deploy.sh${NC}"
 echo -e ""
-if [ -n "$USERNAME" ] && [ "$USERNAME" != "root" ]; then
-    echo -e "${YELLOW}Note: You may want to switch to the deployment user:${NC}"
-    echo -e "  ${BLUE}su - $USERNAME${NC}"
-    echo -e ""
-fi
 
 log_success "VPS is ready for Hiyab Tutor deployment!"
