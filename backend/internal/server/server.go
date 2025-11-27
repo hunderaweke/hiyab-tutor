@@ -3,10 +3,10 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
-	"hiyab-tutor/internal/config"
 	"hiyab-tutor/internal/database"
 )
 
@@ -17,11 +17,7 @@ type Server struct {
 }
 
 func NewServer() *http.Server {
-	c, err := config.LoadConfig()
-	if err != nil {
-		panic("Failed to load config")
-	}
-	port, _ := strconv.Atoi(c.ServerPort)
+	port, _ := strconv.Atoi(os.Getenv("SERVER_PORT"))
 	NewServer := &Server{
 		port: port,
 
