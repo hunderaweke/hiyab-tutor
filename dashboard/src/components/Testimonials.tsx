@@ -28,7 +28,7 @@ const Testimonials = () => {
     if (search) params.append("search", search);
     params.append("page", String(page));
     params.append("limit", String(meta.limit));
-    const resp = await axios.get(`/api/testimonials/`, {
+    const resp = await axios.get(`/api/v1/testimonials/`, {
       params: Object.fromEntries(params.entries()),
     });
     if (resp.data) {
@@ -44,7 +44,7 @@ const Testimonials = () => {
 
   const handleDelete = async (id: number) => {
     const token = localStorage.getItem("auth");
-    const resp = await axios.delete(`/api/testimonials/${id}`, {
+    const resp = await axios.delete(`/api/v1/testimonials/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (resp.status !== 204) {

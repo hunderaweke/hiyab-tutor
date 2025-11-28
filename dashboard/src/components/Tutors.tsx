@@ -360,7 +360,7 @@ const Tutors: React.FC = () => {
                 <TableCell>
                   {tutor.image ? (
                     <img
-                      src={`/api/${tutor.image}`}
+                      src={`/api/v1/${tutor.image}`}
                       alt="t"
                       className="w-12 h-12 object-cover rounded-lg border border-white/20"
                     />

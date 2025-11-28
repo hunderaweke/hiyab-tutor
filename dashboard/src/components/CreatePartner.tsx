@@ -41,7 +41,7 @@ const CreatePartner = () => {
     if (data.image) {
       formData.append("image", data.image[0]);
     }
-    const resp = await axios.post("/api/partners/", formData, {
+    const resp = await axios.post("/api/v1/partners/", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,

@@ -70,7 +70,7 @@ const CreateBooking: React.FC = () => {
     const token = localStorage.getItem("auth");
     try {
       console.log(transformed);
-      await axios.post("/api/bookings", transformed, {
+      await axios.post("/api/v1/bookings", transformed, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

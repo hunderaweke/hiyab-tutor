@@ -32,7 +32,7 @@ const CreateAdmin = () => {
   const [showPassword, setShowPassword] = useState(false);
   const getRole = async () => {
     const token = localStorage.getItem("auth");
-    const resp = await axios.get("/api/admin/me", {
+    const resp = await axios.get("/api/v1/admin/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -42,7 +42,7 @@ const CreateAdmin = () => {
   getRole();
   const onSubmit = async (data: AdminFormInputs) => {
     const token = localStorage.getItem("auth");
-    const resp = await axios.post("/api/admin/", data, {
+    const resp = await axios.post("/api/v1/admin/", data, {
       headers: { Authorization: `Bearer ${token}` },
     });
     console.log(resp.data);

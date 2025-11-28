@@ -79,7 +79,7 @@ export const TestimonialTable: React.FC<TestimonialTableProps> = ({
             <TableCell>
               {t.thumbnail ? (
                 <img
-                  src={`/api/${t.thumbnail}`}
+                  src={`/api/v1/${t.thumbnail}`}
                   alt="thumbnail"
                   className="h-12 w-24 object-cover rounded-md border border-white/20"
                 />

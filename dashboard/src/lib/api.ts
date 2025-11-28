@@ -3,7 +3,7 @@ import axios from "axios";
 // Create a shared axios instance for the dashboard
 const api = axios.create({
   // Backend registers routes under /api/v1 — use that as the base for dashboard API calls
-  baseURL: "/api",
+  baseURL: "/api/v1",
   withCredentials: true,
 });
 

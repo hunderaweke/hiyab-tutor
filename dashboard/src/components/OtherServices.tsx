@@ -206,7 +206,7 @@ const OtherServices: React.FC = () => {
                     <TableCell>
                       {service.image ? (
                         <img
-                          src={`/api/${service.image}`}
+                          src={`/api/v1/${service.image}`}
                           alt="Service"
                           className="w-16 h-16 object-cover rounded-md border border-white/20"
                         />

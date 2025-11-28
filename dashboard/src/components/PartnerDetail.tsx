@@ -28,7 +28,7 @@ const PartnerDetail = () => {
   useEffect(() => {
     const loadPartner = async () => {
       const id = params.id;
-      const response = await axios.get(`/api/partners/${id}`);
+      const response = await axios.get(`/api/v1/partners/${id}`);
       setPartner(response.data);
       setForm({
         name: response.data.name,
@@ -36,7 +36,7 @@ const PartnerDetail = () => {
         image: null,
       });
       setLogoPreview(
-        response.data.image_url ? `/api/${response.data.image_url}` : undefined
+        response.data.image_url ? `/api/v1/${response.data.image_url}` : undefined
       );
       setLoading(false);
     };
@@ -66,15 +66,15 @@ const PartnerDetail = () => {
     if (form.image) formData.append("image", form.image);
     console.log(formData);
     const token = localStorage.getItem("auth");
-    await axios.put(`/api/partners/${partner.id}`, formData, {
+    await axios.put(`/api/v1/partners/${partner.id}`, formData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setEditMode(false);
-    const response = await axios.get(`/api/partners/${partner.id}`);
+    const response = await axios.get(`/api/v1/partners/${partner.id}`);
     setPartner(response.data);
 
     setLogoPreview(
-      response.data.image_url ? `/api/${response.data.image_url}` : undefined
+      response.data.image_url ? `/api/v1/${response.data.image_url}` : undefined
     );
   };
 

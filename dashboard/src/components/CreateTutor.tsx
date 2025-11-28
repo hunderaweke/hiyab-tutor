@@ -89,7 +89,7 @@ const CreateTutor: React.FC = () => {
       });
       if (imageFile) formData.append("image", imageFile);
       if (documentFile) formData.append("document", documentFile);
-      await axios.post("/api/tutors/", formData, {
+      await axios.post("/api/v1/tutors/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       navigate("/tutors");

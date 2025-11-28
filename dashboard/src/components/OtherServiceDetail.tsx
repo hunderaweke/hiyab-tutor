@@ -35,7 +35,7 @@ const OtherServiceDetail: React.FC = () => {
   const fetchService = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`/api/other-services/${id}`);
+      const res = await axios.get(`/api/v1/other-services/${id}`);
       setService(res.data);
     } catch {
       setError("Failed to load service");
@@ -58,7 +58,7 @@ const OtherServiceDetail: React.FC = () => {
     setAdding(true);
     const token = localStorage.getItem("auth");
     axios
-      .post(`/api/other-services/${id}/translations`, form, {
+      .post(`/api/v1/other-services/${id}/translations`, form, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -88,7 +88,7 @@ const OtherServiceDetail: React.FC = () => {
       <h2 className="text-2xl font-bold mb-4">Other Service Detail</h2>
       <div className="mb-6">
         <img
-          src={`/api/${service.image}`}
+          src={`/api/v1/${service.image}`}
           alt="Service"
           className="w-50 object-cover mb-2"
         />

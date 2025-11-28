@@ -47,7 +47,7 @@ const Testimonial = () => {
   useEffect(() => {
     const loadTestimonial = async () => {
       const id = params.id;
-      const response = await axios.get(`/api/testimonials/${id}`);
+      const response = await axios.get(`/api/v1/testimonials/${id}`);
       setTestimonial(response.data);
       setForm({
         name: response.data.name,
@@ -57,10 +57,10 @@ const Testimonial = () => {
         thumbnail: null,
       });
       setVideoPreview(
-        response.data.video ? `/api/${response.data.video}` : undefined
+        response.data.video ? `/api/v1/${response.data.video}` : undefined
       );
       setThumbnailPreview(
-        response.data.thumbnail ? `/api/${response.data.thumbnail}` : undefined
+        response.data.thumbnail ? `/api/v1/${response.data.thumbnail}` : undefined
       );
       setLoading(false);
     };
@@ -109,17 +109,17 @@ const Testimonial = () => {
     if (form.video) formData.append("video", form.video);
     if (form.thumbnail) formData.append("thumbnail", form.thumbnail);
     const token = localStorage.getItem("auth");
-    await axios.put(`/api/testimonials/${testimonial.id}`, formData, {
+    await axios.put(`/api/v1/testimonials/${testimonial.id}`, formData, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setEditMode(false);
-    const response = await axios.get(`/api/testimonials/${testimonial.id}`);
+    const response = await axios.get(`/api/v1/testimonials/${testimonial.id}`);
     setTestimonial(response.data);
     setVideoPreview(
-      response.data.video_url ? `/api/${response.data.video_url}` : undefined
+      response.data.video_url ? `/api/v1/${response.data.video_url}` : undefined
     );
     setThumbnailPreview(
-      response.data.thumbnail ? `/api/${response.data.thumbnail}` : undefined
+      response.data.thumbnail ? `/api/v1/${response.data.thumbnail}` : undefined
     );
   };
 
@@ -132,7 +132,7 @@ const Testimonial = () => {
     try {
       const token = localStorage.getItem("auth");
       await axios.post(
-        `/api/testimonials/${testimonial.id}/translations`,
+        `/api/v1/testimonials/${testimonial.id}/translations`,
         {
           language_code: newTranslation.language_code,
           text: newTranslation.text,
@@ -140,7 +140,7 @@ const Testimonial = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       // refresh testimonial
-      const response = await axios.get(`/api/testimonials/${testimonial.id}`);
+      const response = await axios.get(`/api/v1/testimonials/${testimonial.id}`);
       setTestimonial(response.data);
       setNewTranslation({ language_code: "", text: "" });
     } catch (err) {

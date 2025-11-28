@@ -32,7 +32,7 @@ const Tutor: React.FC = () => {
     if (id) {
       setLoading(true);
       axios
-        .get(`/api/tutors/${id}`)
+        .get(`/api/v1/tutors/${id}`)
         .then((res) => {
           setTutor(res.data);
           setError(null);
@@ -66,7 +66,7 @@ const Tutor: React.FC = () => {
     if (!tutor) return;
     setVerifying(true);
     try {
-      await axios.put(`/api/tutors/${tutor.id}/verify`, null, {
+      await axios.put(`/api/v1/tutors/${tutor.id}/verify`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -89,7 +89,7 @@ const Tutor: React.FC = () => {
       <div className="flex justify-center">
         {tutor.image ? (
           <img
-            src={`/api/${tutor.image}`}
+            src={`/api/v1/${tutor.image}`}
             alt="Tutor"
             className="w-32 h-32 object-cover rounded-full border border-white/10"
           />
@@ -118,7 +118,7 @@ const Tutor: React.FC = () => {
           <div className="mt-2">
             {tutor.document ? (
               <a
-                href={`/api/${tutor.document}`}
+                href={`/api/v1/${tutor.document}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[var(--color-brand-green)] underline"

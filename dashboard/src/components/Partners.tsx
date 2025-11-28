@@ -37,7 +37,7 @@ const Partners: React.FC = () => {
     params.append("limit", String(meta.limit));
     params.append("sort_by", sortBy);
     params.append("sort_order", sortOrder);
-    const response = await axios.get(`/api/partners/`, {
+    const response = await axios.get(`/api/v1/partners/`, {
       params: Object.fromEntries(params.entries()),
     });
     const data = response.data;
@@ -65,7 +65,7 @@ const Partners: React.FC = () => {
   const onView = (id: number) => navigate(`/partners/${id}`);
   const onDelete = async (id: number) => {
     const token = localStorage.getItem("auth");
-    await axios.delete(`/api/partners/${id}`, {
+    await axios.delete(`/api/v1/partners/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     fetchPartners(meta.page);
@@ -146,7 +146,7 @@ const Partners: React.FC = () => {
                     <TableCell>
                       {t.image_url ? (
                         <img
-                          src={`/api/${t.image_url}`}
+                          src={`/api/v1/${t.image_url}`}
                           alt="thumbnail"
                           className="h-12 w-28 object-cover rounded-md border border-white/20"
                         />

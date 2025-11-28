@@ -54,7 +54,7 @@ const CreateTestimonial = () => {
     if (data.thumbnail) {
       formData.append("thumbnail", data.thumbnail[0]);
     }
-    const resp = await axios.post("/api/testimonials/", formData, {
+    const resp = await axios.post("/api/v1/testimonials/", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
