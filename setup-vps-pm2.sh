@@ -143,7 +143,11 @@ install_go() {
             log_info "Skipping Go installation"
             return
         fi
-        # Remove old version
+    fi
+    
+    # Remove old version (if exists)
+    if [ -d "/usr/local/go" ]; then
+        log_info "Removing old Go installation..."
         rm -rf /usr/local/go
     fi
     
