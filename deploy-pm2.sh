@@ -94,6 +94,73 @@ check_env() {
     echo -e "${GREEN}✓ Environment file found${NC}"
 }
 
+# Check and setup PostgreSQL database
+check_database() {
+    echo -e "${BLUE}Checking database connection...${NC}"
+    
+    # Source .env to get database credentials
+    set -a
+    source "$SCRIPT_DIR/.env"
+    set +a
+    
+    # Check if PostgreSQL is installed
+    if ! command -v psql &> /dev/null; then
+        echo -e "${YELLOW}⚠ PostgreSQL not installed${NC}"
+        echo "Please run setup-vps-pm2.sh to install PostgreSQL"
+        return
+    fi
+    
+    # Try to connect to the database
+    DB_HOST=${BLUEPRINT_DB_HOST:-localhost}
+    DB_PORT=${BLUEPRINT_DB_PORT:-5432}
+    DB_NAME=${BLUEPRINT_DB_DATABASE:-hiyab_tutor}
+    DB_USER=${BLUEPRINT_DB_USERNAME:-hiyab_user}
+    DB_PASSWORD=${BLUEPRINT_DB_PASSWORD}
+    
+    if [ -z "$DB_PASSWORD" ]; then
+        echo -e "${YELLOW}⚠ Database password not set in .env${NC}"
+        return
+    fi
+    
+    # Check if database exists
+    export PGPASSWORD="$DB_PASSWORD"
+    if psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c '\q' 2>/dev/null; then
+        echo -e "${GREEN}✓ Database connection successful${NC}"
+    else
+        echo -e "${YELLOW}⚠ Cannot connect to database '$DB_NAME'${NC}"
+        echo "Creating database..."
+        
+        # Try to create the database using postgres user
+        sudo -u postgres psql <<EOF 2>/dev/null
+-- Create user if not exists
+DO \$\$
+BEGIN
+    IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '$DB_USER') THEN
+        CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
+    END IF;
+END
+\$\$;
+
+-- Create database
+CREATE DATABASE $DB_NAME OWNER $DB_USER;
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
+EOF
+        
+        # Test connection again
+        if psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c '\q' 2>/dev/null; then
+            echo -e "${GREEN}✓ Database created successfully${NC}"
+        else
+            echo -e "${RED}Failed to create database${NC}"
+            echo "Please check your PostgreSQL installation and credentials"
+        fi
+    fi
+    
+    unset PGPASSWORD
+    echo ""
+}
+
 # Run build script
 run_build() {
     echo ""
@@ -114,6 +181,7 @@ start_services() {
 main() {
     check_requirements
     check_env
+    check_database
     run_build
     start_services
     

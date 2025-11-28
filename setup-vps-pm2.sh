@@ -217,10 +217,13 @@ install_postgresql() {
     read -p "Enter database name (default: hiyab_tutor): " DB_NAME
     DB_NAME=${DB_NAME:-hiyab_tutor}
     
-    read -p "Enter database username (default: postgres): " DB_USER
-    DB_USER=${DB_USER:-postgres}
+    echo ""
+    log_info "Create a database user (recommended: create a new user instead of using 'postgres')"
+    read -p "Enter database username (default: hiyab_user): " DB_USER
+    DB_USER=${DB_USER:-hiyab_user}
     
-    read -sp "Enter database password: " DB_PASSWORD
+    echo ""
+    read -sp "Enter database password (required): " DB_PASSWORD
     echo
     
     if [ -z "$DB_PASSWORD" ]; then
@@ -228,22 +231,33 @@ install_postgresql() {
         exit 1
     fi
     
+    # Confirm password
+    read -sp "Confirm database password: " DB_PASSWORD_CONFIRM
+    echo
+    
+    if [ "$DB_PASSWORD" != "$DB_PASSWORD_CONFIRM" ]; then
+        log_error "Passwords do not match"
+        exit 1
+    fi
+    
     # Create database and user
     sudo -u postgres psql <<EOF
--- Create database
-CREATE DATABASE $DB_NAME;
-
--- Create user if not exists (skip if using default postgres user)
+-- Create user
 DO \$\$
 BEGIN
-    IF '$DB_USER' != 'postgres' THEN
+    IF NOT EXISTS (SELECT FROM pg_user WHERE usename = '$DB_USER') THEN
         CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
-        GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
     ELSE
-        ALTER USER postgres WITH PASSWORD '$DB_PASSWORD';
+        ALTER USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
     END IF;
 END
 \$\$;
+
+-- Create database
+CREATE DATABASE $DB_NAME OWNER $DB_USER;
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
 EOF
     
     log_success "Database '$DB_NAME' created"

@@ -521,21 +521,22 @@ The `setup-vps-pm2.sh` script automates the entire server setup process. Here's 
 
 2. **Node.js & PM2**
 
-   - Node.js 20.x LTS (latest stable)
+   - Node.js 24.x LTS (latest stable)
    - npm (comes with Node.js)
    - PM2 globally installed
    - PM2 startup script configured
 
 3. **Go Programming Language**
 
-   - Go 1.23.3 (or latest stable)
+   - Go 1.24.0 (or latest stable)
    - Configured in system PATH
    - Added to user's .bashrc
 
 4. **PostgreSQL Database**
 
-   - PostgreSQL 16 (latest)
-   - Creates database and user
+   - PostgreSQL 17 (latest)
+   - Interactive setup: prompts for database name, username, and password
+   - Credentials saved to /tmp/db_config.txt for easy .env configuration
    - Saves credentials to `/tmp/db_config.txt`
    - Starts and enables service
 
