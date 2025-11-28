@@ -97,9 +97,9 @@ install_nodejs() {
         fi
     fi
     
-    # Install Node.js 20.x LTS
-    log_info "Installing Node.js 20.x LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    # Install Node.js 22.x LTS (latest)
+    log_info "Installing Node.js 22.x LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
     apt-get install -y nodejs
     
     # Verify installation
@@ -147,8 +147,8 @@ install_go() {
         rm -rf /usr/local/go
     fi
     
-    # Install Go 1.23.3 (or latest stable)
-    GO_VERSION="1.23.3"
+    # Install Go 1.24.0 (latest)
+    GO_VERSION="1.24.0"
     log_info "Installing Go $GO_VERSION..."
     
     cd /tmp
@@ -484,9 +484,9 @@ main() {
     detect_os
     
     log_info "This script will install:"
-    echo "  - Node.js 20.x LTS"
+    echo "  - Node.js 22.x LTS (latest)"
     echo "  - PM2 process manager"
-    echo "  - Go 1.23.3"
+    echo "  - Go 1.24.0 (latest)"
     echo "  - PostgreSQL 16"
     echo "  - Nginx web server"
     echo "  - System utilities and security tools"

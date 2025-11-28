@@ -24,9 +24,10 @@ sudo ./setup-vps-pm2.sh
 ```
 
 The script will install:
-- ✅ Node.js 20.x LTS & npm
+
+- ✅ Node.js 22.x LTS (latest) & npm
 - ✅ PM2 process manager
-- ✅ Go 1.23.3
+- ✅ Go 1.24.0 (latest)
 - ✅ PostgreSQL 16
 - ✅ Nginx web server
 - ✅ System utilities & security (UFW, fail2ban, certbot)
@@ -43,8 +44,8 @@ If you prefer manual installation or already have some tools installed:
 
 On your VPS, ensure you have:
 
-- **Go** 1.23+ installed
-- **Node.js** 20+ and npm
+- **Go** 1.24+ installed
+- **Node.js** 22+ and npm
 - **PostgreSQL** 16+ running
 - **Nginx** (optional, for reverse proxy)
 - **Git** for cloning the repository
@@ -70,6 +71,7 @@ nano .env
 ```
 
 **If you used the automated setup script (`setup-vps-pm2.sh`):**
+
 - Database credentials were saved to `/tmp/db_config.txt`
 - Copy those values into your `.env` file
 - Remember to delete `/tmp/db_config.txt` after copying for security
@@ -513,27 +515,32 @@ The `setup-vps-pm2.sh` script automates the entire server setup process. Here's 
 ### What Gets Installed
 
 1. **System Updates & Utilities**
+
    - Updates all system packages
    - Installs: curl, wget, git, build-essential, vim, nano, htop, unzip
 
 2. **Node.js & PM2**
+
    - Node.js 20.x LTS (latest stable)
    - npm (comes with Node.js)
    - PM2 globally installed
    - PM2 startup script configured
 
 3. **Go Programming Language**
+
    - Go 1.23.3 (or latest stable)
    - Configured in system PATH
    - Added to user's .bashrc
 
 4. **PostgreSQL Database**
+
    - PostgreSQL 16 (latest)
    - Creates database and user
    - Saves credentials to `/tmp/db_config.txt`
    - Starts and enables service
 
 5. **Nginx Web Server**
+
    - Latest Nginx from official repos
    - Pre-configured reverse proxy for:
      - Frontend → `http://your-ip/`
@@ -551,6 +558,7 @@ The `setup-vps-pm2.sh` script automates the entire server setup process. Here's 
 ### Interactive Prompts
 
 The script will ask you for:
+
 - Database name (default: `hiyab_tutor`)
 - Database username (default: `postgres`)
 - Database password (required)
