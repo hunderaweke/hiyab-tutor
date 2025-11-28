@@ -55,12 +55,10 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 // @host localhost:9000
 // @schemes http
 func main() {
-
+	fmt.Println(os.Environ())
 	server := server.NewServer()
-
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
-	fmt.Println(os.Environ())
 	// Run graceful shutdown in a separate goroutine
 	go gracefulShutdown(server, done)
 
