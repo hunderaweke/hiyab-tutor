@@ -28,11 +28,19 @@ check_requirements() {
     
     local missing=0
     
+    # Add Go to PATH if it exists in /usr/local/go/bin
+    if [ -f "/usr/local/go/bin/go" ]; then
+        export PATH=$PATH:/usr/local/go/bin
+    fi
+    
     if ! command -v go &> /dev/null; then
         echo -e "${RED}✗ Go is not installed${NC}"
+        echo -e "${YELLOW}  If you just ran setup-vps-pm2.sh, try: source ~/.bashrc${NC}"
+        echo -e "${YELLOW}  Or run: export PATH=\$PATH:/usr/local/go/bin${NC}"
         missing=1
     else
-        echo -e "${GREEN}✓ Go installed${NC}"
+        echo -e "${GREEN}✓ Go installed$(go version | awk '{print " (" $3 ")"}')"
+        export PATH=$PATH:/usr/local/go/bin
     fi
     
     if ! command -v node &> /dev/null; then

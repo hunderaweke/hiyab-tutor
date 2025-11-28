@@ -116,11 +116,22 @@ setup_logs() {
 
 # Main build process
 main() {
+    # Add Go to PATH if it exists in /usr/local/go/bin
+    if [ -f "/usr/local/go/bin/go" ]; then
+        export PATH=$PATH:/usr/local/go/bin
+        export GOPATH=$HOME/go
+        export PATH=$PATH:$GOPATH/bin
+    fi
+    
     # Check for required tools
     echo "Checking requirements..."
     
     if ! command -v go &> /dev/null; then
         echo -e "${RED}ERROR: Go is not installed${NC}"
+        echo -e "${YELLOW}If you just ran setup-vps-pm2.sh, reload your shell:${NC}"
+        echo -e "${YELLOW}  source ~/.bashrc${NC}"
+        echo -e "${YELLOW}Or add Go to PATH:${NC}"
+        echo -e "${YELLOW}  export PATH=\$PATH:/usr/local/go/bin${NC}"
         exit 1
     fi
     
