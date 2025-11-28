@@ -515,7 +515,7 @@ main() {
     
     update_system
     install_utilities
-    install_js
+    install_nodejs
     install_pm2
     install_go
     install_postgresql
