@@ -9,9 +9,9 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/joho/godotenv/autoload"
-
 	"hiyab-tutor/internal/server"
+
+	"github.com/joho/godotenv"
 )
 
 func gracefulShutdown(apiServer *http.Server, done chan bool) {
@@ -54,6 +54,9 @@ func gracefulShutdown(apiServer *http.Server, done chan bool) {
 // @host localhost:9000
 // @schemes http
 func main() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalf("error loading .env file %v", err)
+	}
 	server := server.NewServer()
 	// Create a done channel to signal when the shutdown is complete
 	done := make(chan bool, 1)
