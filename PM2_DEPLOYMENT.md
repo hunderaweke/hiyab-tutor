@@ -8,13 +8,48 @@ This guide covers deploying the Hiyab Tutor platform using **PM2** (Process Mana
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option A: Automated VPS Setup (Recommended for Fresh Server)
+
+If you have a fresh VPS, use our automated setup script that installs everything:
+
+```bash
+# Download the setup script
+wget https://raw.githubusercontent.com/hunderaweke/hiyab-tutor/main/setup-vps-pm2.sh
+
+# Make it executable
+chmod +x setup-vps-pm2.sh
+
+# Run with sudo
+sudo ./setup-vps-pm2.sh
+```
+
+The script will install:
+- ✅ Node.js 20.x LTS & npm
+- ✅ PM2 process manager
+- ✅ Go 1.23.3
+- ✅ PostgreSQL 16
+- ✅ Nginx web server
+- ✅ System utilities & security (UFW, fail2ban, certbot)
+
+After the script completes, skip to **Step 1** below to clone the repository.
+
+---
+
+### Option B: Manual Setup
+
+If you prefer manual installation or already have some tools installed:
+
+#### Prerequisites
 
 On your VPS, ensure you have:
-- **Go** 1.24+ installed
-- **Node.js** 16+ and npm
+
+- **Go** 1.23+ installed
+- **Node.js** 20+ and npm
 - **PostgreSQL** 16+ running
+- **Nginx** (optional, for reverse proxy)
 - **Git** for cloning the repository
+
+---
 
 ### 1. Clone Repository
 
@@ -34,7 +69,13 @@ cp .env.example .env
 nano .env
 ```
 
+**If you used the automated setup script (`setup-vps-pm2.sh`):**
+- Database credentials were saved to `/tmp/db_config.txt`
+- Copy those values into your `.env` file
+- Remember to delete `/tmp/db_config.txt` after copying for security
+
 Required configuration:
+
 ```env
 JWT_SECRET=your-strong-secret-here
 SERVER_PORT=8080
@@ -52,6 +93,10 @@ WEB_APP_URL=http://your-vps-ip
 ```
 
 ### 3. Setup PostgreSQL Database
+
+**If you used the automated setup script:** PostgreSQL is already configured and the database is created. Skip to Step 4.
+
+**Manual setup:**
 
 ```bash
 # Create database
@@ -230,11 +275,11 @@ pm2 restart ecosystem.config.js
 
 After deployment, services are available at:
 
-| Service   | URL                          | Port |
-|-----------|------------------------------|------|
-| Backend   | `http://your-vps-ip:8080`    | 8080 |
-| Frontend  | `http://your-vps-ip:4000`    | 4000 |
-| Dashboard | `http://your-vps-ip:3000`    | 3000 |
+| Service   | URL                                | Port |
+| --------- | ---------------------------------- | ---- |
+| Backend   | `http://your-vps-ip:8080`          | 8080 |
+| Frontend  | `http://your-vps-ip:4000`          | 4000 |
+| Dashboard | `http://your-vps-ip:3000`          | 3000 |
 | Swagger   | `http://your-vps-ip:8080/swagger/` | 8080 |
 
 ---
@@ -247,23 +292,23 @@ After deployment, services are available at:
 module.exports = {
   apps: [
     {
-      name: 'hiyab-backend',
-      script: './backend/bin/hiyab-api',
+      name: "hiyab-backend",
+      script: "./backend/bin/hiyab-api",
       instances: 1,
       autorestart: true,
-      max_memory_restart: '1G',
+      max_memory_restart: "1G",
     },
     {
-      name: 'hiyab-frontend',
-      script: 'npx',
-      args: 'serve -s dist -l 4000',
-      cwd: './frontend',
+      name: "hiyab-frontend",
+      script: "npx",
+      args: "serve -s dist -l 4000",
+      cwd: "./frontend",
     },
     {
-      name: 'hiyab-dashboard',
-      script: 'npx',
-      args: 'serve -s dist -l 3000',
-      cwd: './dashboard',
+      name: "hiyab-dashboard",
+      script: "npx",
+      args: "serve -s dist -l 3000",
+      cwd: "./dashboard",
     },
   ],
 };
@@ -298,6 +343,7 @@ pm2 save
 ### 2. Setup Nginx Reverse Proxy
 
 For production, use Nginx to:
+
 - Serve frontend/dashboard on port 80
 - Proxy API requests to backend
 - Enable HTTPS with SSL
@@ -363,11 +409,13 @@ pm2 web
 ### Backend Won't Start
 
 **Check logs:**
+
 ```bash
 pm2 logs hiyab-backend --lines 50
 ```
 
 **Common issues:**
+
 - Database connection failed → Check PostgreSQL is running and credentials in `.env`
 - Port already in use → Check if another process is using port 8080
 - Binary not found → Run `./build.sh backend`
@@ -375,12 +423,14 @@ pm2 logs hiyab-backend --lines 50
 ### Frontend/Dashboard Not Accessible
 
 **Check if build exists:**
+
 ```bash
 ls -la frontend/dist
 ls -la dashboard/dist
 ```
 
 **Rebuild if needed:**
+
 ```bash
 ./build.sh frontend
 ./build.sh dashboard
@@ -390,11 +440,13 @@ pm2 restart hiyab-frontend hiyab-dashboard
 ### Database Connection Issues
 
 **Test connection:**
+
 ```bash
 psql -h localhost -U postgres -d hiyab_tutor -c "SELECT 1;"
 ```
 
 **Check PostgreSQL status:**
+
 ```bash
 sudo systemctl status postgresql
 ```
@@ -402,6 +454,7 @@ sudo systemctl status postgresql
 ### Port Conflicts
 
 **Find process using port:**
+
 ```bash
 sudo lsof -i :8080
 sudo lsof -i :3000
@@ -409,6 +462,7 @@ sudo lsof -i :4000
 ```
 
 **Kill process:**
+
 ```bash
 sudo kill -9 <PID>
 ```
@@ -452,6 +506,83 @@ crontab -e
 
 ---
 
+## 🛠️ VPS Setup Script Details
+
+The `setup-vps-pm2.sh` script automates the entire server setup process. Here's what it does:
+
+### What Gets Installed
+
+1. **System Updates & Utilities**
+   - Updates all system packages
+   - Installs: curl, wget, git, build-essential, vim, nano, htop, unzip
+
+2. **Node.js & PM2**
+   - Node.js 20.x LTS (latest stable)
+   - npm (comes with Node.js)
+   - PM2 globally installed
+   - PM2 startup script configured
+
+3. **Go Programming Language**
+   - Go 1.23.3 (or latest stable)
+   - Configured in system PATH
+   - Added to user's .bashrc
+
+4. **PostgreSQL Database**
+   - PostgreSQL 16 (latest)
+   - Creates database and user
+   - Saves credentials to `/tmp/db_config.txt`
+   - Starts and enables service
+
+5. **Nginx Web Server**
+   - Latest Nginx from official repos
+   - Pre-configured reverse proxy for:
+     - Frontend → `http://your-ip/`
+     - Dashboard → `http://your-ip/admin`
+     - API → `http://your-ip/api`
+     - Swagger → `http://your-ip/swagger`
+   - Started and enabled
+
+6. **Security & Firewall**
+   - UFW firewall enabled
+   - Ports: 22 (SSH), 80 (HTTP), 443 (HTTPS)
+   - fail2ban for intrusion prevention
+   - certbot for SSL/TLS certificates
+
+### Interactive Prompts
+
+The script will ask you for:
+- Database name (default: `hiyab_tutor`)
+- Database username (default: `postgres`)
+- Database password (required)
+
+### Output Files
+
+- `/tmp/db_config.txt` - Contains database credentials (delete after use)
+
+### Running the Script
+
+```bash
+# Download
+wget https://raw.githubusercontent.com/hunderaweke/hiyab-tutor/main/setup-vps-pm2.sh
+
+# Make executable
+chmod +x setup-vps-pm2.sh
+
+# Run as root/sudo
+sudo ./setup-vps-pm2.sh
+```
+
+**Script execution time:** Approximately 5-10 minutes depending on your server speed.
+
+### After Script Completion
+
+1. Copy database credentials from `/tmp/db_config.txt` to your `.env` file
+2. Delete the temporary file: `sudo rm /tmp/db_config.txt`
+3. Clone the repository and deploy
+4. (Optional) Configure SSL with: `sudo certbot --nginx`
+
+---
+
 ## 🔄 Switching from Docker to PM2
 
 If you previously used Docker deployment (from `docker-deployment` branch):
@@ -477,15 +608,15 @@ git pull origin main
 
 ### Docker vs PM2 Comparison
 
-| Feature           | Docker                | PM2                    |
-|-------------------|-----------------------|------------------------|
-| Setup Complexity  | Medium                | Simple                 |
-| Resource Usage    | Higher (containers)   | Lower (native)         |
-| Isolation         | Strong                | Process-level          |
-| Performance       | Slight overhead       | Native speed           |
-| Portability       | Excellent             | OS-dependent           |
-| Learning Curve    | Steeper               | Gentler                |
-| Best For          | Cloud/K8s deployments | Single VPS deployments |
+| Feature          | Docker                | PM2                    |
+| ---------------- | --------------------- | ---------------------- |
+| Setup Complexity | Medium                | Simple                 |
+| Resource Usage   | Higher (containers)   | Lower (native)         |
+| Isolation        | Strong                | Process-level          |
+| Performance      | Slight overhead       | Native speed           |
+| Portability      | Excellent             | OS-dependent           |
+| Learning Curve   | Steeper               | Gentler                |
+| Best For         | Cloud/K8s deployments | Single VPS deployments |
 
 ---
 
@@ -501,6 +632,7 @@ git pull origin main
 ## 🆘 Support
 
 For issues:
+
 1. Check logs: `pm2 logs`
 2. Review this guide's troubleshooting section
 3. Check `.env` configuration
