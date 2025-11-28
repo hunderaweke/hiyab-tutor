@@ -97,9 +97,9 @@ install_nodejs() {
         fi
     fi
     
-    # Install Node.js 22.x LTS (latest)
-    log_info "Installing Node.js 22.x LTS..."
-    curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+    # Install Node.js 24.x LTS (latest)
+    log_info "Installing Node.js 24.x LTS..."
+    curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
     apt-get install -y nodejs
     
     # Verify installation
@@ -195,14 +195,14 @@ install_postgresql() {
         fi
     else
         # Install PostgreSQL 16
-        log_info "Installing PostgreSQL 16..."
+        log_info "Installing PostgreSQL 17..."
         
         # Add PostgreSQL repository
         sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
         
         apt-get update -y
-        apt-get install -y postgresql-16 postgresql-contrib-16
+        apt-get install -y postgresql-17 postgresql-contrib-17
     fi
     
     # Start PostgreSQL service
@@ -484,7 +484,7 @@ main() {
     detect_os
     
     log_info "This script will install:"
-    echo "  - Node.js 22.x LTS (latest)"
+    echo "  - Node.js 24.x LTS (latest)"
     echo "  - PM2 process manager"
     echo "  - Go 1.24.0 (latest)"
     echo "  - PostgreSQL 16"
@@ -501,7 +501,7 @@ main() {
     
     update_system
     install_utilities
-    install_nodejs
+    install_js
     install_pm2
     install_go
     install_postgresql

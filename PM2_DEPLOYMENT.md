@@ -25,7 +25,7 @@ sudo ./setup-vps-pm2.sh
 
 The script will install:
 
-- ✅ Node.js 22.x LTS (latest) & npm
+- ✅ Node.js 24.x LTS (latest) & npm
 - ✅ PM2 process manager
 - ✅ Go 1.24.0 (latest)
 - ✅ PostgreSQL 16
@@ -45,7 +45,7 @@ If you prefer manual installation or already have some tools installed:
 On your VPS, ensure you have:
 
 - **Go** 1.24+ installed
-- **Node.js** 22+ and npm
+- **Node.js** 24+ and npm
 - **PostgreSQL** 16+ running
 - **Nginx** (optional, for reverse proxy)
 - **Git** for cloning the repository
