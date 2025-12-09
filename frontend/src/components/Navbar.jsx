@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { setLanguage } from "../i18n";
+import { setLanguage, getCurrentLanguage, t, onLanguageChange } from "../i18n";
 import logo from "../assets/hiyab-logo.svg";
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(getCurrentLanguage());
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    return onLanguageChange((lang) => setCurrentLang(lang));
+  }, []);
 
   const goToSection = (sectionId) => {
     setOpen(false);
@@ -31,31 +36,31 @@ const Navbar = () => {
         </button>
         <div className="hidden md:flex gap-4 lg:gap-6 items-center text-sm lg:text-base">
           <Link to="/" className="hover:text-brand-green transition-colors">
-            Home
+            {t("nav.home")}
           </Link>
           <button
             onClick={() => goToSection("about")}
             className="hover:text-brand-green transition-colors"
           >
-            About
+            {t("nav.about")}
           </button>
           <button
             onClick={() => goToSection("testimonials")}
             className="hover:text-brand-green transition-colors"
           >
-            Testimonials
+            {t("nav.testimonials")}
           </button>
           <button
             onClick={() => goToSection("tutors")}
             className="hover:text-brand-green transition-colors"
           >
-            Tutors
+            {t("nav.tutors")}
           </button>
           <button
             onClick={() => goToSection("contact")}
             className="hover:text-brand-green transition-colors"
           >
-            Contact
+            {t("nav.contact")}
           </button>
         </div>
         <div className="hidden md:flex items-center gap-3 lg:gap-5">
@@ -63,7 +68,7 @@ const Navbar = () => {
             name="language_code"
             className="bg-transparent border border-white/10 text-white/90 rounded px-2 py-1 text-sm cursor-pointer"
             onChange={(e) => setLanguage(e.target.value)}
-            value={undefined}
+            value={currentLang}
           >
             <option value="en">EN</option>
             <option value="am">AM</option>
@@ -72,13 +77,13 @@ const Navbar = () => {
             to="/apply-tutor"
             className="font-bold text-brand-green border-2 border-brand-green px-2 lg:px-3 py-1 rounded-sm hover:bg-brand-green hover:text-main transition-colors text-xs lg:text-sm whitespace-nowrap"
           >
-            Apply as Tutor
+            {t("nav.applyTutor")}
           </Link>
           <Link
             to="/book-tutor"
             className="font-bold text-main bg-brand-green border-2 border-brand-green px-2 lg:px-3 py-1 rounded-sm hover:bg-transparent hover:text-brand-green transition-colors text-xs lg:text-sm whitespace-nowrap"
           >
-            Book Tutor
+            {t("nav.bookTutor")}
           </Link>
         </div>
       </div>
@@ -90,31 +95,31 @@ const Navbar = () => {
             className="block py-2 hover:text-brand-green transition-colors"
             onClick={() => setOpen(false)}
           >
-            Home
+            {t("nav.home")}
           </Link>
           <button
             onClick={() => goToSection("about")}
             className="block text-left w-full py-2 hover:text-brand-green transition-colors"
           >
-            About
+            {t("nav.about")}
           </button>
           <button
             onClick={() => goToSection("testimonials")}
             className="block text-left w-full py-2 hover:text-brand-green transition-colors"
           >
-            Testimonials
+            {t("nav.testimonials")}
           </button>
           <button
             onClick={() => goToSection("tutors")}
             className="block text-left w-full py-2 hover:text-brand-green transition-colors"
           >
-            Tutors
+            {t("nav.tutors")}
           </button>
           <button
             onClick={() => goToSection("contact")}
             className="block text-left w-full py-2 hover:text-brand-green transition-colors"
           >
-            Contact
+            {t("nav.contact")}
           </button>
           <hr className="border-white/10" />
           <div className="flex flex-col gap-3 pt-2">
@@ -122,6 +127,7 @@ const Navbar = () => {
               name="language_code"
               className="bg-transparent border border-white/10 text-white/90 rounded px-2 py-2 w-full cursor-pointer"
               onChange={(e) => setLanguage(e.target.value)}
+              value={currentLang}
             >
               <option value="en">EN</option>
               <option value="am">AM</option>
@@ -131,14 +137,14 @@ const Navbar = () => {
               className="font-bold text-center text-brand-green border-2 border-brand-green px-3 py-2 rounded-sm hover:bg-brand-green hover:text-main transition-colors"
               onClick={() => setOpen(false)}
             >
-              Apply as Tutor
+              {t("nav.applyTutor")}
             </Link>
             <Link
               to="/book-tutor"
               className="font-bold text-center text-main bg-brand-green border-2 border-brand-green px-3 py-2 rounded-sm hover:bg-transparent hover:text-brand-green transition-colors"
               onClick={() => setOpen(false)}
             >
-              Book Tutor
+              {t("nav.bookTutor")}
             </Link>
           </div>
         </div>

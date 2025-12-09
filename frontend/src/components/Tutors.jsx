@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { t } from "../i18n";
+import { t, onLanguageChange } from "../i18n";
 import useEmblaCarousel from "embla-carousel-react";
 import TutorCard from "./TutorCard";
 
@@ -8,6 +8,11 @@ const Tutors = () => {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [, setLang] = useState("");
+
+  useEffect(() => {
+    return onLanguageChange(() => setLang(Date.now()));
+  }, []);
 
   // Fetch verified tutors from backend
   useEffect(() => {
@@ -40,8 +45,12 @@ const Tutors = () => {
       className="container mx-auto mt-16 sm:mt-20 md:mt-24 lg:mt-28 px-4 sm:px-6 lg:px-8"
     >
       <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 lg:mb-10 text-center lg:text-left px-2 lg:px-0">
-        Our <span className="text-brand-green">Tutors</span>
+        {t("tutors.title")}{" "}
+        <span className="text-brand-green">{t("tutors.titleHighlight")}</span>
       </h2>
+      <p className="text-base sm:text-lg md:text-xl font-light max-w-3xl mb-8 text-center lg:text-left px-2 lg:px-0">
+        {t("tutors.subtitle")}
+      </p>
       <div className="relative">
         {loading ? (
           <div className="flex items-center justify-center h-[400px] bg-gray-100 rounded-2xl">

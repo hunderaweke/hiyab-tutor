@@ -38,7 +38,7 @@ const ContactItem = ({ icon, label, value }) => (
   <div className="flex items-center gap-4 text-white/85">
     <div className="text-brand-green text-xl">{icon}</div>
     <div className="flex flex-col">
-      <span className="text-white/60 text-sm">{label}</span>
+      <span className="text-white/60 text-sm">{t(label)}</span>
       <span className="text-lg">{value}</span>
     </div>
   </div>
@@ -116,7 +116,7 @@ const MoreAndContact = () => {
     >
       {/* More By Hiyab */}
       <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 lg:mb-10 px-2 lg:px-0">
-        {t("more.title")} <span className="text-brand-green">Hiyab</span>
+        {t("more.title")}
       </h2>
       <div className="relative">
         {loading ? (
@@ -205,13 +205,17 @@ const MoreAndContact = () => {
         <div className="space-y-5 sm:space-y-6 md:space-y-8 px-2 lg:px-0">
           <ContactItem
             icon={<FaTelegramPlane />}
-            label="Telegram"
+            label="more.phone"
             value="@telegram"
           />
-          <ContactItem icon={<FiPhone />} label="Phone" value="0912345678" />
+          <ContactItem
+            icon={<FiPhone />}
+            label="more.phone"
+            value="0912345678"
+          />
           <ContactItem
             icon={<HiOutlineMail />}
-            label="Email"
+            label="more.email"
             value="hiyab@gmail.com"
           />
         </div>

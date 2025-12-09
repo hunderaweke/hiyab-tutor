@@ -1,4 +1,13 @@
+import { useState, useEffect } from "react";
+import { t, onLanguageChange } from "../i18n";
+
 const About = () => {
+  const [, setLang] = useState("");
+
+  useEffect(() => {
+    return onLanguageChange(() => setLang(Date.now()));
+  }, []);
+
   return (
     <section
       id="about"
@@ -6,15 +15,10 @@ const About = () => {
     >
       <div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold my-6 sm:my-8 lg:my-16 px-2 lg:px-0">
-          Who are We <span className="text-brand-green">?</span>
+          {t("about.title")} <span className="text-brand-green">?</span>
         </h1>
         <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-extralight max-w-3xl px-2 lg:px-0 leading-relaxed">
-          At Hiyab Tutors, we believe that every student deserves access to the
-          right support — someone who understands their challenges, inspires
-          their curiosity, and guides them toward real progress. Founded with a
-          deep commitment to academic excellence and accessibility, our platform
-          connects families with trusted, qualified tutors across a wide range
-          of subjects.
+          {t("about.description")}
         </p>
       </div>
       <div className="grid grid-rows-2 gap-4 md:gap-5 max-h-fit max-w-full z-10">
@@ -24,7 +28,7 @@ const About = () => {
               2+
             </h1>
             <p className="text-xs sm:text-sm md:text-base lg:text-xl mt-2">
-              Years of Experience
+              {t("about.yearsExperience")}
             </p>
           </div>
           <div className="bg-brand-green text-main rounded-md p-5 sm:p-6 md:p-8 lg:p-10 text-center flex flex-col items-center justify-center">
@@ -32,7 +36,7 @@ const About = () => {
               100+
             </h1>
             <p className="text-xs sm:text-sm md:text-base lg:text-xl mt-2">
-              Trusting Families
+              {t("about.trustingFamilies")}
             </p>
           </div>
         </div>
@@ -41,7 +45,7 @@ const About = () => {
             1000+
           </h1>
           <p className="text-xs sm:text-sm md:text-base lg:text-xl mt-2">
-            Successful Students Exceeding in Academics
+            {t("about.successfulStudents")}
           </p>
         </div>
       </div>
