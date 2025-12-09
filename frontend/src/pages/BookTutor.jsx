@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Footer from "../components/Footer";
 
 const BookTutor = () => {
@@ -159,24 +159,24 @@ const BookTutor = () => {
                 >
                   <option value="">Select city</option>
                   <option value="Adama">Adama</option>
-                  <option value="Addis Ababa">Addis Ababa</option>
-                  <option value="Bahir Dar">Bahir Dar</option>
-                  <option value="Gondar">Gondar</option>
-                  <option value="Mekelle">Mekelle</option>
-                  <option value="Hawassa">Hawassa</option>
-                  <option value="Other">Other</option>
                 </select>
               </div>
               <div>
                 <label className="block text-sm mb-1">
                   Place / Neighbourhood
                 </label>
-                <input
+                <select
                   name="place"
                   value={form.place}
                   onChange={onChange}
-                  className="w-full rounded px-3 py-2 bg-transparent border border-white/10"
-                />
+                  required
+                  className="w-full rounded px-3 py-2 bg-white text-black border border-white/10"
+                >
+                  <option value="">Select Kebele</option>
+                  <option value="Bole">Bole</option>
+                  <option value="College">College</option>
+                  <option value="Kela">Kela</option>
+                </select>
               </div>
               <div>
                 <label className="block text-sm mb-1">Phone</label>
