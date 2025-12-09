@@ -1,0 +1,15 @@
+# Robots.txt for Hiyab Tutors
+# Allow all search engines to crawl the site
+
+User-agent: *
+Allow: /
+
+# Disallow admin/dashboard pages if any
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Sitemap location
+Sitemap: https://tutor.hiyab.org/sitemap.xml
+
+# Crawl-delay (optional, for being nice to servers)
+Crawl-delay: 1
