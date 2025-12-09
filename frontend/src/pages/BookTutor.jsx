@@ -40,7 +40,7 @@ const BookTutor = () => {
         day_per_week: Number(form.day_per_week) || 0,
         hr_per_day: Number(form.hr_per_day) || 0,
       };
-      const resp = await fetch("/api/bookings/", {
+      const resp = await fetch("/api/v1/bookings/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

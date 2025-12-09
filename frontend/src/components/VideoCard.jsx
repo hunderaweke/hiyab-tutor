@@ -15,8 +15,8 @@ const VideoCard = forwardRef(
     const [hasError, setHasError] = useState(false);
     const videoRef = useRef(null);
 
-    const videoSrc = video ? `/api/${video}` : null;
-    const thumbnailSrc = thumbnail ? `/api/${thumbnail}` : placeholderThumbnail;
+    const videoSrc = video ? `/api/v1/${video}` : null;
+    const thumbnailSrc = thumbnail ? `/api/v1/${thumbnail}` : placeholderThumbnail;
 
     // Expose pause method to parent
     useImperativeHandle(ref, () => ({

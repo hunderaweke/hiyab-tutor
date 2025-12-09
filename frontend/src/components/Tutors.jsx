@@ -15,7 +15,7 @@ const Tutors = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/tutors/?verified=true&limit=20");
+        const response = await fetch("/api/v1/tutors/?verified=true&limit=20");
         if (!response.ok) {
           throw new Error("Failed to fetch tutors");
         }
@@ -79,7 +79,7 @@ const Tutors = () => {
                         tutor.hr_per_day || 0
                       } hrs/day`}
                       location={tutor.address || "Location Not Specified"}
-                      image={tutor.image ? `/api/${tutor.image}` : undefined}
+                      image={tutor.image ? `/api/v1/${tutor.image}` : undefined}
                     />
                   </div>
                 ))}

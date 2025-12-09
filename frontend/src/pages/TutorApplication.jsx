@@ -79,7 +79,7 @@ const TutorApplication = () => {
       fd.append("document", documentFile);
       fd.append("image", imageFile);
 
-      const resp = await axios.post("/api/tutors/", fd, {
+      const resp = await axios.post("/api/v1/tutors/", fd, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

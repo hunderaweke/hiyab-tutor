@@ -9,8 +9,6 @@ definitions:
         type: integer
       name:
         type: string
-      password:
-        type: string
       role:
         enum:
         - admin
@@ -22,9 +20,39 @@ definitions:
         type: string
     required:
     - name
-    - password
     - role
     - username
+    type: object
+  domain.Booking:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      assigned:
+        type: boolean
+      created_at:
+        type: string
+      day_per_week:
+        type: integer
+      deleted_at:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      grade:
+        type: integer
+      hr_per_day:
+        type: integer
+      id:
+        type: integer
+      last_name:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        type: string
     type: object
   domain.ChangePasswordRequest:
     properties:
@@ -58,16 +86,12 @@ definitions:
     type: object
   domain.CreatePartnerRequest:
     properties:
-      image_url:
-        type: string
       name:
         type: string
       website_url:
         type: string
     required:
-    - image_url
     - name
-    - website_url
     type: object
   domain.ErrorResponse:
     properties:
@@ -77,14 +101,7 @@ definitions:
   domain.LoginAndRegisterResponse:
     properties:
       access_token:
-        description: |-
-          The access token
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        type: string
-      refresh_token:
-        description: |-
-          The refresh token
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        description: 'example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
         type: string
       user:
         allOf:
@@ -137,6 +154,15 @@ definitions:
       meta:
         $ref: '#/definitions/domain.Pagination'
     type: object
+  domain.MultipleTutorResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/domain.Tutor'
+        type: array
+      pagination:
+        $ref: '#/definitions/domain.Pagination'
+    type: object
   domain.OtherService:
     properties:
       created_at:
@@ -145,7 +171,7 @@ definitions:
         type: string
       id:
         type: integer
-      image_url:
+      image:
         type: string
       languages:
         items:
@@ -230,7 +256,7 @@ definitions:
         type: string
       thumbnail:
         type: string
-      video_url:
+      video:
         type: string
     type: object
   domain.TestimonialTranslation:
@@ -257,6 +283,39 @@ definitions:
       name:
         type: string
     type: object
+  domain.Tutor:
+    properties:
+      address:
+        type: string
+      created_at:
+        type: string
+      day_per_week:
+        type: integer
+      deleted_at:
+        type: string
+      document:
+        type: string
+      education_level:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      hr_per_day:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      last_name:
+        type: string
+      phone_number:
+        type: string
+      updated_at:
+        type: string
+      verified:
+        type: boolean
+    type: object
   domain.UpdateAdminRequest:
     properties:
       name:
@@ -272,16 +331,10 @@ definitions:
     type: object
   domain.UpdatePartnerRequest:
     properties:
-      image_url:
-        type: string
       name:
         type: string
       website_url:
         type: string
-    required:
-    - image_url
-    - name
-    - website_url
     type: object
 info:
   contact:
@@ -589,6 +642,133 @@ paths:
       summary: Get Current Admin
       tags:
       - Admin
+  /bookings:
+    get:
+      consumes:
+      - application/json
+      description: Get all bookings (protected)
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Gender
+        in: query
+        name: gender
+        type: string
+      - description: Assigned
+        in: query
+        name: assigned
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Booking'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Get all bookings
+      tags:
+      - Bookings
+    post:
+      consumes:
+      - application/json
+      description: Create a new booking
+      parameters:
+      - description: Booking
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Booking'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Booking'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Create a new booking
+      tags:
+      - Bookings
+  /bookings/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get a booking by ID (protected)
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Booking'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Get a booking by ID
+      tags:
+      - Bookings
+  /bookings/{id}/assign:
+    put:
+      consumes:
+      - application/json
+      description: Assign a booking (protected)
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Booking'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - JWT: []
+      summary: Assign a booking
+      tags:
+      - Bookings
   /other-services:
     get:
       description: Get all other services with pagination, search, sorting, and language
@@ -791,6 +971,37 @@ paths:
       security:
       - JWT: []
       summary: Update an other service
+      tags:
+      - Other Services
+  /other-services/{id}/translations:
+    post:
+      description: AddTranslation add a translation for a service
+      parameters:
+      - description: Service ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - JWT: []
+      summary: AddTranslation an other service
       tags:
       - Other Services
   /partners:
@@ -1162,6 +1373,205 @@ paths:
       summary: Add a translation to a testimonial
       tags:
       - Testimonials
+  /tutors:
+    get:
+      consumes:
+      - application/json
+      description: Get all tutors with optional filters
+      parameters:
+      - description: Education Level
+        in: query
+        name: education_level
+        type: string
+      - description: Verified
+        in: query
+        name: verified
+        type: boolean
+      - description: Search query
+        in: query
+        name: query
+        type: string
+      - description: Min Day Per Week
+        in: query
+        name: min_day_per_week
+        type: integer
+      - description: Max Day Per Week
+        in: query
+        name: max_day_per_week
+        type: integer
+      - description: Min Hr Per Day
+        in: query
+        name: min_hr_per_day
+        type: integer
+      - description: Max Hr Per Day
+        in: query
+        name: max_hr_per_day
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.MultipleTutorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get all tutors
+      tags:
+      - Tutors
+    post:
+      consumes:
+      - application/json
+      description: Create a new tutor
+      parameters:
+      - description: Tutor
+        in: body
+        name: tutor
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Tutor'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Tutor'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Create a new tutor
+      tags:
+      - Tutors
+  /tutors/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a tutor by ID
+      parameters:
+      - description: Tutor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Delete a tutor by ID
+      tags:
+      - Tutors
+    get:
+      consumes:
+      - application/json
+      description: Get a tutor by ID
+      parameters:
+      - description: Tutor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Tutor'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Get a tutor by ID
+      tags:
+      - Tutors
+    put:
+      consumes:
+      - application/json
+      description: Update an existing tutor
+      parameters:
+      - description: Tutor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Tutor
+        in: body
+        name: tutor
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Tutor'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Tutor'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Update an existing tutor
+      tags:
+      - Tutors
+  /tutors/{id}/verify:
+    put:
+      consumes:
+      - application/json
+      description: Verify a tutor
+      parameters:
+      - description: Tutor ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Tutor'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      summary: Verify a tutor
+      tags:
+      - Tutors
 securityDefinitions:
   JWT:
     in: header

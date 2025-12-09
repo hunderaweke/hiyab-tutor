@@ -56,7 +56,7 @@ const MoreAndContact = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/other-services/?limit=10");
+        const response = await fetch("/api/v1/other-services/?limit=10");
         if (!response.ok) {
           throw new Error("Failed to fetch services");
         }
@@ -74,7 +74,7 @@ const MoreAndContact = () => {
             id: service.id,
             title: translation?.name || "Service",
             desc: translation?.description || translation?.tag_line || "",
-            image: service.image ? `/api/${service.image}` : bag,
+            image: service.image ? `/api/v1/${service.image}` : bag,
             websiteUrl: service.website_url,
           };
         });

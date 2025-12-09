@@ -22,7 +22,7 @@ const Testimonials = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/testimonials/?limit=50");
+        const response = await fetch("/api/v1/testimonials/?limit=50");
         if (!response.ok) {
           throw new Error("Failed to fetch testimonials");
         }

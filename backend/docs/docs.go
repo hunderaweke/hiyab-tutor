@@ -485,6 +485,205 @@ const docTemplate = `{
                 }
             }
         },
+        "/bookings": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get all bookings (protected)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Get all bookings",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Gender",
+                        "name": "gender",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Assigned",
+                        "name": "assigned",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/domain.Booking"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new booking",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Create a new booking",
+                "parameters": [
+                    {
+                        "description": "Booking",
+                        "name": "booking",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Booking"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Booking"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get a booking by ID (protected)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Get a booking by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Booking"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/bookings/{id}/assign": {
+            "put": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Assign a booking (protected)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Assign a booking",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Booking ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Booking"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/other-services": {
             "get": {
                 "description": "Get all other services with pagination, search, sorting, and language filters",
@@ -761,6 +960,55 @@ const docTemplate = `{
                     "Other Services"
                 ],
                 "summary": "Delete an other service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Service ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/other-services/{id}/translations": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "AddTranslation add a translation for a service",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Other Services"
+                ],
+                "summary": "AddTranslation an other service",
                 "parameters": [
                     {
                         "type": "integer",
@@ -1364,6 +1612,307 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/tutors": {
+            "get": {
+                "description": "Get all tutors with optional filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Get all tutors",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Education Level",
+                        "name": "education_level",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Verified",
+                        "name": "verified",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search query",
+                        "name": "query",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Min Day Per Week",
+                        "name": "min_day_per_week",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max Day Per Week",
+                        "name": "max_day_per_week",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Min Hr Per Day",
+                        "name": "min_hr_per_day",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max Hr Per Day",
+                        "name": "max_hr_per_day",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.MultipleTutorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new tutor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Create a new tutor",
+                "parameters": [
+                    {
+                        "description": "Tutor",
+                        "name": "tutor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tutors/{id}": {
+            "get": {
+                "description": "Get a tutor by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Get a tutor by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tutor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing tutor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Update an existing tutor",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tutor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Tutor",
+                        "name": "tutor",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a tutor by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Delete a tutor by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tutor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/tutors/{id}/verify": {
+            "put": {
+                "description": "Verify a tutor",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tutors"
+                ],
+                "summary": "Verify a tutor",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tutor ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Tutor"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/domain.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1371,7 +1920,6 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "name",
-                "password",
                 "role",
                 "username"
             ],
@@ -1388,9 +1936,6 @@ const docTemplate = `{
                 "name": {
                     "type": "string"
                 },
-                "password": {
-                    "type": "string"
-                },
                 "role": {
                     "type": "string",
                     "enum": [
@@ -1402,6 +1947,53 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Booking": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "assigned": {
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "day_per_week": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "gender": {
+                    "type": "string"
+                },
+                "grade": {
+                    "type": "integer"
+                },
+                "hr_per_day": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1452,14 +2044,9 @@ const docTemplate = `{
         "domain.CreatePartnerRequest": {
             "type": "object",
             "required": [
-                "image_url",
-                "name",
-                "website_url"
+                "name"
             ],
             "properties": {
-                "image_url": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },
@@ -1480,11 +2067,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "access_token": {
-                    "description": "The access token\nexample: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                    "type": "string"
-                },
-                "refresh_token": {
-                    "description": "The refresh token\nexample: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                    "description": "example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                     "type": "string"
                 },
                 "user": {
@@ -1568,6 +2151,20 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.MultipleTutorResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Tutor"
+                    }
+                },
+                "pagination": {
+                    "$ref": "#/definitions/domain.Pagination"
+                }
+            }
+        },
         "domain.OtherService": {
             "type": "object",
             "properties": {
@@ -1580,7 +2177,7 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
-                "image_url": {
+                "image": {
                     "type": "string"
                 },
                 "languages": {
@@ -1710,7 +2307,7 @@ const docTemplate = `{
                 "thumbnail": {
                     "type": "string"
                 },
-                "video_url": {
+                "video": {
                     "type": "string"
                 }
             }
@@ -1752,6 +2349,56 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.Tutor": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "day_per_week": {
+                    "type": "integer"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "document": {
+                    "type": "string"
+                },
+                "education_level": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "hr_per_day": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
+                }
+            }
+        },
         "domain.UpdateAdminRequest": {
             "type": "object",
             "required": [
@@ -1773,15 +2420,7 @@ const docTemplate = `{
         },
         "domain.UpdatePartnerRequest": {
             "type": "object",
-            "required": [
-                "image_url",
-                "name",
-                "website_url"
-            ],
             "properties": {
-                "image_url": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },

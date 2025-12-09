@@ -25,10 +25,10 @@ const Analytics = () => {
       try {
         const toJson = async (resp) => (await resp.json()).data || [];
         const [tutorsR, partnersR, testimonialsR, servicesR] = await Promise.all([
-          fetch("/api/tutors/?limit=1"),
-          fetch("/api/partners/?limit=1"),
-          fetch("/api/testimonials/?limit=1"),
-          fetch("/api/other-services/?limit=1"),
+          fetch("/api/v1/tutors/?limit=1"),
+          fetch("/api/v1/partners/?limit=1"),
+          fetch("/api/v1/testimonials/?limit=1"),
+          fetch("/api/v1/other-services/?limit=1"),
         ]);
         const [tutors, partners, testimonials, services] = await Promise.all([
           toJson(tutorsR),
