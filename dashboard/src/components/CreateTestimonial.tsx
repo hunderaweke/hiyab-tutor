@@ -69,59 +69,84 @@ const CreateTestimonial = () => {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="max-w-full mx-auto p-6 space-y-4 border rounded-md bg-white"
+      className="max-w-2xl mx-auto p-6 space-y-6 border rounded-lg bg-card shadow-sm"
     >
-      <h2 className="text-2xl font-bold mb-2">Create Testimonial</h2>
-      <Label htmlFor="name">Name</Label>
-      <Input
-        type="text"
-        placeholder="Name"
-        {...register("name", { required: "Name is required" })}
-        aria-invalid={!!errors.name}
-      />
-      {errors.name && (
-        <span className="text-red-500 text-xs">{errors.name.message}</span>
-      )}
-      <Label htmlFor="role">Role</Label>
-      <Input
-        type="text"
-        placeholder="Role"
-        {...register("role", { required: "Role is required" })}
-        aria-invalid={!!errors.role}
-      />
-      {errors.role && (
-        <span className="text-red-500 text-xs">{errors.role.message}</span>
-      )}
-      <Label htmlFor="video">Video</Label>
-      <Input
-        type="file"
-        placeholder="Video URL (optional)"
-        {...register("video")}
-        onChange={handleVideoChange}
-      />
-      {videoPreview && (
-        <video
-          src={videoPreview}
-          controls
-          className="max-w-lg max-h-96 border rounded mb-2"
+      <h2 className="text-2xl font-bold text-foreground">Create Testimonial</h2>
+
+      <div className="space-y-2">
+        <Label htmlFor="name" className="text-foreground">
+          Name *
+        </Label>
+        <Input
+          type="text"
+          placeholder="Enter full name"
+          {...register("name", { required: "Name is required" })}
+          aria-invalid={!!errors.name}
+          className="bg-background text-foreground"
         />
-      )}
-      <Label htmlFor="thumbnail">Thumbnail</Label>
-      <Input
-        type="file"
-        placeholder="Thumbnail URL (optional)"
-        {...register("thumbnail")}
-        onChange={handleThumbnailChange}
-      />
-      {thumbnailPreview && (
-        <img
-          src={thumbnailPreview}
-          alt="Thumbnail preview"
-          className="max-w-lg max-h-96 border rounded mb-2"
+        {errors.name && (
+          <span className="text-red-500 text-sm">{errors.name.message}</span>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="role" className="text-foreground">
+          Role *
+        </Label>
+        <Input
+          type="text"
+          placeholder="e.g., Student, Parent, Teacher"
+          {...register("role", { required: "Role is required" })}
+          aria-invalid={!!errors.role}
+          className="bg-background text-foreground"
         />
-      )}
+        {errors.role && (
+          <span className="text-red-500 text-sm">{errors.role.message}</span>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="video" className="text-foreground">
+          Video (optional)
+        </Label>
+        <Input
+          type="file"
+          accept="video/*"
+          {...register("video")}
+          onChange={handleVideoChange}
+          className="bg-background text-foreground"
+        />
+        {videoPreview && (
+          <video
+            src={videoPreview}
+            controls
+            className="w-full max-h-96 border rounded-md mt-2"
+          />
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="thumbnail" className="text-foreground">
+          Thumbnail (optional)
+        </Label>
+        <Input
+          type="file"
+          accept="image/*"
+          {...register("thumbnail")}
+          onChange={handleThumbnailChange}
+          className="bg-background text-foreground"
+        />
+        {thumbnailPreview && (
+          <img
+            src={thumbnailPreview}
+            alt="Thumbnail preview"
+            className="w-full max-h-96 object-cover border rounded-md mt-2"
+          />
+        )}
+      </div>
+
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Create"}
+        {isSubmitting ? "Creating..." : "Create Testimonial"}
       </Button>
     </form>
   );
